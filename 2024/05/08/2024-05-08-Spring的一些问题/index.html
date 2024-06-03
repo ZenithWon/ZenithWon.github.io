@@ -1,0 +1,881 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zenith Wang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Spring的一些问题Spring 其实就是一个轻量级、非入侵式的控制反转 (IoC) 和面向切面 (AOP) 的框架 目前企业开发的标配就是：Spring5+SpringBoot2+JDK8 Spring应用的设计模式Spring中用到的设计模式还是很多的，我们一个一个讨论  工厂模式：这其实就是Spring的核心技术IoC，整个IoC容器其实就是一个巨大的工厂，需要什么就提供什么。 代理模式：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring的一些问题">
+<meta property="og:url" content="http://example.com/2024/05/08/2024-05-08-Spring%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="Zenith&#39; Blog">
+<meta property="og:description" content="Spring的一些问题Spring 其实就是一个轻量级、非入侵式的控制反转 (IoC) 和面向切面 (AOP) 的框架 目前企业开发的标配就是：Spring5+SpringBoot2+JDK8 Spring应用的设计模式Spring中用到的设计模式还是很多的，我们一个一个讨论  工厂模式：这其实就是Spring的核心技术IoC，整个IoC容器其实就是一个巨大的工厂，需要什么就提供什么。 代理模式：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405092234967.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405100125794.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405100125392.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405092259092.png">
+<meta property="article:published_time" content="2024-05-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-09T17:25:51.740Z">
+<meta property="article:author" content="Zenith Wang">
+<meta property="article:tag" content="个人笔记">
+<meta property="article:tag" content="Java八股">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405092234967.png">
+  
+  
+  
+  <title>Spring的一些问题 - Zenith&#39; Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","app_key":"Xq6ytGGvYcBfUTC6ZzSnFuPD","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Zenith&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spring的一些问题"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-08 00:00" pubdate>
+          2024年5月8日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spring的一些问题</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Spring的一些问题"><a href="#Spring的一些问题" class="headerlink" title="Spring的一些问题"></a>Spring的一些问题</h1><p>Spring 其实就是一个轻量级、非入侵式的控制反转 (IoC) 和面向切面 (AOP) 的框架</p>
+<p>目前企业开发的标配就是：<strong>Spring5+SpringBoot2+JDK8</strong></p>
+<h2 id="Spring应用的设计模式"><a href="#Spring应用的设计模式" class="headerlink" title="Spring应用的设计模式"></a>Spring应用的设计模式</h2><p>Spring中用到的设计模式还是很多的，我们一个一个讨论</p>
+<ol>
+<li>工厂模式：这其实就是Spring的核心技术IoC，整个IoC容器其实就是一个巨大的工厂，需要什么就提供什么。</li>
+<li>代理模式：这也是Spring的另一个核心技术AOP，AOP的切面增强功能就是基于代理模式实现的。如果这个类继承于某个接口，一般就是JDK动态代理；如果没有，那么就是通过CGLIB搞一个继承它的子类。</li>
+<li>单例模式：Spring容器中的Bean默认就是单例模式</li>
+</ol>
+<p>后面其实就是一些相对不是很重要的设计模式了，比如：</p>
+<ul>
+<li>模板模式：JdbcTemplate、RedisTemplate … 这些就是模板模式</li>
+<li>观察者模式：Listener …</li>
+<li>适配器模式：HandlerAdapter …</li>
+</ul>
+<h2 id="自己实现一个简陋版IoC"><a href="#自己实现一个简陋版IoC" class="headerlink" title="自己实现一个简陋版IoC"></a>自己实现一个简陋版IoC</h2><p>其实就是先在bean.properties文件里面配置好bean的name和对应的全限定包名</p>
+<p>然后我们通过懒加载的方式获取并放到缓存里面就好了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//待实现</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Spring-Bean的相关问题"><a href="#Spring-Bean的相关问题" class="headerlink" title="Spring Bean的相关问题"></a>Spring Bean的相关问题</h2><h4 id="Bean实例化的方式"><a href="#Bean实例化的方式" class="headerlink" title="Bean实例化的方式"></a>Bean实例化的方式</h4><p>construct、factory</p>
+<h4 id="Bean依赖注入的方式"><a href="#Bean依赖注入的方式" class="headerlink" title="Bean依赖注入的方式"></a>Bean依赖注入的方式</h4><p>construct、setter、factory</p>
+<h4 id="Bean的生命周期"><a href="#Bean的生命周期" class="headerlink" title="Bean的生命周期"></a>Bean的生命周期</h4><p>Bean的生命周期分为主要分为四个大阶段：构造函数、设置属性（依赖注入）、初始化、销毁</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405092234967.png" srcset="/img/loading.gif" lazyload alt="三分恶面渣逆袭：Spring Bean生命周期" style="zoom: 33%;" />
+
+<ul>
+<li>构造函数就是构造函数，没啥好说的</li>
+<li>设置对象属性，其实就是依赖注入，但是我们要注意的是这里的依赖注入应该是只针对xml文件的注入方式，如果是通过<code>@Autowired</code>注解注入的话，走的是初始化中的后置处理器，并不是在这里注入的</li>
+<li>初始化：初始化其实又分为很多个步骤<ol>
+<li>首先会检查很多Aware相关的接口，比如BeanName就是在这里获取的</li>
+<li>然后会执行前置处理器，BeforeProcess</li>
+<li>接着执行初始化，比如<code>@PostConstruct</code>修饰的函数就是在这执行的</li>
+<li>然后执行后置处理器，比如AOP代理、Autowired依赖注入等</li>
+</ol>
+</li>
+</ul>
+<h4 id="Bean循环依赖的解决（三级缓存）"><a href="#Bean循环依赖的解决（三级缓存）" class="headerlink" title="Bean循环依赖的解决（三级缓存）"></a>Bean循环依赖的解决（三级缓存）</h4><p>循环依赖就没啥好说的了，但是我们要注意的是Spring的循环依赖解决方式只能解决setter注入的且是非懒加载的循环依赖</p>
+<p>三级缓存的定义分别是：</p>
+<ul>
+<li>一级缓存：已经初始化完的对象</li>
+<li>二级缓存：没完全初始化完的对象</li>
+<li>三级缓存：没完全初始化完的对象的工厂对象</li>
+</ul>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405100125794.png" srcset="/img/loading.gif" lazyload alt="三分恶面渣逆袭：三级缓存" style="zoom: 50%;" />
+
+<p>我们就举一个简单的例子，A和B有循环依赖</p>
+<ul>
+<li>首先按照初始化的顺序，我们先初始化A（这个时候没有人需要A，因此A目前放在的是三级缓存中），当发现需要依赖注入B的时候发现1、2、3级缓存都没有，那么就会去初始化B</li>
+<li>B初始化的时候，由于也没有人需要B，那么也是放在三级缓存中的，等到依赖注入的时候发现需要A，那么就又会去缓存中找，这个时候在三级缓存找到了A</li>
+<li>那么B就会通过三级缓存的工厂对象搞出一个A来，不管是A本身还是代理对象，反正就是搞出来了一个A</li>
+<li>那么既然搞出来了一个A，那这个A就会被放到二级缓存了，同时会将这个A注入到B中，至此B初始化完毕，放到一级缓存中</li>
+<li>最后，继续回到A的初始化，A这次就从一级缓存中拿到了B，那么就可以注入进来，至此A也初始化完毕，也放到一级缓存</li>
+</ul>
+<h2 id="SpringMVC的两种工作流程"><a href="#SpringMVC的两种工作流程" class="headerlink" title="SpringMVC的两种工作流程"></a>SpringMVC的两种工作流程</h2><h4 id="使用ModelAndView"><a href="#使用ModelAndView" class="headerlink" title="使用ModelAndView"></a>使用ModelAndView</h4><p>这个已经背烂了，没啥好说的直接上图：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405100125392.png" srcset="/img/loading.gif" lazyload alt="三分恶面渣逆袭：Spring MVC的工作流程" style="zoom:50%;" />
+
+<blockquote>
+<p>注意的是：HandlerAdapter和Handler应该是一一对应的，它是为了将Request适配到对应的Handler上</p>
+</blockquote>
+<h4 id="不使用ModelAndView"><a href="#不使用ModelAndView" class="headerlink" title="不使用ModelAndView"></a>不使用ModelAndView</h4><p>当我们在Controller的某个方法上加上了<code>@ResponseBody</code>注解的话，那么返回的就是json格式的数据了，而不是ModelAndView，那么这时候工作流程是怎样的呢？</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405092259092.png" srcset="/img/loading.gif" lazyload alt="Spring MVC Restful请求响应示意图" style="zoom: 20%;" />
+
+<ul>
+<li><p>其实先开始都是一样的，先通过HandlerMapping找到Handler，然后通过HandlerAdapter调用对应的Handler</p>
+</li>
+<li><p>但是等到HandlerAdapter返回的时候，因为没有视图，返回的这个ModelAndView是NULL</p>
+</li>
+<li><p>在调用完Handler方法后，Adapter会进一步调用HandlerMethodReturnValueHandler来处理返回值，简单说就是将json序列化，写到 ServletServerHttpResponse（封装了原生的HttpServletResponse）中返回</p>
+</li>
+</ul>
+<h2 id="SpringBoot的相关问题"><a href="#SpringBoot的相关问题" class="headerlink" title="SpringBoot的相关问题"></a>SpringBoot的相关问题</h2><p>SpringBoot一句话来说，就是为了简化Spring开发中的一堆复杂的配置</p>
+<h4 id="SpringBoot自动装配"><a href="#SpringBoot自动装配" class="headerlink" title="SpringBoot自动装配"></a>SpringBoot自动装配</h4><p>SpringBoot的自动装配是由SpringBootApplicaiton这个注解实现的，这个注解包含三个部分：</p>
+<ul>
+<li><code>@SpringConfiguration</code></li>
+<li><code>@EnableAutoConfiguration</code></li>
+<li><code>@ComponentScan</code></li>
+</ul>
+<p>其中EnableAutoConfiguration注解就是开启了自动配置，它Import了一个AutoConfigurationImportSelector，接下来这个东西做了一下几步：</p>
+<ol>
+<li>首先，这个东西读取所有的MEAT-INF&#x2F;spring.factories里面的所有自动配置类，这里的每个类都是是加了<code>@Configuration</code>注解，也就是说这里面声明的所有Bean都<strong>有可能</strong>会被加载（为什么是有可能看后面）</li>
+<li>然后这个Selector会根据SpringBootApplication注解中的exclude和excludeName排除掉不需要的自动配置类</li>
+<li>最后，也不是剩下的这些东西所有配置类都会被加载，他会根据一系列ConditionOnxxx的条件，过滤掉不需要加载的配置类，剩下的就是会自动配置的类了</li>
+</ol>
+<blockquote>
+<p>注意的是，这里MEAT-INF&#x2F;spring.factories不仅仅是spring底下的，只要你maven依赖的jar包，里面只要有这个文件，都会读取出来的</p>
+</blockquote>
+<h4 id="SpringBoot启动流程"><a href="#SpringBoot启动流程" class="headerlink" title="SpringBoot启动流程"></a>SpringBoot启动流程</h4>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
+      
+        <a href="/tags/Java%E5%85%AB%E8%82%A1/" class="print-no-link">#Java八股</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spring的一些问题</div>
+      <div>http://example.com/2024/05/08/2024-05-08-Spring的一些问题/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zenith Wang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/08/2024-05-08-Redis%E6%80%BB%E7%BB%93/" title="Redis总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis总结</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/06/2024-05-05-MySQL%E6%80%BB%E7%BB%93/" title="MySQL总结">
+                        <span class="hidden-mobile">MySQL总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","appKey":"Xq6ytGGvYcBfUTC6ZzSnFuPD","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,917 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zenith Wang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="RocketMQ系统架构  Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。 Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。广播模式下，一个队列的消息会发给每一个消费者，集群模式下，每个队列只会和一个消费者绑定，只会被消费一次。 NameServe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ">
+<meta property="og:url" content="http://example.com/2024/05/17/2024-05-17-RocketMQ%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/index.html">
+<meta property="og:site_name" content="Zenith&#39; Blog">
+<meta property="og:description" content="RocketMQ系统架构  Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。 Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。广播模式下，一个队列的消息会发给每一个消费者，集群模式下，每个队列只会和一个消费者绑定，只会被消费一次。 NameServe">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170114120.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170134407.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344006.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344431.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344523.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172353960.png">
+<meta property="article:published_time" content="2024-05-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-17T16:54:26.696Z">
+<meta property="article:author" content="Zenith Wang">
+<meta property="article:tag" content="个人笔记">
+<meta property="article:tag" content="Java八股">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png">
+  
+  
+  
+  <title>RocketMQ - Zenith&#39; Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","app_key":"Xq6ytGGvYcBfUTC6ZzSnFuPD","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Zenith&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="RocketMQ"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-17 00:00" pubdate>
+          2024年5月17日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">RocketMQ</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h1><h2 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h2><p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png" srcset="/img/loading.gif" lazyload alt=" "></p>
+<ul>
+<li>Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。</li>
+<li>Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。<strong>广播模式</strong>下，一个队列的消息会发给每一个消费者，<strong>集群模式</strong>下，每个队列只会和一个消费者绑定，只会被消费一次。</li>
+<li>NameServer Cluster：一个Broker与Topic路由的注册中心，Broker需要和NameServer保持长连接，定时发送心跳检测。并且还保存Broker路由信息以及队列信息，方便Consumer和Producer拉取信息消费。</li>
+<li>BrokerCluster：Broker充当着消息中转角色，负责存储消息、转发消息。Broker在RocketMQ系统中负责接收并存储从生产者发送来的消息，同时为消费者的拉取请求作准备。</li>
+</ul>
+<blockquote>
+<p>消费者组中Consumer的数量应该小于等于订阅Topic的Queue数量。如果超出Queue数量，则多出的<br>Consumer将不能消费消息。</p>
+<p>此外：</p>
+<ol>
+<li>消费者组只能消费一个Topic的消息，不能同时消费多个Topic消息</li>
+<li>一个消费者组中的消费者必须订阅完全相同的Topic</li>
+</ol>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170114120.jpeg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="消息生产和存储"><a href="#消息生产和存储" class="headerlink" title="消息生产和存储"></a>消息生产和存储</h2><h4 id="消息生产"><a href="#消息生产" class="headerlink" title="消息生产"></a>消息生产</h4><p>Producer可以将消息写入到某Broker中的某Queue中，其经历了如下过程：</p>
+<ol>
+<li>向NameServer发出获取消息Topic的路由信息的请求</li>
+<li>NameServer返回该Topic的路由表及Broker列表</li>
+</ol>
+<blockquote>
+<ul>
+<li>路由表：key为topic，value是<strong>队列列表</strong>，但是这个队列列表的元素是按broker为单位分的，也就是说队列列表是一个二维列表</li>
+<li>Broker列表：key为topic，value是<strong>Broker列表</strong>，Broker列表中的元素是一个Broker的主从集群作</li>
+</ul>
+</blockquote>
+<ol start="3">
+<li>Producer根据代码中指定的Queue选择策略，从Queue列表中选出一个队列，用于后续存储消息</li>
+<li>Producer向选择出的Queue所在的Broker发出<strong>RPC</strong>请求，将消息发送到选择出的Queue</li>
+</ol>
+<h4 id="消息存储"><a href="#消息存储" class="headerlink" title="消息存储"></a>消息存储</h4><ol>
+<li><p>commitLog文件</p>
+<ul>
+<li><p>commitLog存放了所有发到这个Broker上的消息（不区分topic），在RocketMQ的commitlog目录中存放着很多的mappedFile文件，每个文件大小为1G，文件名由20位十进制数构成，表示当前文件的第一条消息的起始位移偏移量。</p>
+</li>
+<li><p>当一条消息进来后，就会<strong>顺序写入</strong>commitLog，当前mppedFile满了，就会创建新的继续写入</p>
+</li>
+<li><p>其中存放的最小单元是消息单元，</p>
+</li>
+<li><p>包含消息总长度MsgLen、消息的物理位置physicalOffset、消息体内容Body、消息体长度BodyLength、消息主题Topic、Topic长度TopicLength、消息生产者BornHost、消息发送时间戳BornTimestamp、消息所在的队列QueueId、消息在Queue中存储的偏移量QueueOffset等近20余项消息相关属性。</p>
+</li>
+</ul>
+</li>
+<li><p>consumequeue</p>
+<ul>
+<li>RokcetMQ同样也会为每个topic创建一个目录，每个topic目录下会为每个队列创建目录，目录名为queueId</li>
+<li>每个队列目录下放了多个consumequeue文件，它里面存放的每个单元是该消息在commitLog中的偏移量，即存放的是索引</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170134407.png" srcset="/img/loading.gif" lazyload alt="image-20240517013452373"></p>
+</li>
+</ol>
+<h4 id="消息写入"><a href="#消息写入" class="headerlink" title="消息写入"></a>消息写入</h4><p>一条消息进入到Broker后经历了以下几个过程才最终被持久化。</p>
+<ul>
+<li>Broker根据queueId，获取到该消息对应索引条目要在consumequeue目录中的写入偏移量，即<br>QueueOffset</li>
+<li>将queueId、queueOffset等数据，与消息一起封装为消息单元，写入到commitlog，形成消息索引条目</li>
+<li>将消息索引条目分发到相应的consumequeue，如果消息包含key，则写入indexFile</li>
+</ul>
+<h2 id="IndexFile"><a href="#IndexFile" class="headerlink" title="IndexFile"></a>IndexFile</h2><h4 id="IndexFile结构"><a href="#IndexFile结构" class="headerlink" title="IndexFile结构"></a>IndexFile结构</h4><p>每个Broker都有一组IndexFile文件，名称是该文件创建时候的时间，一个IndexFile文件分为三个部分，分别是：indexHeader，slots槽位，indexData索引数据</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344006.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<ul>
+<li><p>indexHeader存放的是该索引文件的信息，比如索引条目个数、填充的slot条目个数等等</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344431.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+</li>
+<li><p>slots就是一个hsh表，存放的是该索引条目在indexData中的位置，其底层处理冲突的方式是拉链法</p>
+</li>
+<li><p>indexData存放的是索引数据，存放对应msg在commitLog中位置等信息</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344523.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<blockquote>
+<p>timeDiff是插入这条index时候距离索引创建时间（索引文件名获取）的偏移，方便按时间查找</p>
+</blockquote>
+<h4 id="IndexFile写入"><a href="#IndexFile写入" class="headerlink" title="IndexFile写入"></a>IndexFile写入</h4><p>当一个消息需要存到indexFile中的时候，会经过一下几个步骤：</p>
+<ol>
+<li><p>计算key的hash值，然后试图存放到indexFile中，会有两种情况需要新建一个indexFile：</p>
+<ul>
+<li>当前为第一个消息，还没有indexFile</li>
+<li>indexFile的索引个数达到2000W，那么也需要新建</li>
+</ul>
+</li>
+<li><p>存放的时候，会将hash(key)%500w，结果为存放的slots位置</p>
+<ul>
+<li><p>如果没有发生冲突，那么直接存放到indexData中，前驱indexDataNo置为空，并将该slots对应的indexNo置为存放的位置</p>
+</li>
+<li><p>如果发生冲突，就需要使用拉链法处理，构建indexData后，需要将原本slot底下的indexData的前驱indexDataNo置为新的indexDat的位置，然后slot也存放新的indexDataNo</p>
+<blockquote>
+<p>slot只存放最新的indexData在index部分的位置，类似undo log，index存放的才是实际拉链的链表顺序结构</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="消息的消费"><a href="#消息的消费" class="headerlink" title="消息的消费"></a>消息的消费</h2><h4 id="维护顺序"><a href="#维护顺序" class="headerlink" title="维护顺序"></a>维护顺序</h4><p>对于<strong>集群模式</strong>而言：在RocketMQ的服务端有一个<code>ConsumserOffset.json</code>文件，他保存了每个消费者组对于每个消费队列的消费进度，每次发送pull request都会先找broker要offset</p>
+<p>对于<strong>广播模式</strong>而言：由于每个消费者都要去消费topic的每个消息，因此这个offset保存在本地，不用去远程拉</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172353960.png" srcset="/img/loading.gif" lazyload alt="image-20240517235309926"></p>
+<h4 id="PushConsumer"><a href="#PushConsumer" class="headerlink" title="PushConsumer"></a>PushConsumer</h4><p>当一个消费者start后，就会调用pullMessageService.start()，这个就就会开启一个线程，做的事情就是从一个阻塞队列里面去读，读到一个pullRequest就拉去消息，然后回调pushCallBack函数处理消息，处理完就会更新pullRequest然后再放回去，这就实现了推送型接收</p>
+<p>那么还有两个问题：</p>
+<ol>
+<li><p>pullRequest怎么放进去的？</p>
+<p>负载均衡的时候，会重新分配一个队列，分配完就会将这个队列对应的pullRequest放进去</p>
+<p>也就是说，一个队列对应一个pullRequest</p>
+</li>
+<li><p>如果pull的时候没有消息怎么办？</p>
+<p>Broker的<strong>长轮询机制</strong>，Broker收到pullRequest后先根据tag过滤，然后看看对应的offset有没有新消息，有就立刻返回，没有就保留pullRequest，每五秒查询一次，查到再返回</p>
+</li>
+</ol>
+<blockquote>
+<p>pullConsumer就是单纯的从某个地方拉取多少条消息，没啥好说的</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="category-chain-item">消息队列</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
+      
+        <a href="/tags/Java%E5%85%AB%E8%82%A1/" class="print-no-link">#Java八股</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>RocketMQ</div>
+      <div>http://example.com/2024/05/17/2024-05-17-RocketMQ消息队列/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zenith Wang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月17日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/18/2024-05-18-ElasticSearch%E6%80%BB%E7%BB%93/" title="ElasticSearch总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ElasticSearch总结</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/11/2024-05-11-%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95%E9%A2%98/" title="美团面试笔试题">
+                        <span class="hidden-mobile">美团面试笔试题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","appKey":"Xq6ytGGvYcBfUTC6ZzSnFuPD","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
