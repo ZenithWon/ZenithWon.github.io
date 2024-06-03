@@ -27,10 +27,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010129724.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406022252939.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405302238988.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405302314869.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010012897.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406032351484.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406040003561.png">
 <meta property="article:published_time" content="2024-05-30T14:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-03T15:43:04.443Z">
+<meta property="article:modified_time" content="2024-06-03T17:52:26.271Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -257,7 +257,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.9k 字
+          3.4k 字
         
       </span>
     
@@ -268,7 +268,7 @@
         
         
         
-          25 分钟
+          28 分钟
         
       </span>
     
@@ -423,31 +423,52 @@
 <li>如果并发太夸张，导致CAS一直在自旋，占用CPU资源</li>
 </ol>
 <h2 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h2><p>由于synchronized的实现和对象头中的markword息息相关，因此先来看看一个java对象的内存组成有哪些</p>
-<p>我们以64bit的hotpot JVM为例：</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405302314869.png" srcset="/img/loading.gif" lazyload alt="image-20240530231436781" style="zoom:50%;" />
-
+<h3 id="宏观来看"><a href="#宏观来看" class="headerlink" title="宏观来看"></a>宏观来看</h3><blockquote>
 <p>在说这个之前，我们要先讲讲Java的引用大小问题：</p>
 <p>在64位的OS中一个指针的大小是8B的，但是Java默认开启了<strong>对象头指针压缩</strong>和<strong>成员变量对象指针压缩</strong>，压缩后的指针大小会从8B变成4B</p>
+</blockquote>
+<p>下面来聊一聊对象内存布局，我们以64bit的hotpot JVM为例：</p>
+<p>对象内存布局分为两种，一个是普通对象，一个数组对象</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406032351484.png" srcset="/img/loading.gif" lazyload alt="image-20240603235114382" style="zoom: 33%;" />
+
 <ul>
-<li><p>一个对象分为四个部分：</p>
+<li><p>一个对象分为三个部分：</p>
 <ul>
-<li><strong>对象头</strong>，64位的就是64bit即8B，它存储了hashcode、GC age等等，并且当成为锁对象后会重写markword（后面再说）</li>
-<li><strong>类型指针</strong>，指向Class类对象的指针，标注它属于哪个类，由于开启指针压缩因此就是4B</li>
-<li><strong>实例数据</strong>，存放数据的地方，但是如果这里有对象，那么就是指针的大小，由于默认开启了指针压缩，因此也是4B</li>
+<li><p><strong>对象头</strong>，包括markword、class pointer等</p>
+<ul>
+<li>markword，存储了hashcode、GC age等等，并且当成为锁对象后会重写markword（后面再说）</li>
+<li>class pointer，指向方法区类元信息的指针（<strong>不是Class类！</strong>），标注它属于哪个类，由于开启指针压缩因此就是4B</li>
+<li>数组对象会多一个数组长度信息</li>
+</ul>
+</li>
+<li><p><strong>实例数据</strong>，存放数据的地方，但是如果这里有对象，那么就是指针的大小，由于默认开启了指针压缩，因此也是4B，<strong>数组的话就是所有数据按顺序堆叠起来</strong></p>
+</li>
+<li><p><strong>对齐</strong>，由于是64位的JVM，因此对齐按8B对齐</p>
+</li>
+</ul>
+</li>
 </ul>
 <blockquote>
 <p>注意：成员变量的long和Long占的字节分别是8B和4B</p>
 </blockquote>
-<ul>
-<li><strong>对齐</strong>，由于是64位的JVM，因此对齐按8B对齐</li>
-</ul>
-</li>
-<li><p>Markword具体内容和锁的级别息息相关</p>
-</li>
-</ul>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010012897.png" srcset="/img/loading.gif" lazyload alt="image-20240601001247736" style="zoom: 33%;" />
+<h3 id="Markword"><a href="#Markword" class="headerlink" title="Markword"></a>Markword</h3><p>Markword具体内容和锁的级别息息相关</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406040003561.png" srcset="/img/loading.gif" lazyload alt="image-20240604000307369" style="zoom: 45%;" />
 
 <h2 id="Synchronized原理"><a href="#Synchronized原理" class="headerlink" title="Synchronized原理"></a>Synchronized原理</h2><p>早期的Synchronized一上锁就是重量级，但是后面lock出来、CAS出来，Java团队在JDK1.6不得不对synchronized进行了优化，优化总共分为三部分：<strong>锁升级、锁消除、锁粗化</strong></p>
+<p>其中<strong>锁升级</strong>极为重要！！！</p>
+<h3 id="锁升级总体过程"><a href="#锁升级总体过程" class="headerlink" title="锁升级总体过程"></a>锁升级总体过程</h3><p>由于原本的synchronized过于庞大，一使用直接干到内核态，十分消耗时间和资源，因此在JDK1.6中，为了尽可能减少进入内核态的次数，并且<strong>主观上认为synchronized同步的代码块往往并发量不高且运行时间不长</strong></p>
+<p>JDK1.6团队提出了锁升级的概念：<strong>无锁-&gt;偏向锁-&gt;轻量级锁-&gt;重量级锁</strong></p>
+<p>那么我们先一个一个介绍这几个锁吧</p>
+<p>（太难了，我就自己理解理解，写出来很有可能是错的，有时间把JVM源码看明白了再写）</p>
+<h3 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3><p>延时、hashCode</p>
+<p>cas_set_mark(mark,header)：查看对象的header是否和mark一样，一样就swap</p>
+<p>偏向锁也会生成lock record（第一次进入都是一个无锁的markword+ref_object，和轻量级锁一样），并且重入一次就会再生成一个</p>
+<h3 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3><h3 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h3><p>JIT会对方法进行逃逸分析，如果锁对象并没有出现在调用方法外，那么synchronized(object)就会被JIT无视</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span><span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();<br>    <span class="hljs-comment">//该锁对象不会出现在该方法外</span><br>    <span class="hljs-keyword">synchronized</span> (o)&#123;<br>        System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>如果连续很多个代码块，用的同一个锁对象，那么不会synchronized多次，而是只会synchronzied一次</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>    Thread.sleep(<span class="hljs-number">5000</span>);<br>    Object o=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();<br>    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(()-&gt;&#123;<br>        <span class="hljs-comment">//连续三个synchronized</span><br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>    &#125;).start();<br>&#125;<br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
