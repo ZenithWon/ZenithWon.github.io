@@ -16,16 +16,16 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="JUC并发工具详解AQS抽象队列同步器AQS全程是AbstractQueueSynchronizer，即抽象队列同步器。 既然是抽象的，那肯定就是某一类组件的公共基础部分的抽取，其实AQS就是JUC并发工具的基石框架，主要解决的问题就是：多线程下锁的分配问题 AQS本质就是，通过一个FIFO的队列完成对资源state的管控，完成对多线程的控制同步   ReentrantLock">
+    <meta name="description" content="JUC并发工具详解线程基础进程、线程、管程太经典了，这个问题 进程是系统资源分配的单位，而线程是执行的最小单位 管程可以理解为monitor，只有一个线程持有管程的时候，才可以进入同步代码块 用户线程和守护线程用户线程是用户创建的，最典型的就是main方法的主线程 守护线程是为用户线程提供服务的，在后台运行，最典型的就是垃圾回收线程 假设当前JVM只有守护线程时，那么JVM就会退出  即使main">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JUC并发工具详解">
 <meta property="og:url" content="http://example.com/2024/06/03/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="JUC并发工具详解AQS抽象队列同步器AQS全程是AbstractQueueSynchronizer，即抽象队列同步器。 既然是抽象的，那肯定就是某一类组件的公共基础部分的抽取，其实AQS就是JUC并发工具的基石框架，主要解决的问题就是：多线程下锁的分配问题 AQS本质就是，通过一个FIFO的队列完成对资源state的管控，完成对多线程的控制同步   ReentrantLock">
+<meta property="og:description" content="JUC并发工具详解线程基础进程、线程、管程太经典了，这个问题 进程是系统资源分配的单位，而线程是执行的最小单位 管程可以理解为monitor，只有一个线程持有管程的时候，才可以进入同步代码块 用户线程和守护线程用户线程是用户创建的，最典型的就是main方法的主线程 守护线程是为用户线程提供服务的，在后台运行，最典型的就是垃圾回收线程 假设当前JVM只有守护线程时，那么JVM就会退出  即使main">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406050105638.png">
 <meta property="article:published_time" content="2024-06-03T15:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-04T17:05:21.161Z">
+<meta property="article:modified_time" content="2024-06-05T17:38:45.786Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -252,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          117 字
+          946 字
         
       </span>
     
@@ -263,7 +263,7 @@
         
         
         
-          1 分钟
+          8 分钟
         
       </span>
     
@@ -313,7 +313,46 @@
             
               <div class="markdown-body">
                 
-                <h1 id="JUC并发工具详解"><a href="#JUC并发工具详解" class="headerlink" title="JUC并发工具详解"></a>JUC并发工具详解</h1><h2 id="AQS抽象队列同步器"><a href="#AQS抽象队列同步器" class="headerlink" title="AQS抽象队列同步器"></a>AQS抽象队列同步器</h2><p>AQS全程是AbstractQueueSynchronizer，即抽象队列同步器。</p>
+                <h1 id="JUC并发工具详解"><a href="#JUC并发工具详解" class="headerlink" title="JUC并发工具详解"></a>JUC并发工具详解</h1><h2 id="线程基础"><a href="#线程基础" class="headerlink" title="线程基础"></a>线程基础</h2><h3 id="进程、线程、管程"><a href="#进程、线程、管程" class="headerlink" title="进程、线程、管程"></a>进程、线程、管程</h3><p>太经典了，这个问题</p>
+<p>进程是系统资源分配的单位，而线程是执行的最小单位</p>
+<p>管程可以理解为monitor，只有一个线程持有管程的时候，才可以进入同步代码块</p>
+<h3 id="用户线程和守护线程"><a href="#用户线程和守护线程" class="headerlink" title="用户线程和守护线程"></a>用户线程和守护线程</h3><p>用户线程是用户创建的，最典型的就是main方法的主线程</p>
+<p>守护线程是为用户线程提供服务的，在后台运行，最典型的就是垃圾回收线程</p>
+<p>假设当前JVM只有守护线程时，那么JVM就会退出</p>
+<blockquote>
+<p>即使main方法的主线程运行完了，但是里面创建的子线程还在运行，那么JVM仍然不会退出</p>
+</blockquote>
+<h2 id="CompletableFuture"><a href="#CompletableFuture" class="headerlink" title="CompletableFuture"></a>CompletableFuture</h2><h3 id="线程是如何创建的？"><a href="#线程是如何创建的？" class="headerlink" title="线程是如何创建的？"></a>线程是如何创建的？</h3><p>这是一个老生常谈的问题了，都是说三种方法：继承Thread类、实现Runnable接口、实现Callable接口</p>
+<p>但是实际上你看一看线程的构造函数，其实只有一个Runnable接口的构造注入，也就是说Thread除了你去继承他，实际上只有一个传入Runnable方法去构造Thread</p>
+<p>也就是说调用线程的start的方法的时候：</p>
+<ul>
+<li>如果你是继承Thread类，那么你就是重写了run方法，没有Runnable对象</li>
+<li>如果你是实现Runnable接口，并构造注入一个Thread类，那用的原生的Thread的run方法，这里会直接调用Runnable的run方法</li>
+</ul>
+<p>附代码：Thread类的run方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">//这个target就是构造方法注入的Runnable对象</span><br>    <span class="hljs-keyword">if</span> (target != <span class="hljs-literal">null</span>) &#123;<br>        target.run();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>综上所述，其实启动线程说到底就两种方法，那Callable是如何启动线程的呢？</p>
+<h3 id="Callable接口如何启动线程的"><a href="#Callable接口如何启动线程的" class="headerlink" title="Callable接口如何启动线程的"></a>Callable接口如何启动线程的</h3><p>Callable接口其实没有办法直接启动线程，而是通过构造注入FutureTask类，然后FutureTask实现了Runnable接口，从而通过FutureTask类构造注入Thread，来启动线程的</p>
+<p>那为什么要搞这么麻烦呢？</p>
+<p>这个Callable接口设计出来，就是为了获取线程执行的结果的，如果一个FutureTask构造注入了Callable方法，那么它实现的Runnable接口的run方法就会做两个事儿：</p>
+<ul>
+<li>执行callable的call方法</li>
+<li>将callable方法的返回值赋给futureTask的返回值，这样你get的时候就能得到“所谓的线程执行的结果”</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>	<span class="hljs-comment">//...省略</span><br>    <span class="hljs-keyword">try</span> &#123;<br>        Callable&lt;V&gt; c = callable;<br>        <span class="hljs-keyword">if</span> (c != <span class="hljs-literal">null</span> &amp;&amp; state == NEW) &#123;<br>            V result;<br>            <span class="hljs-type">boolean</span> ran;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">//执行call，然后set结果</span><br>                result = c.call();<br>                ran = <span class="hljs-literal">true</span>;<br>            &#125; <span class="hljs-keyword">catch</span> (Throwable ex) &#123;<br>                result = <span class="hljs-literal">null</span>;<br>                ran = <span class="hljs-literal">false</span>;<br>                setException(ex);<br>            &#125;<br>            <span class="hljs-keyword">if</span> (ran)<br>                set(result);<br>        &#125;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">//...省略</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><p>既然知道了Callable是通过FutureTask来启动线程的，那么为啥要非这么多力气去搞一个FutureTask？</p>
+<p>FutureTask实现了RunnableFuture接口，这个接口继承了Runnable和Future接口</p>
+<p>Runnable接口就是用来创建线程的，Future接口做任务控制的（定义查看任务状态、获取任务结果等方法）</p>
+<p>其次FutureTask还通过构造注入了Callable接口，尽管支持注入Runnable+result的方式，但是底层还是会通过这两个构造一个callable</p>
+<p>那么既然搞了这三个东西，那这个futureTask可想而知，是一个<strong>三功能综合体</strong>：</p>
+<ul>
+<li>开启线程（Runnable接口）</li>
+<li>实现任务管理（Future接口）</li>
+<li>获取线程执行结果（Callable接口）</li>
+</ul>
+<h2 id="AQS抽象队列同步器"><a href="#AQS抽象队列同步器" class="headerlink" title="AQS抽象队列同步器"></a>AQS抽象队列同步器</h2><p>AQS全程是AbstractQueueSynchronizer，即抽象队列同步器。</p>
 <p>既然是抽象的，那肯定就是某一类组件的公共基础部分的抽取，其实AQS就是JUC并发工具的基石框架，主要解决的问题就是：<strong>多线程下锁的分配问题</strong></p>
 <p>AQS本质就是，通过一个FIFO的队列完成对资源state的管控，完成对多线程的控制同步</p>
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406050105638.png" srcset="/img/loading.gif" lazyload alt="CLH 队列" style="zoom:50%;" />
