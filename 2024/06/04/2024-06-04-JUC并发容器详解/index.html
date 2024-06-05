@@ -25,8 +25,10 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406042321554.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406042321355.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317031.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317376.png">
 <meta property="article:published_time" content="2024-06-04T15:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-04T17:08:21.210Z">
+<meta property="article:modified_time" content="2024-06-05T15:18:18.872Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -253,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.5k 字
+          5.4k 字
         
       </span>
     
@@ -264,7 +266,7 @@
         
         
         
-          30 分钟
+          46 分钟
         
       </span>
     
@@ -429,6 +431,106 @@
 </ul>
 <p>当其他线程对这个地方put等操作的时候，会发现是ForwardNode，那么<strong>反正都是要挂起等待迁移完成，那为啥不帮着一起迁移呢？</strong>。因此，这些线程也会根据transferIndex领取一个迁移任务，进行迁移</p>
 <p>rehash同样和HashMap一样，红黑树分完后<strong>如果节点个数小于6，也会退化为链表</strong></p>
+<h5 id="addCount"><a href="#addCount" class="headerlink" title="addCount"></a>addCount</h5><p>在put操作后，会通过addCount将map的size+1，然后判断是否超过sizeCtl，若超过则也进行扩容</p>
+<p>但是这里的加一，并不是直接暴力CAS让baseCount+1，因为要考虑多线程问题，所以为了提供效率，这里的addCount借鉴了LongAdder思想，一旦CAS失败就会存到一个CountCell数组里面</p>
+<p>这里还是有很多特殊情况的，我们一个一个分析</p>
+<ol>
+<li>首先，最简单粗暴的就是，先CAS 让baseCount+1一下，如果成功就直接返回了</li>
+<li>失败，那就要查看CountCell了，但是这个CountCell初始是空的，因此发现是空的就会执行<code>fullAddCount</code>函数；如果不为空，那就会找到相应的CountCell位置，若这个地方的CountCell为空还是会<code>fullAddCount</code>一下，不为空则CAS修改CountCell的值，失败还是会<code>fullAddCount</code></li>
+</ol>
+<p>总的来说，就是先CAS baseCount，失败了就会去CAS countCell，如果<strong>CountCell数组没有初始化或者CountCell[i]没有初始化</strong>，就会直接进入<code>fullCount</code>，同样<strong>CAS countCell失败也会</strong></p>
+<blockquote>
+<p>那么如果计算当前线程应该操作哪个CountCell呢？</p>
+<p>会通过ThreadLocalRandom这个类来为当前线程生成一个随机数，然后拿这个随机数去取模</p>
+</blockquote>
+<h5 id="fullAddCount"><a href="#fullAddCount" class="headerlink" title="fullAddCount"></a>fullAddCount</h5><p>如果addCount失败，那就会进入fullAddCount，这里总的可以分为两种情况：</p>
+<blockquote>
+<p>在此之前，我们要知道：如果线程需要操作CountCell，那就需要先CAS cellBusy将其置为1，然后才能去操作，否则就会自旋，重新case下面三种情况</p>
+</blockquote>
+<ol>
+<li><p>CountCell数组不为空，这个情况比较复杂</p>
+<ul>
+<li>先看看当前位置是不是空，为空则先抢cellBusy，抢到就创建一个CountCell放到指定位置</li>
+<li>不是空的话，就先CAS countCell，如果失败，就说明也有线程跟当前线程操作的是一个CountCell单元，那就就会有两种解决措施：<ul>
+<li>如果CountCell个数没有达到根据CPU核数计算出来的阈值，那就<strong>翻倍扩容</strong></li>
+<li>达到了，那就说明无法扩容，只能重置随机数，自旋</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>CountCell数组为空</p>
+<p>那就CAS cellBusy，抢到就将CountCell初始化为CountCell[2]</p>
+<p>如果CAS失败，那就说明有其他线程在操作CountCell，那就直接CASbaseCount，失败就自旋</p>
+</li>
+</ol>
+<h2 id="ConcurrentLinkedQueue"><a href="#ConcurrentLinkedQueue" class="headerlink" title="ConcurrentLinkedQueue"></a>ConcurrentLinkedQueue</h2><p>ConcurrentLinkedQueue是一个线程安全的队列，它和ConcurrentHashMap不一样，不使用synchronized这种会阻塞线程的锁，而是使用CAS来实现</p>
+<p>在讲这个之前，<strong>我们要知道一点</strong>：</p>
+<p>ConcurrentLinkedQueue的节点被封装为一个内部类Node，既然是queue那肯定是有一个head节点和一个tail节点，由于ConcurrentLinkedQueue底层是基于CAS的非阻塞形式，因此它<strong>对于head和tail的更新是采用一种延迟加载的策略</strong></p>
+<p>这种延迟加载的策略会导致head或者tail并不是真正的head和tail，极有可能会出现下面这种情况：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317031.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
+
+<p>这一点会贯穿整个底层实现，到底是如何这种延迟加载的，后面会说到。</p>
+<h3 id="数据结构-2"><a href="#数据结构-2" class="headerlink" title="数据结构"></a>数据结构</h3><p>在ConcurrentLinkedQueue中，定义了一个内部类Node</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span>&lt;E&gt; &#123;<br>    <span class="hljs-keyword">volatile</span> E item;<br>    <span class="hljs-keyword">volatile</span> Node&lt;E&gt; next;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>同时，还定义了两个链表的对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-keyword">volatile</span> Node&lt;E&gt; head;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-keyword">volatile</span> Node&lt;E&gt; tail;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>再次提醒一下，这个head和tail不是真实的head和tail，而是采用一种延迟加载的机制</p>
+</blockquote>
+<h3 id="poll操作"><a href="#poll操作" class="headerlink" title="poll操作"></a>poll操作</h3><p>为了方便offer更好的理解，我们先从poll操作讲起，我们不一定按照代码逻辑判断的顺序来</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> E <span class="hljs-title function_">poll</span><span class="hljs-params">()</span> &#123;<br>    restartFromHead:<br>    <span class="hljs-keyword">for</span> (;;) &#123;<br>        <span class="hljs-keyword">for</span> (Node&lt;E&gt; h = head, p = h, q;;) &#123;<br>            <span class="hljs-type">E</span> <span class="hljs-variable">item</span> <span class="hljs-operator">=</span> p.item;<br><br>            <span class="hljs-keyword">if</span> (item != <span class="hljs-literal">null</span> &amp;&amp; p.casItem(item, <span class="hljs-literal">null</span>)) &#123;<br>                <span class="hljs-keyword">if</span> (p != h)<br>                    updateHead(h, ((q = p.next) != <span class="hljs-literal">null</span>) ? q : p);<br>                <span class="hljs-keyword">return</span> item;<br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ((q = p.next) == <span class="hljs-literal">null</span>) &#123;<br>                updateHead(h, p);<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (p == q)<br>                <span class="hljs-keyword">continue</span> restartFromHead;<br>            <span class="hljs-keyword">else</span><br>                p = q;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ol>
+<li><p>首先，会先拿出当前维护的head节点，并将其赋值给p，然后拿出p里面的item</p>
+</li>
+<li><p>如果拿出来的item不是null并且CAS成功，那就返回item</p>
+<p>但是返回之前，看看需不需要加载一下head：</p>
+<ul>
+<li>如果发现在p和head不相等了，那就说明p往后找了几个节点（有线程已经poll了几个但是没有更新head），那就要更新head为p后面的那个，执行updateHead(p.next)，当然，如果后面的节点是null的话，那就没必要更新为p.next了，直接updateHead(p)</li>
+</ul>
+</li>
+<li><p>如果是null的话，那就说明已经到了队尾，那就返回null，但是在返回之前需要更新一下head</p>
+</li>
+<li><p>如果发现p&#x3D;q，那就是有其他队列已经更新了head，发生并发，那就要重新读取head，然后再次循环，为什么更新head会发生p.next&#x3D;q呢？</p>
+<blockquote>
+<p>在updateHead代码中，cas更新完head后，会讲原本的head指针的next指向自己，表示这个节点已经废了，如果有的线程发现了这个节点，那就需要重新读取</p>
+</blockquote>
+</li>
+<li><p>最后，发现当前节点已经被读过了，并且当前head也是正常的，那就进入下一个节点继续判断</p>
+</li>
+</ol>
+<h3 id="offer操作"><a href="#offer操作" class="headerlink" title="offer操作"></a>offer操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">offer</span><span class="hljs-params">(E e)</span> &#123;<br>    checkNotNull(e);<br>    <span class="hljs-keyword">final</span> Node&lt;E&gt; newNode = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;E&gt;(e);<br><br>    <span class="hljs-keyword">for</span> (Node&lt;E&gt; t = tail, p = t;;) &#123;<br>        Node&lt;E&gt; q = p.next;<br>        <span class="hljs-keyword">if</span> (q == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-comment">// p is last node</span><br>            <span class="hljs-keyword">if</span> (p.casNext(<span class="hljs-literal">null</span>, newNode)) &#123;<br>                <span class="hljs-keyword">if</span> (p != t) <span class="hljs-comment">// hop two nodes at a time</span><br>                    casTail(t, newNode);  <span class="hljs-comment">// Failure is OK.</span><br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>            &#125;<br>            <span class="hljs-comment">// Lost CAS race to another thread; re-read next</span><br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (p == q)<br>            p = (t != (t = tail)) ? t : head;<br>        <span class="hljs-keyword">else</span><br>            <span class="hljs-comment">// Check for tail updates after two hops.</span><br>            p = (p != t &amp;&amp; t != (t = tail)) ? t : q;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ol>
+<li><p>offer之前先检查是否为空，然后将tail赋值t和p，new一个待插入的节点，开始循环</p>
+</li>
+<li><p>如果p的next是空，那就尝试cas将p的next改为newNode，修改next失败，那就自旋</p>
+<p>修改成功，那就看看有没有往后找了，有的话就要casTail，但是失败了不会自旋（CAS失败表示有线程更新成功了，即使和当前不一样，但是后续的poll还是会延迟加载）</p>
+<blockquote>
+<p>但是这里要注意的是，只要cas改掉了p的next，不管修改cas修改tail是否成功，都会返回true，因为即使没有改成功，后面也会延迟加载tail</p>
+</blockquote>
+</li>
+<li><p>如果p和q相等，那就是head已经到tail后面去了，tail目前指向的是废弃节点（因为更新head 的时候，会把以前的head的next指向自己），那么就需要将从head节点开始一个一个往后找了</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317376.png" srcset="/img/loading.gif" lazyload alt="Node2从队列中出队后的状态" style="zoom:67%;" />
+
+<p>但是，在直接将p改为head之前，需要看看t和tail是否相等，因为很有可能就在<strong>这一刹那有一个线程已经将tail更新为正确的tail了</strong>，因此修改p的表达式为：<code>p=(t != (t = tail)) ? t : head</code></p>
+</li>
+<li><p>那走到最后，还是没有问题，那就说明已经有别的线程在该线程之前offer了一个节点，那就往后找，往后找同样需要判断在这一刹那是否已经有线程更新了tail，更新了那就直接将p改成新的tail，没更新，那就改为p.next（即q）：<code>p = (p != t &amp;&amp; t != (t = tail)) ? t : q;</code></p>
+</li>
+</ol>
+<h3 id="延迟加载策略"><a href="#延迟加载策略" class="headerlink" title="延迟加载策略"></a>延迟加载策略</h3><p><strong>延迟加载是ConcurrentLinkedQueue非阻塞更新队列的核心</strong>，既然整篇都是延迟加载，那么就来讲一讲head和tail是什么时候延迟加载的吧</p>
+<ul>
+<li><p>head延迟加载：当发现当前head指向的节点为null，在返回item数据之前需要<strong>updateHead</strong>一下，</p>
+<blockquote>
+<p>不同于更改tail的一次CAS，更改head在CAS过后，为了标记出队的节点不可用，需要将原head的next指向自己</p>
+<p>这样，当其他的offer、poll操作的时候，就会发现这个问题</p>
+</blockquote>
+</li>
+<li><p>tail的延迟加载：若tail指向的不是最后一个节点（有线程已经插入了，或者前面很多次poll操作导致tail指向了废弃节点），那就会尝试CAS一下tail，但是不会管成功还是失败</p>
+</li>
+</ul>
 
                 
               </div>
