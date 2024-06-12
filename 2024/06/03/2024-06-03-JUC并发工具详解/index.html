@@ -26,7 +26,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406110034513.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406050105638.png">
 <meta property="article:published_time" content="2024-06-03T15:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-12T15:17:26.983Z">
+<meta property="article:modified_time" content="2024-06-12T15:20:22.096Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -401,7 +401,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//private是隐式的final</span><br><span class="hljs-keyword">private</span> Node <span class="hljs-title function_">addWaiter</span><span class="hljs-params">(Node mode)</span> &#123;<br>    <span class="hljs-type">Node</span> <span class="hljs-variable">node</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>(Thread.currentThread(), mode);<br>    <span class="hljs-comment">// Try the fast path of enq; backup to full enq on failure</span><br>    <span class="hljs-type">Node</span> <span class="hljs-variable">pred</span> <span class="hljs-operator">=</span> tail;<br>    <span class="hljs-keyword">if</span> (pred != <span class="hljs-literal">null</span>) &#123;<br>        node.prev = pred;<br>        <span class="hljs-keyword">if</span> (compareAndSetTail(pred, node)) &#123;<br>            pred.next = node;<br>            <span class="hljs-keyword">return</span> node;<br>        &#125;<br>    &#125;<br>    enq(node);<br>    <span class="hljs-keyword">return</span> node;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>以上就是acquire函数的大致思想（模版方法），具体这两个函数怎么工作的后，下面会详细介绍</p>
-<h5 id="addWaiter"><a href="#addWaiter" class="headerlink" title="addWaiter"></a>addWaiter</h5><p>这个函数会创造一个新的节点，然后将这个节点入队，具体入队操作就是：</p>
+<h4 id="addWaiter"><a href="#addWaiter" class="headerlink" title="addWaiter"></a>addWaiter</h4><p>这个函数会创造一个新的节点，然后将这个节点入队，具体入队操作就是：</p>
 <ul>
 <li>将tail的next指向新节点，再CAS将tail指针指向新节点</li>
 </ul>
@@ -414,7 +414,7 @@
 <p>为什么要创建虚拟头节点？</p>
 <p>因为队列中被阻塞的节点都需要被前驱节点唤醒，如果把搞一个虚拟头节点，那么第一个入队的节点就没人唤醒了，导致整个队列都无法被唤醒！</p>
 </blockquote>
-<h5 id="acquireQueued"><a href="#acquireQueued" class="headerlink" title="acquireQueued"></a>acquireQueued</h5><p>这个函数就是阻塞等待唤醒，唤醒后获取资源的函数，这个函数返回值是 该线程在park的时候有没有被inturrpt唤醒。如果被唤醒了就会返回true，并且会在获取资源后，执行<code>selfInterrupt</code>方法，再次把中断标记置为true</p>
+<h4 id="acquireQueued"><a href="#acquireQueued" class="headerlink" title="acquireQueued"></a>acquireQueued</h4><p>这个函数就是阻塞等待唤醒，唤醒后获取资源的函数，这个函数返回值是 该线程在park的时候有没有被inturrpt唤醒。如果被唤醒了就会返回true，并且会在获取资源后，执行<code>selfInterrupt</code>方法，再次把中断标记置为true</p>
 <p>在每次循环中：</p>
 <ul>
 <li>如果发现其前驱是头节点，那么就tryAcquire一下，成功了就把自己设为头节点，因为头节点的任务已经完成了（唤醒了后继节点），那么接下来就由抢到资源的节点去唤醒下一个头节点了</li>
@@ -438,13 +438,13 @@
 <p>唤醒的节点就会重新开始acquireQueued中的死循环，由于是被头节点并且还是前驱节点唤醒的，因此就会执行tryAcquire获取资源，拿到资源就会把自己设置为头节点，方便唤醒后继节点</p>
 <h3 id="ConditionObject"><a href="#ConditionObject" class="headerlink" title="ConditionObject"></a>ConditionObject</h3><p>如果想像synchronized一样，在执行的时候调用wait函数来释放锁，并在别的线程中通过notify函数重新唤醒来重新去争抢锁</p>
 <p>那就需要通过AQS中的ConditionObject来实现，它提供的await和signal方法就分别对应了wait和notify方法，下面一个一个介绍吧</p>
-<h5 id="await方法"><a href="#await方法" class="headerlink" title="await方法"></a>await方法</h5><p>这个就不放源码了，比较简单</p>
+<h4 id="await方法"><a href="#await方法" class="headerlink" title="await方法"></a>await方法</h4><p>这个就不放源码了，比较简单</p>
 <ul>
 <li>首先会创建一个waitStatus为CONDITION的节点，然后将其放入Condition的等待队列中</li>
 <li>然后就会释放持有的锁，就是调用AQS提供的release方法释放，释放完就park自己</li>
 <li>一旦park结束就会先校验是不是意外打断导致的唤醒，如果是就继续park，否则就开始重新获取资源，调用acquireQueued方法</li>
 </ul>
-<h5 id="signal方法"><a href="#signal方法" class="headerlink" title="signal方法"></a>signal方法</h5><p>那么await中被park住的线程是如何被唤醒的呢？就是通过signal调用unpark方法释放</p>
+<h4 id="signal方法"><a href="#signal方法" class="headerlink" title="signal方法"></a>signal方法</h4><p>那么await中被park住的线程是如何被唤醒的呢？就是通过signal调用unpark方法释放</p>
 <ul>
 <li>首先，它会找到waiter队列中的第一个节点，取出来然后更新队列</li>
 <li>更新完了后，就将该节点放到AQS队列中，然后unpark一下去竞争，这个时候刚刚await方法中的park结束继续执行下去，调用acquireQueued方法（其实这个方法执行中该阻塞还是会阻塞）</li>

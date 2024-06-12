@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317031.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317376.png">
 <meta property="article:published_time" content="2024-06-04T15:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-12T15:13:18.630Z">
+<meta property="article:modified_time" content="2024-06-12T15:21:01.053Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -566,12 +566,12 @@
 </ul>
 </blockquote>
 <h3 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h3><p>这是一个无界的队列，底层是通过<code>PriorityQueue</code>+<code>ReentrantLock</code>+<code>Condition</code>实现，里面的元素需要实现Delayed接口因为需要获取延迟时间</p>
-<h5 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h5><p>通过优先队列根据<strong>任务到期时间</strong>（入队的currentTime+delayime）升序排序，这样可以保证每次出队的元素是最紧急需要执行的</p>
+<h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4><p>通过优先队列根据<strong>任务到期时间</strong>（入队的currentTime+delayime）升序排序，这样可以保证每次出队的元素是最紧急需要执行的</p>
 <p>每次出队的时候需要看看出队的元素是否到了执行时间，由于元素实现了Delayed接口，因此可以调用<code>getDelay</code>方法获取剩余的delayTime，$\le 0$则代表到期</p>
 <p>当然这只是基本思想，由于每次入队一个元素需要唤醒所有线程，但是最终仍然只有一个线程会抢到任务，因此DelayQueue使用leader-follower模式，保证在有leader线程的情况下只会唤醒一个线程</p>
-<h5 id="leader-follower模式"><a href="#leader-follower模式" class="headerlink" title="leader-follower模式"></a>leader-follower模式</h5><p>在这个模式中，如果有leader的情况下，任务会优先给leader消费，leader消费完后就会释放这个位置，唤醒所有的follower去竞争这个leader</p>
+<h4 id="leader-follower模式"><a href="#leader-follower模式" class="headerlink" title="leader-follower模式"></a>leader-follower模式</h4><p>在这个模式中，如果有leader的情况下，任务会优先给leader消费，leader消费完后就会释放这个位置，唤醒所有的follower去竞争这个leader</p>
 <p>这样的话，在有leader的情况下，不会调用signal的情况，减小CPU开销</p>
-<h5 id="take操作"><a href="#take操作" class="headerlink" title="take操作"></a>take操作</h5><blockquote>
+<h4 id="take操作"><a href="#take操作" class="headerlink" title="take操作"></a>take操作</h4><blockquote>
 <p>要注意的是take和poll不一样，take在没有元素的情况下会一直等待，而poll会直接返回null</p>
 <p>即使poll传入了等待时间，超过这个时间仍然会返回空</p>
 </blockquote>
@@ -590,12 +590,12 @@
 <blockquote>
 <p>awaitNanos(waitTime)返回的是剩余的等待时间，如果正常到期唤醒那就返回0，如果被提前signal唤醒，那就返回剩余的等待时间</p>
 </blockquote>
-<h5 id="offer操作-1"><a href="#offer操作-1" class="headerlink" title="offer操作"></a>offer操作</h5><p>是不是前面的take操作把自己设为leader后，就百分百锁定这个待到期的任务了呢？其实并不是</p>
+<h4 id="offer操作-1"><a href="#offer操作-1" class="headerlink" title="offer操作"></a>offer操作</h4><p>是不是前面的take操作把自己设为leader后，就百分百锁定这个待到期的任务了呢？其实并不是</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">offer</span><span class="hljs-params">(E e)</span> &#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.lock;<br>    lock.lock();<br>    <span class="hljs-keyword">try</span> &#123;<br>        q.offer(e);<br>        <span class="hljs-keyword">if</span> (q.peek() == e) &#123;<br>            leader = <span class="hljs-literal">null</span>;<br>            available.signal();<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>在offer的时候，会先入队，然后看看队列的第一个是不是刚入队的，如果是那就说明最紧急的任务发生了变化，那么以前的leader就不能再等到上一个任务到期的时间了，这个时候就会将leader置为空，然后全局唤醒</p>
 <p>因此，很有可能在<code>awaitNanos(delayTime)</code>这个时间内，来一个更早执行的任务，那就会全局唤醒来争抢这个任务，争抢不到的第一个任务会更改leader为自己，其他线程全部await无限期阻塞</p>
-<h5 id="poll操作-1"><a href="#poll操作-1" class="headerlink" title="poll操作"></a>poll操作</h5><p>不带等待时间的poll很简单，就是拿出来看看第一个任务有没有到期，到期直接返回任务；没到期或者队列空，那就直接返回null</p>
+<h4 id="poll操作-1"><a href="#poll操作-1" class="headerlink" title="poll操作"></a>poll操作</h4><p>不带等待时间的poll很简单，就是拿出来看看第一个任务有没有到期，到期直接返回任务；没到期或者队列空，那就直接返回null</p>
 <p>我们重点来看看有等待时间的，同时还是先拿出第一个元素</p>
 <ul>
 <li><p>如果第一个元素为空，那就阻塞waitTime，如果有入队的元素全局唤醒会提前唤醒的</p>
