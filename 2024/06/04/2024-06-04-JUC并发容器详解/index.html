@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317031.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406052317376.png">
 <meta property="article:published_time" content="2024-06-04T15:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-05T15:18:18.872Z">
+<meta property="article:modified_time" content="2024-06-12T15:13:18.630Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -255,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.4k 字
+          7.4k 字
         
       </span>
     
@@ -266,7 +266,7 @@
         
         
         
-          46 分钟
+          62 分钟
         
       </span>
     
@@ -530,6 +530,101 @@
 </li>
 <li><p>tail的延迟加载：若tail指向的不是最后一个节点（有线程已经插入了，或者前面很多次poll操作导致tail指向了废弃节点），那就会尝试CAS一下tail，但是不会管成功还是失败</p>
 </li>
+</ul>
+<h2 id="BlockingQueue"><a href="#BlockingQueue" class="headerlink" title="BlockingQueue"></a>BlockingQueue</h2><p>阻塞队列和前面刚刚提到的ConcurrentLinkedQueue不同，它是用于“生产者-消费者”模式的问题</p>
+<p>当队列put满了，就会阻塞调用put的生产者线程；当队列take空了，就会阻塞调用take的消费者线程</p>
+<p>而BlockingQueue是一个接口，它定义了如下操作：</p>
+<p>&lt; img src&#x3D;”<a target="_blank" rel="noopener" href="https://cdn.tobebetterjavaer.com/stutymore/BlockingQueue-20230818143620.png">https://cdn.tobebetterjavaer.com/stutymore/BlockingQueue-20230818143620.png</a>“ alt&#x3D;”img” style&#x3D;”zoom:70%;” &#x2F;&gt;</p>
+<p>JUC提供了很多BlockingQueue的实现类，比如ArrayBlockingQueue、DelayQueue、LinkedBlockingDeque等等</p>
+<h3 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h3><p>ArrayBlockingQueue底层是通过ReentrantLock+Condition实现的，有两个Condition和一个lock</p>
+<p>它是一个有界队列，在初始化的时候，必须传入capacity参数，表示队列容量且不能修改</p>
+<p>此外，这一个循环队列，并且使用count的额外遍历来记录队列实际大小同时用于判断队列是否已满，而不是通过start&#x3D;end-1来判断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/** Main lock guarding all access */</span><br><span class="hljs-keyword">final</span> ReentrantLock lock;<br><br><span class="hljs-comment">/** Condition for waiting takes */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Condition notEmpty;<br><br><span class="hljs-comment">/** Condition for waiting puts */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Condition notFull;<br></code></pre></td></tr></table></figure>
+
+<p>put和take操作都会先通过ReentrantLock获取锁，然后才能进行队列操作</p>
+<p>在进行put的时候：</p>
+<ul>
+<li>如果发现队列满，则会通过notEmpty阻塞，等到take出队成功就会调用notEmpty唤醒</li>
+<li>如果队列没有满，则会调用enqueue函数，加入队列并调用notFull的signal，唤醒一个阻塞的take进程</li>
+</ul>
+<p>take方法则相反：</p>
+<ul>
+<li>如果发现队列空，则会通过notFull阻塞，等到put入队成功就会调用notFull唤醒</li>
+<li>如果队列没有满，则会调用dequeue函数，加入队列并调用notEmpty的signal，唤醒一个阻塞的put进程</li>
+</ul>
+<h3 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h3><p>LinkedBlockQueue底层使用链表的数据结构，可以支持无界队列（不传capacity就是无界的），并且底层用的是两把ReentrantLock+两个Condition</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/** Lock held by take, poll, etc */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">takeLock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReentrantLock</span>();<br><br><span class="hljs-comment">/** Wait queue for waiting takes */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Condition</span> <span class="hljs-variable">notEmpty</span> <span class="hljs-operator">=</span> takeLock.newCondition();<br><br><span class="hljs-comment">/** Lock held by put, offer, etc */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">putLock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReentrantLock</span>();<br><br><span class="hljs-comment">/** Wait queue for waiting puts */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Condition</span> <span class="hljs-variable">notFull</span> <span class="hljs-operator">=</span> putLock.newCondition();<br></code></pre></td></tr></table></figure>
+
+<p>和ArrayBlockingQueue不一样的是，LinkedBlockingQueue将put和take两个操作用两把锁，这样可以提高并发量，并且为了防止两个线程的并发问题，count使用的是AtomicInteger来保证安全性</p>
+<p>其他的出队和入队的基本流程和ArrayBlockingQueue差不多</p>
+<blockquote>
+<p>ArrayBlockingQueue和LinkedBlockingQueue：</p>
+<ul>
+<li>二者都是基于ReentrantLock+Condition实现的</li>
+<li>前者底层用的是数组并且有界，后者用的是链表可以支持无界</li>
+<li>后者的锁粒度更细（put、take分离），并发量更大</li>
+</ul>
+</blockquote>
+<h3 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h3><p>这是一个无界的队列，底层是通过<code>PriorityQueue</code>+<code>ReentrantLock</code>+<code>Condition</code>实现，里面的元素需要实现Delayed接口因为需要获取延迟时间</p>
+<h5 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h5><p>通过优先队列根据<strong>任务到期时间</strong>（入队的currentTime+delayime）升序排序，这样可以保证每次出队的元素是最紧急需要执行的</p>
+<p>每次出队的时候需要看看出队的元素是否到了执行时间，由于元素实现了Delayed接口，因此可以调用<code>getDelay</code>方法获取剩余的delayTime，$\le 0$则代表到期</p>
+<p>当然这只是基本思想，由于每次入队一个元素需要唤醒所有线程，但是最终仍然只有一个线程会抢到任务，因此DelayQueue使用leader-follower模式，保证在有leader线程的情况下只会唤醒一个线程</p>
+<h5 id="leader-follower模式"><a href="#leader-follower模式" class="headerlink" title="leader-follower模式"></a>leader-follower模式</h5><p>在这个模式中，如果有leader的情况下，任务会优先给leader消费，leader消费完后就会释放这个位置，唤醒所有的follower去竞争这个leader</p>
+<p>这样的话，在有leader的情况下，不会调用signal的情况，减小CPU开销</p>
+<h5 id="take操作"><a href="#take操作" class="headerlink" title="take操作"></a>take操作</h5><blockquote>
+<p>要注意的是take和poll不一样，take在没有元素的情况下会一直等待，而poll会直接返回null</p>
+<p>即使poll传入了等待时间，超过这个时间仍然会返回空</p>
+</blockquote>
+<ul>
+<li><p>先拿出队首的元素，如果为空直接await()，因为队列为空，为了保证公平性不会设置leader</p>
+</li>
+<li><p>不为空，则看看是否到期，如果到期那就直接拿出来返回了</p>
+</li>
+<li><p>还没有到期，那就看看有没有leader，已经有leader在等这个任务那就await自己，等待全局唤醒</p>
+</li>
+<li><p>还没到期，而且还没有leader，那就把自己设为leader，<code>awaitNanos(delayTime)</code>时间就醒来拿这个任务</p>
+</li>
+<li><p><strong>最后有个finally操作</strong>，当leader的awaitNanos到了，如果发现leader还是自己，那就将leader置为空，并去拿任务，拿到了执行完了就会检测leader是否还是空并且队列是否还有元素，如果满足那就全局唤醒所有follower去争抢</p>
+</li>
+</ul>
+<blockquote>
+<p>awaitNanos(waitTime)返回的是剩余的等待时间，如果正常到期唤醒那就返回0，如果被提前signal唤醒，那就返回剩余的等待时间</p>
+</blockquote>
+<h5 id="offer操作-1"><a href="#offer操作-1" class="headerlink" title="offer操作"></a>offer操作</h5><p>是不是前面的take操作把自己设为leader后，就百分百锁定这个待到期的任务了呢？其实并不是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">offer</span><span class="hljs-params">(E e)</span> &#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.lock;<br>    lock.lock();<br>    <span class="hljs-keyword">try</span> &#123;<br>        q.offer(e);<br>        <span class="hljs-keyword">if</span> (q.peek() == e) &#123;<br>            leader = <span class="hljs-literal">null</span>;<br>            available.signal();<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在offer的时候，会先入队，然后看看队列的第一个是不是刚入队的，如果是那就说明最紧急的任务发生了变化，那么以前的leader就不能再等到上一个任务到期的时间了，这个时候就会将leader置为空，然后全局唤醒</p>
+<p>因此，很有可能在<code>awaitNanos(delayTime)</code>这个时间内，来一个更早执行的任务，那就会全局唤醒来争抢这个任务，争抢不到的第一个任务会更改leader为自己，其他线程全部await无限期阻塞</p>
+<h5 id="poll操作-1"><a href="#poll操作-1" class="headerlink" title="poll操作"></a>poll操作</h5><p>不带等待时间的poll很简单，就是拿出来看看第一个任务有没有到期，到期直接返回任务；没到期或者队列空，那就直接返回null</p>
+<p>我们重点来看看有等待时间的，同时还是先拿出第一个元素</p>
+<ul>
+<li><p>如果第一个元素为空，那就阻塞waitTime，如果有入队的元素全局唤醒会提前唤醒的</p>
+<blockquote>
+<p>阻塞waitTime的函数是<code>awaitNanos(waitTime)</code>，这个函数返回的是剩余的等待时间，如果正常到期唤醒那就返回0，如果被提前signal唤醒，那就返回剩余的等待时间</p>
+</blockquote>
+</li>
+<li><p>如果不为空，那就取出来，发现已经到期了，那就直接返回</p>
+</li>
+<li><p>没到期，则就看看最紧急任务的剩余时间是不是大于等待时间，并再看看leader是否为空：</p>
+<p><code>nanos &lt; delay || leader != null</code></p>
+<p>只要二者条件满足一个就要awaitNanos(waitTime)，后者的判断是因为leader会先执行，执行完在finally中会全局唤醒</p>
+</li>
+<li><p>没有leader，并且最紧急任务的剩余时间小于等待时间，那就awaitNanos(delayTime)，并将leader设置为自己，并且如果被提前唤醒，需要更新下次等待的总时间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">long</span> <span class="hljs-variable">timeLeft</span> <span class="hljs-operator">=</span> available.awaitNanos(delay);<br>nanos -= delay - timeLeft;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h2><p>CopyOnWriteArrayList使用的和Linux的fork函数一样的写时复制技术，用来处理多线程ArrayList的并发问题</p>
+<h3 id="基本思想-1"><a href="#基本思想-1" class="headerlink" title="基本思想"></a>基本思想</h3><p>内部维护一个Object数组（volatile修饰），然后读的时候就直接从这里面读</p>
+<p>写的时候，会先获取锁（<strong>防止多个线程都复制一份，出现并发问题</strong>），然后将Object数组copy一份往里写，写完再将原本的Object数组引用换成写完后的新数组</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/** The array, accessed only via getArray/setArray. */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-keyword">volatile</span> Object[] array;<br></code></pre></td></tr></table></figure>
+
+<h3 id="get方法"><a href="#get方法" class="headerlink" title="get方法"></a>get方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> E <span class="hljs-title function_">get</span><span class="hljs-params">(<span class="hljs-type">int</span> index)</span> &#123;<br>    <span class="hljs-keyword">return</span> get(getArray(), index);<br>&#125;<br><span class="hljs-keyword">final</span> Object[] getArray() &#123;<br>    <span class="hljs-keyword">return</span> array;<br>&#125;<br><span class="hljs-keyword">private</span> E <span class="hljs-title function_">get</span><span class="hljs-params">(Object[] a, <span class="hljs-type">int</span> index)</span> &#123;<br>    <span class="hljs-keyword">return</span> (E) a[index];<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>就是从数组中正常的读元素，没啥其他的</p>
+<h3 id="add方法"><a href="#add方法" class="headerlink" title="add方法"></a>add方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">add</span><span class="hljs-params">(E e)</span> &#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.lock;<br>    lock.lock();<br>    <span class="hljs-keyword">try</span> &#123;<br>        Object[] elements = getArray();<br>        <span class="hljs-type">int</span> <span class="hljs-variable">len</span> <span class="hljs-operator">=</span> elements.length;<br><br>        Object[] newElements = Arrays.copyOf(elements, len + <span class="hljs-number">1</span>);<br>		newElements[len] = e;<br>        setArray(newElements);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>先获取锁，这是ReentrantLock实现的锁，防止多个线程同时复制，由于setArray不是CAS而且同时复制更容易OOM，因此只用一把写锁</li>
+<li>拿到锁后，就复制一份，但是这一份</li>
 </ul>
 
                 
