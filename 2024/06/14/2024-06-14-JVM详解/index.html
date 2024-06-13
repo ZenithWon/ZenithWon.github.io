@@ -16,23 +16,26 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Java并发编程基础问题线程的三种创建方式 Thread类继承 Runnable接口实现 Callable接口实现，这种方法可以通过FutureTask获取线程的执行结果  sleep和waitsleep不会释放锁，wait会释放锁 JMM指令重排序volatile原理锁SynchronizedAQSCAS*">
+    <meta name="description" content="JVM详解初步认知JVM是一个程序集虚拟机，它可以运行一系列虚拟的计算机指令，这个指令就是我们常说的字节码 当然，JVM不仅仅就是运JAVA程序，它其实是一个虚拟机，你只要提供的字节码是满足JVM定义的规范那就可以运行 也就是说对于任意一个语言，我们只需要设计一个编译器将该语言编译成JVM定义的字节码规范，就可以直接在JVM中运行，比如Scala、Kotlin等 JVM的整体架构JVM的组成可以分">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java并发编程">
-<meta property="og:url" content="http://example.com/2024/05/09/2024-05-09-Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:title" content="JVM详解">
+<meta property="og:url" content="http://example.com/2024/06/14/2024-06-14-JVM%E8%AF%A6%E8%A7%A3/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="Java并发编程基础问题线程的三种创建方式 Thread类继承 Runnable接口实现 Callable接口实现，这种方法可以通过FutureTask获取线程的执行结果  sleep和waitsleep不会释放锁，wait会释放锁 JMM指令重排序volatile原理锁SynchronizedAQSCAS*">
+<meta property="og:description" content="JVM详解初步认知JVM是一个程序集虚拟机，它可以运行一系列虚拟的计算机指令，这个指令就是我们常说的字节码 当然，JVM不仅仅就是运JAVA程序，它其实是一个虚拟机，你只要提供的字节码是满足JVM定义的规范那就可以运行 也就是说对于任意一个语言，我们只需要设计一个编译器将该语言编译成JVM定义的字节码规范，就可以直接在JVM中运行，比如Scala、Kotlin等 JVM的整体架构JVM的组成可以分">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-05-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-06-12T15:47:45.300Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406140127545.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406140127612.png">
+<meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
+<meta property="article:modified_time" content="2024-06-13T17:28:05.796Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406140127545.png">
   
   
   
-  <title>Java并发编程 - Zenith&#39; Blog</title>
+  <title>JVM详解 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Java并发编程"></span>
+            <span id="subtitle" data-typed-text="JVM详解"></span>
           
         </div>
 
@@ -238,8 +241,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-05-09 00:00" pubdate>
-          2024年5月9日 凌晨
+        <time datetime="2024-06-14 01:36" pubdate>
+          2024年6月14日 凌晨
         </time>
       </span>
     
@@ -250,7 +253,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          66 字
+          398 字
         
       </span>
     
@@ -261,7 +264,7 @@
         
         
         
-          1 分钟
+          4 分钟
         
       </span>
     
@@ -306,19 +309,30 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Java并发编程</h1>
+            <h1 id="seo-header">JVM详解</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="Java并发编程"><a href="#Java并发编程" class="headerlink" title="Java并发编程"></a>Java并发编程</h1><h2 id="基础问题"><a href="#基础问题" class="headerlink" title="基础问题"></a>基础问题</h2><h4 id="线程的三种创建方式"><a href="#线程的三种创建方式" class="headerlink" title="线程的三种创建方式"></a>线程的三种创建方式</h4><ol>
-<li><code>Thread</code>类继承</li>
-<li><code>Runnable</code>接口实现</li>
-<li><code>Callable</code>接口实现，这种方法可以通过<code>FutureTask</code>获取线程的执行结果</li>
-</ol>
-<h4 id="sleep和wait"><a href="#sleep和wait" class="headerlink" title="sleep和wait"></a>sleep和wait</h4><p>sleep不会释放锁，wait会释放锁</p>
-<h2 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h2><h4 id="指令重排序"><a href="#指令重排序" class="headerlink" title="指令重排序"></a>指令重排序</h4><h4 id="volatile原理"><a href="#volatile原理" class="headerlink" title="volatile原理"></a>volatile原理</h4><h2 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h2><h4 id="Synchronized"><a href="#Synchronized" class="headerlink" title="Synchronized"></a>Synchronized</h4><h4 id="AQS"><a href="#AQS" class="headerlink" title="AQS"></a>AQS</h4><h4 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h4><p>* </p>
+                <h1 id="JVM详解"><a href="#JVM详解" class="headerlink" title="JVM详解"></a>JVM详解</h1><h2 id="初步认知"><a href="#初步认知" class="headerlink" title="初步认知"></a>初步认知</h2><p>JVM是一个程序集虚拟机，它可以运行一系列虚拟的计算机指令，这个指令就是我们常说的字节码</p>
+<p>当然，JVM不仅仅就是运JAVA程序，它其实是一个虚拟机，你只要提供的字节码是满足JVM定义的规范那就可以运行</p>
+<p>也就是说对于任意一个语言，我们只需要设计一个编译器将该语言编译成JVM定义的字节码规范，就可以直接在JVM中运行，比如Scala、Kotlin等</p>
+<h3 id="JVM的整体架构"><a href="#JVM的整体架构" class="headerlink" title="JVM的整体架构"></a>JVM的整体架构</h3><p>JVM的组成可以分为三大部分，分别是：<strong>类加载器</strong>、<strong>运行时数据区</strong>、<strong>执行引擎</strong></p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406140127545.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
 
+<ul>
+<li><p>类加载器：就是将.class文件加载到内存中，生成一个klass对象，放在方法区中</p>
+</li>
+<li><p>运行时数据区：这个就是JVM的内存结构，这个一定要和JMM区分开，JMM是屏蔽硬件而定义的一个规范</p>
+<blockquote>
+<p>因为JVM是一个虚拟机，因此我们需要在这里面屏蔽掉底层操作系统的异构性，所以定义了一个叫做JMM的内存规范，它提供了多线程情况下的内存访问方式，抽象出了主内存和工作内存两大空间，并且还提供了类似volatile、synchronized这些关键字用于线程同步</p>
+</blockquote>
+</li>
+<li><p>执行引擎：这个就是执行字节码，这期间还涉及到了垃圾回收和即时编译（JIT）</p>
+</li>
+</ul>
+<p>如果学完整个JVM，最终的JVM架构图应该是这样的：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406140127612.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:40%;" />
                 
               </div>
             
@@ -365,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Java并发编程</div>
-      <div>http://example.com/2024/05/09/2024-05-09-Java并发编程/</div>
+      <div>JVM详解</div>
+      <div>http://example.com/2024/06/14/2024-06-14-JVM详解/</div>
     </div>
     <div class="license-meta">
       
@@ -378,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年5月9日</div>
+          <div>2024年6月14日</div>
         </div>
       
       
@@ -410,18 +424,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/05/10/2024-05-10-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%9F%BA%E7%A1%80/" title="消息队列基础">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">消息队列基础</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/05/08/2024-05-08-Redis%E6%80%BB%E7%BB%93/" title="Redis总结">
-                        <span class="hidden-mobile">Redis总结</span>
+                      <a href="/2024/06/04/2024-06-04-JUC%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8%E8%AF%A6%E8%A7%A3/" title="JUC并发容器详解">
+                        <span class="hidden-mobile">JUC并发容器详解</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
