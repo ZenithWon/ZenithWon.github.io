@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406170150575.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406170154711.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-16T18:02:54.505Z">
+<meta property="article:modified_time" content="2024-06-16T18:08:52.959Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -486,13 +486,13 @@
 
 
 
-<h3 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h3><h5 id="存放内容"><a href="#存放内容" class="headerlink" title="存放内容"></a>存放内容</h5><p>局部变量表存放的就是，该方法的参数、方法体内的局部变量、returnAddress类型等，也就是说<strong>局部变量只存放基本数据类型和对象引用（指针）</strong></p>
+<h3 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h3><h4 id="存放内容"><a href="#存放内容" class="headerlink" title="存放内容"></a>存放内容</h4><p>局部变量表存放的就是，该方法的参数、方法体内的局部变量、returnAddress类型等，也就是说<strong>局部变量只存放基本数据类型和对象引用（指针）</strong></p>
 <p>并且局部变量表的大小是在编译的时候就已经确定好了，这个是预编译好的最大的局部变量表的大小，不一定真正运行的时候，一定就是那么大，因为程序运行中会有报错、if&#x2F;else分支等操作</p>
 <p>在局部变量表中，最基本的存储单元是slot，除了double和long占两个slot外，其他的数据类型如byte、char、boolean、对象引用（开了指针压缩）等都是会转换为int类型，在表中占一个slot</p>
 <blockquote>
 <p>当前方法如果不是static方法，那局部变量表的第一个index0的位置会<strong>放一个this引用</strong>，然后剩下的才会往后放到表中</p>
 </blockquote>
-<h5 id="长度以及内容的优化"><a href="#长度以及内容的优化" class="headerlink" title="长度以及内容的优化"></a>长度以及内容的优化</h5><p>字节码中的局部变量表很有意思：</p>
+<h4 id="长度以及内容的优化"><a href="#长度以及内容的优化" class="headerlink" title="长度以及内容的优化"></a>长度以及内容的优化</h4><p>字节码中的局部变量表很有意思：</p>
 <ul>
 <li><p>如果一个局部变量在代码块中只是声明了，但是没有用到，那么局部变量表就不会有这个，但是字节码中的局部变量表的最大长度会算上它，而且还会根据if else来取最大值，这个十分有意思</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span>(i==<span class="hljs-number">1</span>)&#123;<br>        <span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-type">int</span> k=<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
@@ -508,7 +508,7 @@
 <p>该代码的max length以为是4？，其实还是3，因为h和k、j的作用域是互斥的，然后h和j是if&#x2F;else互斥的，因此最后<strong>其实h、k、j是可以共用一块区域的</strong>。如下：全是用的slot2：</p>
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406170154711.png" srcset="/img/loading.gif" lazyload alt="image-20240617015400667" style="zoom:50%;" /></li>
 </ul>
-<h5 id="重要性"><a href="#重要性" class="headerlink" title="重要性"></a>重要性</h5><ul>
+<h4 id="重要性"><a href="#重要性" class="headerlink" title="重要性"></a>重要性</h4><ul>
 <li>它和JVM调优比较密切</li>
 <li>方法执行的时候，使用局部变量表完成方法传递</li>
 <li>局部变量表中的引用变量作为GC的root节点</li>
