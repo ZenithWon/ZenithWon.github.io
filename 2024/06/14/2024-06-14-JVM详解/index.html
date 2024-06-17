@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180140353.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180150099.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-17T17:52:58.032Z">
+<meta property="article:modified_time" content="2024-06-17T17:58:11.829Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -553,7 +553,7 @@
 <li>堆的空间是固定的，在JVM进程创建的时候，堆的大小就已经确定下来了</li>
 <li>堆是GC的主要区域，方法区也会有GC但是比例不大，GC又是JVM调优主要的关注对象</li>
 </ul>
-<p>堆的具体内存结构如下，就不多说了</p>
+<p>堆的具体内存结构如下，要注意的是JVM参数设置的堆空间大小只有新生代和老年代（JDK7和JDK8都是）</p>
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180150099.png" srcset="/img/loading.gif" lazyload alt="image-20240618015047008" style="zoom: 40%;" />
 
 <p>以上是堆的基本理论，但是还有几个平时不会注意的问题：</p>
