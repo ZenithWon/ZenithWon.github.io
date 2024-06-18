@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406152303592.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406152303132.png">
-<meta property="og:image" content="https://segmentfault.com/img/bVcHO1t/view">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190210050.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406152307708.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406152307442.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406170033580.png">
@@ -36,8 +36,12 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406172241735.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180140353.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180150099.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406182334191.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190052195.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190100664.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190148915.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-17T17:58:11.829Z">
+<meta property="article:modified_time" content="2024-06-18T18:15:49.072Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -264,7 +268,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.2k 字
+          6.6k 字
         
       </span>
     
@@ -275,7 +279,7 @@
         
         
         
-          44 分钟
+          56 分钟
         
       </span>
     
@@ -359,7 +363,7 @@
 <p>如果学完整个JVM，最终的JVM架构图应该是这样的：</p>
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406152303132.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:40%;" />
 
-<h2 id="类加载子系统"><a href="#类加载子系统" class="headerlink" title="类加载子系统"></a>类加载子系统</h2><h3 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h3><img src="https://segmentfault.com/img/bVcHO1t/view" srcset="/img/loading.gif" lazyload alt="preview" style="zoom: 80%;" />
+<h2 id="类加载子系统"><a href="#类加载子系统" class="headerlink" title="类加载子系统"></a>类加载子系统</h2><h3 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h3><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190210050.png" srcset="/img/loading.gif" lazyload alt="preview" style="zoom: 80%;" />
 
 <p>类加载过程总的氛围三个阶段：Loading、Linking、Initialization，其中Linking阶段还分为为三个子阶段：Verifying、Prepare、Resolve</p>
 <p>这里一定要把这里的Loading阶段的加载和类加载器的加载区分开，Loading阶段只是类加载的一个阶段，但是它只是恰好也叫加载</p>
@@ -549,9 +553,15 @@
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180140353.png" srcset="/img/loading.gif" lazyload alt="image-20240618014058269" style="zoom:50%;" />
 
 <h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h3><ul>
-<li>堆在JVM进程中是唯一的，一个JVM进程只有一个运行时数据区，也只有一个堆</li>
-<li>堆的空间是固定的，在JVM进程创建的时候，堆的大小就已经确定下来了</li>
-<li>堆是GC的主要区域，方法区也会有GC但是比例不大，GC又是JVM调优主要的关注对象</li>
+<li><p>堆在JVM进程中是唯一的，一个JVM进程只有一个运行时数据区，也只有一个堆</p>
+</li>
+<li><p>堆的空间是固定的，在JVM进程创建的时候，堆的大小就已经确定下来了</p>
+<ul>
+<li>堆大小的JVM参数有两个分别是<code>-Xms</code>（堆初始大小）和<code>-Xmx</code>（堆最大大小）</li>
+</ul>
+</li>
+<li><p>堆是GC的主要区域，方法区也会有GC但是比例不大，GC又是JVM调优主要的关注对象</p>
+</li>
 </ul>
 <p>堆的具体内存结构如下，要注意的是JVM参数设置的堆空间大小只有新生代和老年代（JDK7和JDK8都是）</p>
 <img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406180150099.png" srcset="/img/loading.gif" lazyload alt="image-20240618015047008" style="zoom: 40%;" />
@@ -561,6 +571,97 @@
 <li>堆空间不一定物理上连续，但是逻辑上是连续的</li>
 <li>所有线程共享Java堆，但是不是共享所有的堆空间。堆中可能还会划分一小块区域，作为线程的<strong>私有的堆缓冲区TLAB</strong></li>
 <li>不是所有的对象一定会在堆中分配内存，如果逃逸分析后没有逃逸出去，可以在栈上直接分配</li>
+<li>堆内存的实际可用空间是小于JVM参数分配的空间的，因为<strong>S0和S1区只会有一个使用</strong></li>
+</ul>
+<h3 id="新生代与老年代"><a href="#新生代与老年代" class="headerlink" title="新生代与老年代"></a>新生代与老年代</h3><p>Java对象可以被分为两类，分别是生命周期较短的瞬时对象和生命周期较长的对象</p>
+<p>由于生命周期较长的对象一般不会被GC，因此<strong>为了优化GC性能</strong>，JMV把堆空间分成了新生代和老年代。</p>
+<p>其中新生代可以进一步分为Eden区、Survivor0区、Survivor1区。新生代可以经常GC，但是老年代原则上应该GC少点</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406182334191.png" srcset="/img/loading.gif" lazyload alt="image-20240618233406091" style="zoom:50%;" />
+
+<p>新生代和老年代的大小可以通过<code>-XX:NewRatio</code>参数来修改，他代表老年代和新生代大小的比例。默认是2，代表老年代是新生代的2倍，并且此参数一般不会修改</p>
+<p>同样新生代中的Eden区和Survivor区也可以通过参数<code>-XX:SurvivorRatio</code>来调整，但是要注意的是Survivor区有两个，配置的比例是Eden区和其中一个Survivor区的比例。也就是说如果设置为8，那么就表示Eden区占8&#x2F;10，而另外两个Survivor区分别占1&#x2F;10</p>
+<h3 id="对象分配"><a href="#对象分配" class="headerlink" title="对象分配"></a>对象分配</h3><p>首先，我们抛开特殊情况不谈，先来说一说<strong>基本流程</strong>：</p>
+<ul>
+<li>当一个对象创建的时候，会先放到Eden区</li>
+<li>如果Eden区放不下，那么<strong>在Eden区创建对象之前</strong>，会做下面几件事：<ul>
+<li>做一次YonugGC，清理掉Eden区Survivor区的垃圾，同时新生代所有对象GC年龄（存在对象头中）<code>+1</code></li>
+<li>将原本Eden区、from区存活下来的对象放到to区，然后to变成下次的from，from变成下次的to</li>
+<li>超过年龄阈值（默认为15，可通过<code>-XX:MaxTenuringThreshold</code>参数设置）的对象直接转移至老年代</li>
+</ul>
+</li>
+</ul>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190052195.png" srcset="/img/loading.gif" lazyload style="zoom:67%;" />
+
+<p>这里要注意的是，<strong>Survivor区是被动GC的</strong>，只有Eden区满了才会GC整个新生代，Survivor区不会主动GC</p>
+<p>上述是基本流程，但是仍然会有一些<strong>特殊情况</strong>：</p>
+<ul>
+<li><p>Young GC后，Eden区还是放不下</p>
+<p>那就说明是超大对象，因此会直接往Old区放，如果Old区放不下就会执行Full GC</p>
+</li>
+<li><p>Young GC后，往to区放的时候放不下</p>
+<p>一般来说，Young GC的时候都会往to区放，首先会看是否到年龄阈值，到了就放到old区</p>
+<p>然后如果没到，但是往to区放的时候发现放不下，那也会直接放到old区</p>
+</li>
+</ul>
+<p>因此最终，对象分配的大致流程就是下面这样：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190100664.png" srcset="/img/loading.gif" lazyload alt="image-20240619010000561" style="zoom: 40%;" />
+
+<p>此外，JVM还提供了几个比较重要的晋升老年代的规则：</p>
+<ul>
+<li><p>大对象直接进入老年代</p>
+</li>
+<li><p>Survivor区晋升老年代，还有一种动态的年龄判断：这个不用等到maxTenuringThreshold才去晋升，而是那个动态年龄阈值（排序后的空间百分比）</p>
+</li>
+</ul>
+<h3 id="空间担保机制"><a href="#空间担保机制" class="headerlink" title="空间担保机制"></a>空间担保机制</h3><p>在Minor GC之前，其实还有一次判断：</p>
+<ul>
+<li>如果发现新生代大小比老年代剩余区域小，那就说明即使Minor GC每一个垃圾且全部放到老年代都能放下，那么就说明本次Minor GC安全，可以执行</li>
+<li>如果发现放不下且开启空间担保（<code>-XX:HandlerPromotionFailure=true</code>）则：<ul>
+<li>要是老年代可用空间，大于以前每次MinorGC晋升到老年代空间的平均值，则进行一次有风险的Minor GC</li>
+<li>否则直接Full GC（没开启，或者小于平均值）</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>空间担保机制在JDK7以后强制开启，即使保留了<code>-XX:HandlerPromotionFailure</code>参数，但是不会使用</p>
+</blockquote>
+<h3 id="GC分类"><a href="#GC分类" class="headerlink" title="GC分类"></a>GC分类</h3><p>JVM的GC的时候并不是每次都会对整个堆空间GC，其实一共有三种方式：Minor GC、Major GC、Full GC</p>
+<p>在HotpotJVM中，GC可以大致分为两种：整堆GC和部分GC</p>
+<ul>
+<li><p>整堆GC：Full GC，会对<strong>整个堆空间+方法区</strong>做一次GC，包括所有的新生代和老年代</p>
+<p>因此老年代空间不足和方法区空间不足，都会触发Full GC</p>
+</li>
+<li><p>部分GC：Minor GC（Young GC）和Major GC（Old GC），这里一定要区别Major GC和Ful GC</p>
+<ul>
+<li>Minor GC是针对整个新生代，且只会由Eden区满了后主动触发</li>
+<li>Major GC是针对整个老年代，但是目前<strong>只有CMS会有Major GC</strong></li>
+<li>上述混合就是Mixed GC，这个是整个新生代+部分老年代，这个目前<strong>只有G1有Mixed GC</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="TLAB"><a href="#TLAB" class="headerlink" title="TLAB"></a>TLAB</h3><p>由于堆是线程共享的区域，因此当多个线程同时创建对象的时候就会出现操作同一块内存的线程不安全问题</p>
+<p>为了解决这个问题，简单粗暴的解决办法就是加锁来实现对象创建，但是这会大大降低JVM性能</p>
+<p>所以TLAB就出现了，它会<strong>在Eden区为每个线程分配一块私有区域</strong></p>
+<blockquote>
+<p>当线程把这块TLAB用掉后，就会归还给Eden区作为共享区域，然后重新分配TLAB区域</p>
+<p><strong>分配TLAB的时候还是会CAS，因为这个时候同样也是线程不安全的</strong></p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406190148915.png" srcset="/img/loading.gif" lazyload alt="image-20240619014834807" style="zoom: 40%;" />
+
+<p>但是，TLAB实际上很小，如果对象占用空间大于TLAB大小，那么还是会通过<strong>CAS</strong>的方式去共享区域分配内存</p>
+<h3 id="堆空间的JVM参数"><a href="#堆空间的JVM参数" class="headerlink" title="堆空间的JVM参数"></a>堆空间的JVM参数</h3><p>首先要说的是对于<code>-XX:-啥啥啥</code>，由于前面是减号，因此表示禁用某个功能</p>
+<p>相反对于<code>-XX:+啥啥啥</code>，前面是加号，因此表示开启某个功能，前面没有符号默认是加号</p>
+<ul>
+<li><p><code>-Xms</code>、<code>-Xmx</code>、<code>-Xmn</code>：堆空间初始大小、堆空间最大大小、新生代大小</p>
+</li>
+<li><p><code>-XX:NewRatio</code>、<code>-XX:SurvivorRatio</code>：老年代和新生代的比值、Eden和Survivor的比值</p>
+</li>
+<li><p><code>-XX:MaxTenuringThreshold</code>：晋升Old区的年龄阈值</p>
+</li>
+<li><p><code>-XX:+PrintGCDetails</code>、<code>-XX:PrintGC</code>：打印GC详细日志、打印GC简略日志</p>
+</li>
+<li><p><code>-XX:HandlerPromotionFailure=true</code>：开启空间担保</p>
+</li>
 </ul>
 
                 
