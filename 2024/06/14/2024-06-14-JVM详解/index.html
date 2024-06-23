@@ -46,8 +46,9 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406032351484.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406210040767.webp">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406210039514.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406240028093.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-20T16:43:11.971Z">
+<meta property="article:modified_time" content="2024-06-23T17:26:24.535Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -274,7 +275,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          9.6k 字
+          11k 字
         
       </span>
     
@@ -285,7 +286,7 @@
         
         
         
-          81 分钟
+          94 分钟
         
       </span>
     
@@ -832,6 +833,63 @@
 <p>其中直接引用时hotSpot的实现，从对象头也可以看出来</p>
 <p>因为句柄访问需要额外空间，并且还需要两次的地址访问，既耗时间又耗空间</p>
 <p>但是句柄相对直接引用更灵活，可以更好的应对发生GC后对象的移动情况（晋升、标记-整理等）</p>
+<h2 id="执行引擎"><a href="#执行引擎" class="headerlink" title="执行引擎"></a>执行引擎</h2><h3 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a>概述</h3><p>执行引擎是Java虚拟机的核心组成部分之一，但是和基于物理机的执行不同的是：</p>
+<ul>
+<li>物理机的执行引擎是直接基于机器指令和、处理器等部分的</li>
+<li>虚拟机的执行引擎是软件实现的，不会受到硬件平台的限制</li>
+</ul>
+<p>也就是说JVM的执行引擎就是将Java字节码的指令解释（<strong>解释器</strong>）&#x2F;编译（<strong>JIT</strong>）为对应平台的机器指令</p>
+<p>从运行时数据区的角度来看，执行引擎就是根据程序计数器的值，去执行对应的指令，然后根据指令对栈进行操作，比如局部变量表、操作数栈、新建一个栈帧等等</p>
+<p>由于，执行引擎在执行字节码的时候，可能会解释执行，也可能通过JIT编译后的代码编译执行，因此Java语言是一门半解释半编译的语言</p>
+<h3 id="解释器"><a href="#解释器" class="headerlink" title="解释器"></a>解释器</h3><p>JVM设计的初衷就是跨平台性，实现跨平台性的方法就是设计了不同平台的JVM，这样可以保证对于不同平台，可	以将相同的字节码翻译成对应的机器指令</p>
+<p>那么解释器做的事情就是这个，不同平台的JVM解释器是不一样的，它可以根据当前平台的指令集，将字节码翻译成指定的指令，然后在对应平台上执行</p>
+<p>但是这样做会导致程序运行的很低效，因为同一条字节码每次执行都需要翻译一遍。为了解决这一痛点，JIT即时编译器就出现了，它可以将部分代码提前编译好，等运行的时候直接运行就可以了</p>
+<h3 id="JIT编译器"><a href="#JIT编译器" class="headerlink" title="JIT编译器"></a>JIT编译器</h3><h4 id="编译器分类"><a href="#编译器分类" class="headerlink" title="编译器分类"></a>编译器分类</h4><p>Java编译器可以大致分为三种，分别是Java到字节码的编译器、JIT编译器、AOT编译器</p>
+<ul>
+<li>Java到字节码编译的过程，一般就是用sun的javac</li>
+<li>JIT编译器是Hotspot比较重要的，有C1和C2</li>
+<li>AOT编译器是直接完全将字节码翻译为机器码，比如GCJ（GNU compiler for the java）</li>
+</ul>
+<h4 id="产生的原因"><a href="#产生的原因" class="headerlink" title="产生的原因"></a>产生的原因</h4><p>为什么要搞这么个东西，而且又要把两个不同模式进行穿插使用呢？</p>
+<p>我们要明确JIT和解释器的差别：</p>
+<ul>
+<li>JIT是编译完在执行机器码，执行起来速度很快，但是编译会耗费一定时间</li>
+<li>解释器是上来就可以解释执行，但是每条字节码执行起来会慢点</li>
+</ul>
+<p>因此，最终JVM一个也没有抛弃，逐渐演变成了一个半解释半执行的语言</p>
+<h4 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h4><p>在HotSpot虚拟机中（JRockit没有用解释器），一个<strong>Java程序启动后</strong>：</p>
+<ul>
+<li>首先，解释器直接开始执行字节码，可以尽可能减小启动时间</li>
+<li>然后，随着解释器的执行，JIT会通过热点探测找出热点代码，将其编译然后存放到方法区的JIT cache中</li>
+<li>如果在解释执行的过程中，发现该代码块边JIT编译缓存了，那么就直接拿出来执行</li>
+<li>最后，随着时间的推移，越来越到的代码被编译成机器码，程序会越来越快</li>
+</ul>
+<blockquote>
+<p>这也就是为什么，Spring程序启动后，多发几次请求，后面的请求会比第一次快的原因之一</p>
+<p>阿里为了解决这个问题，也采用了分批启动的方式，给出冷机和热机这样的名词</p>
+</blockquote>
+<h3 id="热点代码及探测"><a href="#热点代码及探测" class="headerlink" title="热点代码及探测"></a>热点代码及探测</h3><p>在HotSpot中，会实时的根据执行情况分析出热点代码，然后将其翻译为机器码缓存到方法区</p>
+<p>那么什么才是热点代码呢?</p>
+<p>其实就是根据执行频率来定的，比如被多次调用的方法或者循环次数很多的循环体（次数是通过计数器来计算的），而这也正好分成了两种方式，方法和循环</p>
+<h4 id="方法JIT"><a href="#方法JIT" class="headerlink" title="方法JIT"></a>方法JIT</h4><p>方法使用的计数器叫做<strong>方法计数器</strong>，，其阈值进行即时编译是通过<code>-XX:CompileThreshold</code>来人为设定的</p>
+<p>具体替换，其实就是栈上替换，因为一个方法就是栈帧，可以直接替换掉原本的栈帧，流程如下：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406240028093.png" srcset="/img/loading.gif" lazyload alt="image-20240624002809965" style="zoom: 40%;" />
+
+<blockquote>
+<p>要注意的是，JIT的阈值<strong>并不是一个绝对次数</strong>，如果程序超过规定的时间，阈值就会减半（称之为半衰期），可用参数<code>-XX:CounterHalfLifeTime</code>来规定半衰期大小</p>
+</blockquote>
+<h4 id="循环JIT"><a href="#循环JIT" class="headerlink" title="循环JIT"></a>循环JIT</h4><p>循环的使用的计数器叫<strong>回边计数器</strong>，大概思路和方法JIT差不多</p>
+<h2 id="StringTable"><a href="#StringTable" class="headerlink" title="StringTable"></a>StringTable</h2><h3 id="String的基本使用"><a href="#String的基本使用" class="headerlink" title="String的基本使用"></a>String的基本使用</h3><p>String可以通过字面量的形式或者new的形式构造出来，因为它很容易被我们当作是一种基本数据类型</p>
+<p>String类实现了Serializable接口实现序列化，实现Comparable接口实现比较、排序</p>
+<h4 id="String数据结构"><a href="#String数据结构" class="headerlink" title="String数据结构"></a>String数据结构</h4><p>String底层数据结构在不同JDK版本是不一样的，要注意的是JDK9及以后，从char数组改为了byte数组，因为Java团队发现大部分时候String存储的都是8字节的编码形式的数组，如果使用char会造成一半的空间浪费（相关的StringBuilder也修改了）</p>
+<p>但是为了兼容16字节编码的字符串，JDK9及以后使用了byte+编码（决定是按1字节decode还是2字节decode）的形式来表示字符串</p>
+<h4 id="String的不可变"><a href="#String的不可变" class="headerlink" title="String的不可变"></a>String的不可变</h4><p>String是不可被修改了，可以从两个角度来看：</p>
+<ul>
+<li><strong>String内部的存储结构</strong>（不管是char数组还是byte数组）是声明为final，</li>
+<li><strong>String类也是声明为final</strong>的，因此String类无法被继承也没有暴露可修改的方法，甚至底层数据结构本身也无法修改</li>
+</ul>
+<h4 id="String底层的HashTable"><a href="#String底层的HashTable" class="headerlink" title="String底层的HashTable"></a>String底层的HashTable</h4><p>String常量池底层是一个哈希表，并且大小固定（可用<code>-XX:StringTableSize</code>来设置），使用拉链法解决冲突，因此字符串常量池不会存储相同的字符串。</p>
+<p>如果字符串过多导致链表过长，就会导致调用String.intern时间过长</p>
 
                 
               </div>
