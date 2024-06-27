@@ -48,7 +48,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406210039514.webp">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406240028093.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-23T17:26:24.535Z">
+<meta property="article:modified_time" content="2024-06-27T15:19:46.019Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -275,7 +275,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          11k 字
+          12k 字
         
       </span>
     
@@ -286,7 +286,7 @@
         
         
         
-          94 分钟
+          101 分钟
         
       </span>
     
@@ -888,8 +888,59 @@
 <li><strong>String内部的存储结构</strong>（不管是char数组还是byte数组）是声明为final，</li>
 <li><strong>String类也是声明为final</strong>的，因此String类无法被继承也没有暴露可修改的方法，甚至底层数据结构本身也无法修改</li>
 </ul>
-<h4 id="String底层的HashTable"><a href="#String底层的HashTable" class="headerlink" title="String底层的HashTable"></a>String底层的HashTable</h4><p>String常量池底层是一个哈希表，并且大小固定（可用<code>-XX:StringTableSize</code>来设置），使用拉链法解决冲突，因此字符串常量池不会存储相同的字符串。</p>
-<p>如果字符串过多导致链表过长，就会导致调用String.intern时间过长</p>
+<h4 id="String底层的HashTable"><a href="#String底层的HashTable" class="headerlink" title="String底层的HashTable"></a>String底层的HashTable</h4><p>StringTable其实是一个key为字符串，value为堆中String对象引用的哈希表</p>
+<p>其大小固定（可用<code>-XX:StringTableSize</code>来设置），使用拉链法解决冲突，因此字符串常量池<strong>不会存储相同的字符串</strong>。</p>
+<p>如果字符串过多导致链表过长，就会导致调用intern时间过长</p>
+<h3 id="String的内存分配"><a href="#String的内存分配" class="headerlink" title="String的内存分配"></a>String的内存分配</h3><p>Java的8大基本数据类型以及String都有一个常量池，而String的常量池比较特殊，主要使用的方法有两种：</p>
+<ul>
+<li>如果通过字面量的形式new一个字符串，<code>String str = &quot;aaa&quot;</code>，那就会在常量池中创建一个这样的String</li>
+<li>如果不是通过字面量的形式创建，则可以通过<code>intern()</code>方法，会先看常量池有没有，没有则创建</li>
+</ul>
+<blockquote>
+<p>Java6及以前，字符串常量池放在永久代</p>
+<p>Java7的时候，将字符串常量池以及静态变量移到堆里面去了</p>
+<p>Java8提出元空间，字符串常量池和静态变量也都放在堆中</p>
+</blockquote>
+<p>那为什么要这样移动呢，其实有两个原因</p>
+<ul>
+<li>放在方法区的字符串常量池大小默认比较小，容易OOM</li>
+<li>放在堆中的常量池，可以GC的更加频繁</li>
+</ul>
+<h3 id="String的拼接操作"><a href="#String的拼接操作" class="headerlink" title="String的拼接操作"></a>String的拼接操作</h3><p>String拼接其实就是Java唯一一个重载了的运算符<code>+</code>做的事情</p>
+<p>其原理是先new一个StringBuilder，然后用append方法，然后最后调用toString方法new一个String对象返回</p>
+<blockquote>
+<ul>
+<li><p>StringBuilder底层是一个char数组，调用toString方法的时候，就是用这个数组去new一个String</p>
+<p>调用append方法的时候，如果超过char数组大小，会进行扩容操作</p>
+</li>
+<li><p>toString方法中的new String是通过char数组去new的，不会先在常量池new一个，再在堆new一个</p>
+<p><strong>包括String.valueOf函数也是如此</strong></p>
+</li>
+</ul>
+</blockquote>
+<p>因此，如果不对该结果调用intern方法，那么其实两个字符串值相等，但是一个在常量池一个在堆中new了一个String对象，这两个地址是不一样的</p>
+<p>只有调用了intern方法，返回了常量池中的地址，这样才会相同，如下方代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>    String s1=<span class="hljs-string">&quot;ab&quot;</span>;<br>    String s2=<span class="hljs-string">&quot;a&quot;</span>;<br>    String s3=<span class="hljs-string">&quot;b&quot;</span>;<br>    String s4=s2+s3;<span class="hljs-comment">//new String(&quot;ab&quot;)</span><br>    String s5=s4.intern();<span class="hljs-comment">//&quot;ab&quot;</span><br>    System.out.println(s1==s4);<span class="hljs-comment">//false</span><br>    System.out.println(s1==s5);<span class="hljs-comment">//true</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是有几种情况，是不使用StringBuilder拼接的，会直接通过<strong>编译器优化</strong>，将结果先写到常量池中：</p>
+<ul>
+<li>如果是两个字面量拼接，那就直接在编译的时候写到常量池里面去</li>
+<li>如果是final的常量并且初始化了，即使后面用的是这些final的变量，那仍然会编译器优化</li>
+</ul>
+<h3 id="intern方法"><a href="#intern方法" class="headerlink" title="intern方法"></a>intern方法</h3><p>intern就是在字符串常量池中找该String，没有的话就new一个</p>
+<p>它可以保证同一个字符串只有一个内存，减少空间的使用</p>
+<p>但是有一点要注意，Java7及以后由于常量池从方法区移到堆中，为了进一步节省空间，当调用intern的时候：</p>
+<ul>
+<li><p>如果常量池中没有并且堆中有该String对象，那么就用这个String作为常量池中的String，即一个指针</p>
+<p>也就是说<strong>StringTable其实是一个key为字符串，value为堆中String对象引用的哈希表</strong></p>
+</li>
+</ul>
+<p>因此，<strong>在Java7及以后</strong>，下面两组代码结果是不一样的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>    <span class="hljs-comment">//new String &quot;ab&quot;但是不是常量池的value</span><br>    String s2=<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;a&quot;</span>)+<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;b&quot;</span>);<br>    <span class="hljs-comment">//这里intren后，常量池中&quot;ab&quot;的value就指向了这个Stirng，因为没有，value直接指向调用intern的String</span><br>    s2.intern();<br>    String s1=<span class="hljs-string">&quot;ab&quot;</span>;<br>    System.out.println(s1==s2);<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>    <span class="hljs-comment">//先创建一个String&quot;ab&quot;作为常量池指向的地方，然后再new String给s2</span><br>    String s2=<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(<span class="hljs-string">&quot;ab&quot;</span>);<br>    <span class="hljs-comment">//调用intern的时候已经有了，并且不是s2的new String，而是new String里面的&quot;ab&quot;的new String</span><br>    s2.intern();<br>    String s1=<span class="hljs-string">&quot;ab&quot;</span>;<br>    System.out.println(s1==s2);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>对于Java6及以前，不管堆中有没有new String，只要方法区没有，那就new一个出来</p>
+</blockquote>
 
                 
               </div>
