@@ -29,8 +29,14 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339903.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339941.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339107.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049066.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049260.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049728.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049801.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049816.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282050064.png">
 <meta property="article:published_time" content="2024-05-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-06-25T15:39:36.758Z">
+<meta property="article:modified_time" content="2024-06-28T12:50:13.081Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="MySQL">
@@ -257,7 +263,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.2k 字
+          5.1k 字
         
       </span>
     
@@ -268,7 +274,7 @@
         
         
         
-          27 分钟
+          43 分钟
         
       </span>
     
@@ -466,6 +472,95 @@
 <h4 id="InnoDB为什么需要遍历计数"><a href="#InnoDB为什么需要遍历计数" class="headerlink" title="InnoDB为什么需要遍历计数"></a><strong>InnoDB为什么需要遍历计数</strong></h4><p>不同于MyISAM，当直接计算全表个数的时候，InnoDB需要遍历全表，但是MyISAM有一个字段专门维护记录个数。因此，计算全表个数的时候，InnoDB是O(n)而MyISAM是O(1)</p>
 <p>这是因为InnoDB还需要支持事务，使用MVCC来解决并发的话就不能直接通过一个字段来决定，有的记录对于当前事务来说是不可见的，需要<strong>通过遍历来判断</strong></p>
 <p>而当有条件的计数时候，InnoDB和MyISAM都是会遍历的</p>
+<h2 id="MySQL事务"><a href="#MySQL事务" class="headerlink" title="MySQL事务"></a>MySQL事务</h2><h3 id="事务的特性"><a href="#事务的特性" class="headerlink" title="事务的特性"></a>事务的特性</h3><p>这个已经讲烂了：<strong>ACID</strong>，那么在InnoDB中ACID是如何保证的呢？</p>
+<ul>
+<li>Atomic：原子性是指一个事务中的所有操作，要么一起提交，要么一起回滚。这是通过<strong>undo log</strong>实现的，当事务中发生异常，就要通过undo log回滚，实现原子性</li>
+<li>Isolation：隔离性是指多个事务之间，应该是相互隔离的，无法看到事务执行的中间状态。这是通过<strong>MVCC+锁机制</strong>实现的，快照读使用MVCC，当前读使用锁机制</li>
+<li>Durable：持久性是指事务执行完后，结果永远保留。这是通过<strong>redo log</strong>实现的，当事务执行完后redo log就会保存操作记录，并刷盘持久化，如果事务提交后发生崩溃，导致buffer pool还没有写入磁盘，可以通过redo log恢复</li>
+<li>Consistent：一致性是指数据的一致性，这个是通过AID来共同保证的</li>
+</ul>
+<p>也就是说ACID中，<strong>AID是基础，最终保证了C</strong></p>
+<h3 id="并发事务引起的问题"><a href="#并发事务引起的问题" class="headerlink" title="并发事务引起的问题"></a>并发事务引起的问题</h3><p>MySQL提出了事务隔离级别的概念，不同的隔离级别就是为了解决不同的问题</p>
+<p>一共有三种问题：</p>
+<ul>
+<li><p><strong>脏读</strong>：事务A读到了还没有提交的事务B的中间状态</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049066.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom:50%;" />
+</li>
+<li><p><strong>不可重复读</strong>：事务A中执行了两次相同的select，但是事务B在这两次select中提交了修改，导致两次select读出来的数据不一样（这里指的不一样指的是内容，而不是条数增加了）</p>
+<blockquote>
+<p>update、delete都是修改，delete底层是逻辑删除，会有单独线程来清理</p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049260.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom: 50%;" />
+</li>
+<li><p><strong>幻读</strong>：幻读专门指的insert导致的，他是指在两次前后查询到的数据个数不一样</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049728.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom:50%;" />
+
+<p>这个要和不可重复读区别开，幻读是insert引起的，而不是更新操作引起的，因为这有可能会导致两次select的条数不一样</p>
+<p>虽然delete也会，但是delete后是逻辑删除，还是可以通过MVCC来控制，具体为什么我们后面详细说说</p>
+</li>
+</ul>
+<h3 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h3><p>既然事务并发有上面这三个问题，那MySQL肯定也解决了它们，MySQL提供了四种隔离级别：</p>
+<p>Read Uncommitted &lt; Read Committed &lt; Repeatable Read &lt; Serializable</p>
+<p>当然这四种隔离级别肯定也不是所有的都解决了上述问题</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049801.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<p>那这些隔离界别是如何实现的呢？</p>
+<ul>
+<li><p>Read Uncommitted</p>
+<p>没有任何操作，任何并发问题都有可能发生，数据库里是啥，就读啥</p>
+</li>
+<li><p>Read Committed</p>
+<p>通过MVCC实现，但是会在每次读之前生成一个Read View，只解决了脏读问题</p>
+</li>
+<li><p>Repeatable Read，是MySQL的默认隔离级别，但是只解决了部分幻读，可重复读级别使用了两种方式来解决的：</p>
+<ul>
+<li><p>对于快照读，使用的是MVCC</p>
+</li>
+<li><p>对于当前读，使用的是间隙锁。</p>
+<p>间隙锁其实就是范围锁，当使用<code>select for update</code>的时候，由于会直接读取最新的，为防止两次读取之间有修改操作导致结果不一样，会<strong>对这个select范围就会加上间隙锁</strong>直接不允许操作这个范围内的任何数据，如果需要在这个范围里面做update、delete、insert操作都会被阻塞，直至事务提交</p>
+</li>
+</ul>
+</li>
+<li><p>Serializable</p>
+<p>通过读写锁实现，允许并发读，但是不允许同时读写，也不允许并发写</p>
+</li>
+</ul>
+<h3 id="幻读问题"><a href="#幻读问题" class="headerlink" title="幻读问题"></a>幻读问题</h3><p>接下来，我们来重点讨论一下幻读，为什么Repeatable Read隔离级别只解决了部分幻读问题？</p>
+<p><strong>幻读是指</strong>：同一个查询在不同的时间产生不同的结果集时，事务中就会出现所谓的幻象问题。例如，如果 SELECT 执行了两次，但第二次返回了第一次没有返回的行，则该行是“幻像”行</p>
+<h4 id="快照读避免幻读"><a href="#快照读避免幻读" class="headerlink" title="快照读避免幻读"></a>快照读避免幻读</h4><p>在Repeatable Read级别中，由于MVCC创建的读视图是不变的，因此在当前事务中，<strong>一般情况下</strong>，如果有其他事务insert、delete、update的时候都不会出现问题。</p>
+<p>MVCC会从undo log中找到符合读视图的版本，如果是insert的话，那找到最后也没发现直接返回空</p>
+<p>这里有两个问题：</p>
+<ul>
+<li><p><strong>delete的记录，为什么还能从表中找到undo log的头指针？</strong></p>
+<p>这是因为MySQL的delete操作是逻辑删除，因此还是会找到该数据，会判断是否符合读视图还会判断是否已删除</p>
+<p>那如果全都是逻辑删除岂不是会很耗空间？</p>
+<p>MySQL会有一个单独线程（线程数可以设置），来删除逻辑删除的数据条目和undo log，只要确定该记录不会被用到了，比如该记录trx_id以前的事务都已经终止了，那就会删掉</p>
+</li>
+<li><p><strong>为什么说是一般情况？</strong></p>
+<p>因为如果你不做update操作就永远是在读视图里面select就不会出问题，但是如果在当前事务使用delete、update、insert操作，这些操作是基于当前读实现的，那就有可能会出问题了</p>
+<p>如果在当前事务执行修改操作之前，事务B插入了一条数据，恰巧当前事务的修改操作范围匹配上事务B插入的数据，那么本次修改操作就会<strong>在开发者不知道的情况下作用在事务B插入的数据上，并且会将该记录的trx_id修改成自己的</strong>，那么下次查询就会莫名其妙的查出来了</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049816.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 67%;" />
+
+<p>其实不仅仅是事务B的insert操作，事务B的delete操作，如果事务Aupdate在delete之后，那就会发现update并没有生效，还是有很多种情况的</p>
+<p>如果要解决只能通过serializable来解决，因为它不允许并发读写和并发写</p>
+</li>
+</ul>
+<h4 id="当前读解决幻读"><a href="#当前读解决幻读" class="headerlink" title="当前读解决幻读"></a>当前读解决幻读</h4><p>那就是简单粗暴的使用间隙锁了，只要在当前事务中使用了select for update语句，那就会有两种情况：</p>
+<ul>
+<li>有其他事务正在写，那么当前事务阻塞，知道写事务提交，才会拿到结果并加上间隙锁</li>
+<li>没有写事务，那就直接加锁并获取结果</li>
+</ul>
+<p>加上间隙锁后，任何对于该范围内的写操作都会被阻塞，因此当前事务所有的当前读都不会被其他写操作干扰，不会出现幻读</p>
+<p>那么就有人问了，如果先select 在select for update呢？</p>
+<p>那确实有可能会不一样，但原则上select和select for update是两个不同的语句，不一样可以接受</p>
+<h2 id="MySQL日志"><a href="#MySQL日志" class="headerlink" title="MySQL日志"></a>MySQL日志</h2><h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><p>在将MySQL日志之前，我觉得有些东西得先讲一讲，那就是缓冲区</p>
+<p>在MySQL的日志、数据这些写入操作的时候，都不是直接写到磁盘，而是先放在一个buffer中，然后由MySQL的配置决定什么时候写到page cache，然后在通过fsync来持久化到磁盘</p>
+<p><strong>从MySQL的角度来说，只要写到page cache其实就算持久化了</strong>，因为这个时候即使MySQL崩了也不会发生丢失，page cache是OS层面的缓存，只有OS崩了或者系统断电等情况发生，才会丢失</p>
+<p>此外，我们还需要提醒一点：undo log的buffer是放在buffer pool中的，而redo log和binlog的buffer都是单独存在的</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282050064.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<p>后面看日志和BufferPool的时候，我们一定要明确一点：</p>
+<p>MySQL是基于磁盘的，<strong>如何减少磁盘IO的同时并保证数据完整性</strong>，是MySQL日志和Buffer Pool优化的地方，这里任何技术的提出都是为了达到此作用</p>
 
                 
               </div>
