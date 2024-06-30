@@ -47,8 +47,11 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406210040767.webp">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406210039514.webp">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406240028093.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301911274.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908306.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908632.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-28T13:34:20.823Z">
+<meta property="article:modified_time" content="2024-06-30T11:11:57.843Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -275,7 +278,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          12k 字
+          14k 字
         
       </span>
     
@@ -286,7 +289,7 @@
         
         
         
-          102 分钟
+          119 分钟
         
       </span>
     
@@ -941,12 +944,108 @@
 <blockquote>
 <p>对于Java6及以前，不管堆中有没有new String，只要方法区没有，那就new一个出来</p>
 </blockquote>
-<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>垃圾回收有三大问题：</p>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>垃圾回收有三大问题，因此我们下面也基本就这三大部分：</p>
 <ul>
-<li>哪些内存是需要被当作垃圾回收的？（垃圾识别算法）</li>
-<li>什么时候回收垃圾？（垃圾回收算法）</li>
+<li>哪些内存是需要被当作垃圾回收的？（垃圾标记算法）</li>
+<li>什么时候回收垃圾？（垃圾清除算法）</li>
 <li>怎么回收垃圾？（垃圾回收器）</li>
 </ul>
+<blockquote>
+<p><strong>内存溢出和内存泄漏</strong></p>
+<p>如果不进行垃圾回收的话，就会导致JVM的内存溢出，即OOM；</p>
+<p>但是，如果存在一些不使用的对象无法被回收，那就会出现内存泄漏，并最终导致内存溢出</p>
+</blockquote>
+<h3 id="垃圾标记算法"><a href="#垃圾标记算法" class="headerlink" title="垃圾标记算法"></a>垃圾标记算法</h3><p>垃圾标记阶段算法有两个，分别是引用计数法和可达性分析法</p>
+<p>一般来说，如果<strong>一个对象没有引用指向</strong>了，那就可以被认为是一个垃圾，因为没有引用指向就说明这个对象已经丢失了，无法找到这个对象了。</p>
+<h4 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h4><p>这个算法比较简单，就是给对象设置一个属性，记录该对象被引用的次数</p>
+<p>每当一个引用指向了它，那就让计数器加一，引用失效的时候，就让计数器减一。如果减为零那就说明它是一个垃圾</p>
+<p>这种算法，虽然比较简单，但是缺点也是很多的：</p>
+<ul>
+<li><p>无法解决循环引用问题（主要缺点，JVM也因此没有用这个算法）</p>
+</li>
+<li><p>需要额外的空间来存储这个计数器，并且每次引用的变更都需要修改计数器</p>
+</li>
+</ul>
+<h4 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h4><p>可达性分析算法是通过树来实现的，它通过GC roots集合组成了一个森林，只要对象和GC roots集合中的任意一个root相连，就可以被认为它不是一个垃圾</p>
+<p>因此，这里比较重要的是GC root集合到底是哪些：</p>
+<ul>
+<li>虚拟机栈、本地方法栈中的引用对象</li>
+<li>方法区中的静态属性引用的对象</li>
+<li>synchronized持有的对象</li>
+<li>JVM内部引用，比如Class对象、ClassLoader对象等等</li>
+</ul>
+<blockquote>
+<p>除了这些常规的GC roots以外，如果是进行分代垃圾回收，比如只回收年轻代，那么老年代中的引用也可以作为GC roots</p>
+<p>其实，可以总结为：<strong>不在当前垃圾回收范围内的引用，都可以作为GC root</strong></p>
+</blockquote>
+<p>如果要使用可达性分析算法，在分析的时候需要STW，不然准确性无法保证。</p>
+<p>即使像CMS、G1这种的也是会有STW的标记阶段，来查找root和root的直接子节点</p>
+<h3 id="对象的生命周期"><a href="#对象的生命周期" class="headerlink" title="对象的生命周期"></a>对象的生命周期</h3><p>Object基类对象有一个finalize方法，当系统要GC的时候会先调用该方法，然后才会回收</p>
+<p>finalize方法有可能会让当前被标记为不可达的对象在GC之前有一个复活的机会，这个机会<strong>有且仅有一次</strong>，一旦调用了并被复活，下次GC的时候就不会再调用了（用户手动调用除外）</p>
+<p>也正是因为有了这个finalize方法，对象的生命周期也进一步被细化了：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301911274.png" srcset="/img/loading.gif" lazyload alt="java-lifetime-of-finalizable-object" style="zoom: 80%;" />
+
+<p>当一个对象经过可达性分析算饭被标记为不可达后，具体流程如下：</p>
+<ul>
+<li>查看该对象是否重写了finalize方法（因为Object的finalize方法是空的，没必要执行），如果没有重写，那就直接GC掉</li>
+<li>如果发现没有重写，并且没有被JVM执行过（用户手动执行不算），那么就会将其加入F-Queue队列（队列中存放的是JVM专门定义的<code>FinalizerReference</code>引用类型），等待单独的线程从队列里面拿出来执行finalize方法</li>
+<li>执行完finalize方法，如果发现和GC roots中的节点产生联系，那就复活不进行GC；但是如果仍然没有产生联系，那就还是需要GC</li>
+</ul>
+<p>我们可以通过以下程序试验：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* 最终输出：</span><br><span class="hljs-comment">* Execute finalize method!</span><br><span class="hljs-comment">* Execute finalize method!</span><br><span class="hljs-comment">* Obj alive!</span><br><span class="hljs-comment">* Obj dead!</span><br><span class="hljs-comment">*/</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Test</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Test obj;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">finalize</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>        <span class="hljs-built_in">super</span>.finalize();<br>        System.out.println(<span class="hljs-string">&quot;Execute finalize method!&quot;</span>);<br>        obj=<span class="hljs-built_in">this</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>        obj=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Test</span>();<br>        <span class="hljs-comment">//手动调用，不影响GC调用</span><br>        obj.finalize();<br>        obj =<span class="hljs-literal">null</span>;<br><br>        <span class="hljs-comment">//第一次GC，调用finalize方法</span><br>        System.gc();<br>        <span class="hljs-comment">//finalize方法单独线程执行，需要sleep等待执行完</span><br>        Thread.sleep(<span class="hljs-number">1000</span>);<br>        <span class="hljs-keyword">if</span>(obj==<span class="hljs-literal">null</span>)&#123;<br>            System.out.println(<span class="hljs-string">&quot;Obj dead!&quot;</span>);<br>        &#125;<span class="hljs-keyword">else</span>&#123;<br>            System.out.println(<span class="hljs-string">&quot;Obj alive!&quot;</span>);<br>        &#125;<br><br>        obj=<span class="hljs-literal">null</span>;<br>        <span class="hljs-comment">//第二次GC，不执行finalize方法了</span><br>        System.gc();<br>        Thread.sleep(<span class="hljs-number">1000</span>);<br>        <span class="hljs-keyword">if</span>(obj==<span class="hljs-literal">null</span>)&#123;<br>            System.out.println(<span class="hljs-string">&quot;Obj dead!&quot;</span>);<br>        &#125;<span class="hljs-keyword">else</span>&#123;<br>            System.out.println(<span class="hljs-string">&quot;Obj alive!&quot;</span>);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="垃圾清除算法"><a href="#垃圾清除算法" class="headerlink" title="垃圾清除算法"></a>垃圾清除算法</h3><p>当通过垃圾标记算法找到最终需要被清理的对象过后，就要开始进行释放内存，然后腾出新的空间了</p>
+<p>但是，释放内存后，这些内存空间怎么管理，怎么个释放法，这就是垃圾清除算法要做的事</p>
+<h4 id="标记-清除算法（Mark-Sweep）"><a href="#标记-清除算法（Mark-Sweep）" class="headerlink" title="标记-清除算法（Mark-Sweep）"></a>标记-清除算法（Mark-Sweep）</h4><p>这个就是遍历两次（会STW），第一次标记垃圾，第二次清除被标记为垃圾的对象，直接释放内存</p>
+<p>但是这个算法会有很多缺点：</p>
+<ul>
+<li><p>需要STW</p>
+</li>
+<li><p>会产生大量内存碎片</p>
+</li>
+<li><p>要用额外的空闲链表来维护空闲空间</p>
+<p>也就是说，该算法对应的对象的分配方式是使用的空闲链表法</p>
+</li>
+</ul>
+<h4 id="复制算法（Copying）"><a href="#复制算法（Copying）" class="headerlink" title="复制算法（Copying）"></a>复制算法（Copying）</h4><p>将原本的内存区域分为两块，每次清理的时候将存活的对象复制到另一块去，它比标记-清除算法更简单高效，还不会产生内存碎片</p>
+<p>但是，也十分直观的：<strong>可用内存空间减少了一半</strong>。</p>
+<p>此外，由于移动过后对象地址变了，而Java使用的是直接引用而不是句柄引用，因此需要<strong>修改相关的引用地址</strong>。尤其是像G1这种的，更要花空间和时间来维护region之间对象引用的关系。</p>
+<p>而且当每次GC清除对象很少的时候，复制算法往往几乎复制了所有的对象到另一块内存中，这样效率会十低下，因此一般应用于新生代（比如<strong>Survivor区</strong>）</p>
+<h4 id="标记-压缩算法（Mark-Compact）"><a href="#标记-压缩算法（Mark-Compact）" class="headerlink" title="标记-压缩算法（Mark-Compact）"></a>标记-压缩算法（Mark-Compact）</h4><p>上述提到，复制算法适用于垃圾对象多，存活对象少的情况下，十分不适用于老年代</p>
+<p>但是，使用标记-清除算法又会导致内存碎片，如果是空间担保机制，很容易OOM</p>
+<p>为此，又提出了一个适用于老年代的标记-压缩算法：</p>
+<ul>
+<li>仍然是先标记，但是清除的时候不是直接释放内存，而是将存活对象往一边移动，这样可以防止内存碎片产生</li>
+</ul>
+<p>同样，也是有一些缺点的：</p>
+<ul>
+<li>移动的时候需要STW</li>
+<li>仍然需要修改引用的地址</li>
+</ul>
+<h3 id="垃圾回收算法的一些优化"><a href="#垃圾回收算法的一些优化" class="headerlink" title="垃圾回收算法的一些优化"></a>垃圾回收算法的一些优化</h3><p>现有的垃圾回收算法（标记和清理），都比较单一，缺点也是十分明显的，如何融合起来做适配，就是我们下面要说的优化问题了</p>
+<h4 id="分代回收算法"><a href="#分代回收算法" class="headerlink" title="分代回收算法"></a>分代回收算法</h4><p>上述三个算法都只是单纯的算法罢了，而Java堆内存是分代的，每个代都有自己的特点</p>
+<p>比如年轻代垃圾多，存活时间短，老年代垃圾少，存活时间长等等</p>
+<p>因此目前的JVM对于不同区的垃圾清理，一般是使用不同的算法，这也就是<strong>分代回收算法</strong></p>
+<p>在Hotspot中，是这样做的：</p>
+<ul>
+<li>年轻代：<strong>复制算法</strong>。复制的target是to区，复制的source是eden区和from区</li>
+<li>老年代：<strong>标记-压缩+标记-清除混合实现</strong>。比如CMS回收器，具体后面再说</li>
+</ul>
+<h4 id="增量收集算法"><a href="#增量收集算法" class="headerlink" title="增量收集算法"></a>增量收集算法</h4><p>由于现有的垃圾回收算法，都需要STW挂起用户线程，一旦挂起时间过长，就会影响用户体验</p>
+<p>为此，提出了一种增量收集算法：</p>
+<ul>
+<li>让垃圾收集线程和应用线程交替执行，将垃圾回收划分为多个阶段（并发标记、并发清理等）</li>
+</ul>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908306.png" srcset="/img/loading.gif" lazyload alt="CMS 收集器" style="zoom:80%;" />
+
+<p>但是，这种方法会导致线程的频繁的切换，系统性能也会下降</p>
+<h4 id="分区算法"><a href="#分区算法" class="headerlink" title="分区算法"></a>分区算法</h4><p>将对空间划分为多个Region，然后根据停顿的时间，每次回收合适数量的Region</p>
+<p>该算法完全颠覆了传统的JVM堆内存结构，将内存结构<strong>从物理分代转变为逻辑分代</strong>，比如G1</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908632.png" srcset="/img/loading.gif" lazyload alt="g1 GC内存布局" style="zoom:67%;" />
+
+<blockquote>
+<p>其实这些都只是一些小的优化思想，在这里说一点是为了后面直接看垃圾回收器不懵逼，真正的垃圾回收器要复杂很多，是各种垃圾回收算法的复合和适配</p>
+</blockquote>
 
                 
               </div>
