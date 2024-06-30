@@ -51,7 +51,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908306.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908632.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-06-30T11:11:57.843Z">
+<meta property="article:modified_time" content="2024-06-30T15:40:57.275Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -278,7 +278,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          14k 字
+          15k 字
         
       </span>
     
@@ -289,7 +289,7 @@
         
         
         
-          119 分钟
+          124 分钟
         
       </span>
     
@@ -1046,7 +1046,38 @@
 <blockquote>
 <p>其实这些都只是一些小的优化思想，在这里说一点是为了后面直接看垃圾回收器不懵逼，真正的垃圾回收器要复杂很多，是各种垃圾回收算法的复合和适配</p>
 </blockquote>
-
+<h3 id="垃圾回收相关概念"><a href="#垃圾回收相关概念" class="headerlink" title="垃圾回收相关概念"></a>垃圾回收相关概念</h3><p>在讲垃圾回收器之前，我们需要明确以下垃圾回收的一些概念，这样在后面讲垃圾回收器的时候，才能弄明白</p>
+<ul>
+<li><p>System.gc()方法</p>
+<p>这个方法只是触发一次GC，但是并不会立马调用垃圾回收器去执行GC，相当于是一个异步的</p>
+</li>
+<li><p>内存泄露</p>
+<p>当一些对象不再使用，但是GC无法回收，就会导致内存泄漏，在开发中有很多场景：</p>
+<ul>
+<li><p>单例模式，由于单例对象是static声明的类静态变量是一个GC root，如果它里面引用了某个对象，但是这个对象后面不用了，那么就会无法GC掉</p>
+</li>
+<li><p>数据库、socket这些连接没有手动close掉，就会泄漏</p>
+</li>
+<li><p>ThreadLocal中key是弱引用，但是value为强引用，一旦ThreadLocal外部的强引用没了，ThreadLocalMap中的key就会没了，无法访问到value，但是value的强引用还在，无法GC</p>
+<p>具体看：<a target="_blank" rel="noopener" href="https://zenithwon.github.io/2024/06/03/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/">JUC并发工具详解</a></p>
+</li>
+</ul>
+</li>
+<li><p>安全点和安全区域</p>
+<p>并非所有时候，都可以STW进行GC，只有到特定位置才能停下来GC，这些位置就是全局安全点。</p>
+<p>由于GC时间往往比较长，因此<strong>为了让用户尽可能无感知</strong>，一般安全点选在某条执行时间较长的指令地方，比如方法调用、分支或循环跳转</p>
+<blockquote>
+<p>如何在GC触发的时候让线程都到SafePoint停下来呢？</p>
+<ul>
+<li>线程被动：先让所有线程都停下来，然后告诉他们要在最近的安全点停下来</li>
+<li>线程主动：触发GC后设置一个标志位，线程每次到一个安全点，就根据标志位判断是否需要停下来</li>
+</ul>
+</blockquote>
+<p>但是有时候，并不是什么时候都可以找到最近的安全点停下来，比如sleep的时候，这时候就需要安全区域了</p>
+<p>安全区域指的是某一段代码块不会发生对象的引用变更，那么这段代码任何地方都可以GC</p>
+</li>
+</ul>
+<h3 id="几种引用类型"><a href="#几种引用类型" class="headerlink" title="几种引用类型"></a>几种引用类型</h3>
                 
               </div>
             
