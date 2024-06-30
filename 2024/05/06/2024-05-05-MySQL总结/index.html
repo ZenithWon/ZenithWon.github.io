@@ -34,9 +34,12 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049728.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049801.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049816.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282050064.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134065.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134799.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134345.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301135150.png">
 <meta property="article:published_time" content="2024-05-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-06-28T12:50:13.081Z">
+<meta property="article:modified_time" content="2024-06-30T03:35:34.214Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="MySQL">
@@ -263,7 +266,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.1k 字
+          7k 字
         
       </span>
     
@@ -274,7 +277,7 @@
         
         
         
-          43 分钟
+          59 分钟
         
       </span>
     
@@ -557,10 +560,105 @@
 <p>在MySQL的日志、数据这些写入操作的时候，都不是直接写到磁盘，而是先放在一个buffer中，然后由MySQL的配置决定什么时候写到page cache，然后在通过fsync来持久化到磁盘</p>
 <p><strong>从MySQL的角度来说，只要写到page cache其实就算持久化了</strong>，因为这个时候即使MySQL崩了也不会发生丢失，page cache是OS层面的缓存，只有OS崩了或者系统断电等情况发生，才会丢失</p>
 <p>此外，我们还需要提醒一点：undo log的buffer是放在buffer pool中的，而redo log和binlog的buffer都是单独存在的</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282050064.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134065.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
 
 <p>后面看日志和BufferPool的时候，我们一定要明确一点：</p>
 <p>MySQL是基于磁盘的，<strong>如何减少磁盘IO的同时并保证数据完整性</strong>，是MySQL日志和Buffer Pool优化的地方，这里任何技术的提出都是为了达到此作用</p>
+<h3 id="Undo-log"><a href="#Undo-log" class="headerlink" title="Undo log"></a>Undo log</h3><p>如果在事务还没有提交的时候，MySQL出现了错误或者崩溃需要回滚，那就需要靠undo log记录下执行前的数据，这样如果发生回滚就可以直接根据undo log回滚了，<strong>保证了事务的原子性</strong></p>
+<p>此外，undo log在MVCC中也起到了十分重要的作用，通过undo log形成的链表，找到符合当前读视图的那个记录版本</p>
+<p>要注意的是，每个undo log记录格式并不相同，它取决于执行的操作是insert、delete、update</p>
+<p>undo log的buffer不同于redo log和binlog，它是放在buffer pool中的，被当作是数据页看待。因此undo log的修改同样也会被redo log记录下来</p>
+<p>而redo log会每秒刷盘+事务提交刷盘，因此redo log<strong>可以保证持久性</strong></p>
+<blockquote>
+<p>其实在这里，我想到了一个问题：</p>
+<p>当事务执行一半的时候，mysql崩了，此时修改的数据页脏页刷盘了，但是undolog页并没有刷盘，但是<strong>由于事务执行一半redo log也没有刷盘</strong>。这个时候数据页已经写进去了（如果没写进去，那还好，mysql恢复过来什么也没有刷盘，执行一半的事务相当于没有发生），此时事务相当于没完成需要回滚，但是undo log没了，redo log也没记录undo log的变更</p>
+<p>那么此时，该怎么办？</p>
+<p>其实这个时候，确实是回滚不来了的，这个问题的<strong>重点其实是我加粗的那块</strong></p>
+<p>事务提交reo log刷盘是msyql的默认策略，本来就不能保证强一执行。我们可以修改参数，使其没执行一条指令刷一次盘，这样就可以解决上述问题了。</p>
+</blockquote>
+<h3 id="Buffer-Pool"><a href="#Buffer-Pool" class="headerlink" title="Buffer Pool"></a>Buffer Pool</h3><p>Buffer Pool其实就是MySQL做的一层分页，MySQL定义的页大小是16KB，是OS的四倍（4KB）</p>
+<p>那么既然讲到分页，那应该就能理解了，MySQL使用undo log、数据页的时候，不会只取一条改完再写回，而是一次取一页，然后LRU换出的时候被动写回</p>
+<p>这样的话可以进一步提高速度，因为这个BufferPool是MySQL自己的缓存，不像OS的page cache是OS层面的，要和其他进程竞争页面<strong>更容易缺页</strong>。</p>
+<h3 id="Redo-log"><a href="#Redo-log" class="headerlink" title="Redo log"></a>Redo log</h3><p>对于BufferPool来说，毕竟是基于内存的，一旦MySQL崩了或者系统断电，那么如果脏页没有写回去，那就会出现数据丢失</p>
+<p>为了防止这种情况发生，MySQL使用redo log来保证持久性</p>
+<p>简单来说，就是当有数据更新的时候，会先更新BufferPool中的数据页和undo log，然后将此次修改记录到redo log中，BufferPool中的数据可以异步刷盘，但是redo log数据必须刷盘</p>
+<p>这样，即使MySQL出问题了，也可以通过redo log恢复过来。</p>
+<p>这就是<strong>WAL技术</strong>（Write Ahead Logging），写操作不急着刷盘，而是记录日志将日志刷盘，脏页异步刷盘</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134799.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<h4 id="undo-log和redo-log的区别"><a href="#undo-log和redo-log的区别" class="headerlink" title="undo log和redo log的区别"></a>undo log和redo log的区别</h4><ul>
+<li><p>undo log是用于回滚和MVCC的，记录的是数据修改之前的状态，保证事务的原子性</p>
+</li>
+<li><p>redo log是用于数据持久化的，记录的是数据修改了什么地方，保证事务的持久性</p>
+</li>
+</ul>
+<h4 id="那为什么不直接将buffer-pool刷盘，而是非要通过redo-log来搞？"><a href="#那为什么不直接将buffer-pool刷盘，而是非要通过redo-log来搞？" class="headerlink" title="那为什么不直接将buffer pool刷盘，而是非要通过redo log来搞？"></a>那为什么不直接将buffer pool刷盘，而是非要通过redo log来搞？</h4><p>这是因为redo log是<strong>顺序写入</strong>的</p>
+<p>就比如一个事务修改了100张表，那如果是直接写入，这100张表的数据肯定不在一个数据页上吧，那就得写回100次</p>
+<p>但是如果是异步写回数据页，我们只需要将redo log刷盘，而redo log是顺序记录这100次表的修改的，基本就是在一个redo log页上，只需要写回一次</p>
+<p>那当然redo log性能高了</p>
+<p>此外，<strong>根据局部性原理</strong>，一般拿出来的数据页可能有多个线程修改，那等多个线程写完一起写回，肯定比写一次写回一次要效率高吧！</p>
+<p>因此，总结下来有两个原因：</p>
+<ul>
+<li>redo log是顺序写入</li>
+<li>buffer pool可能多个线程修改同一个页，异步写回，效率更高</li>
+</ul>
+<h4 id="redo-log是怎么刷盘的"><a href="#redo-log是怎么刷盘的" class="headerlink" title="redo log是怎么刷盘的"></a>redo log是怎么刷盘的</h4><p>Redo log也是有自己的buffer的，但是为了保证数据持久性，肯定不能也放在buffer pool中异步写回，因此redo log buffer独立出来，单独处理</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134345.webp" srcset="/img/loading.gif" lazyload alt="img" style="zoom:40%;" />
+
+<p>redo log的刷盘是有策略的，除了默认的<strong>一秒一次的刷盘</strong>，还有如下细节：</p>
+<ul>
+<li><p>首先，可以通过配置决定什么时候刷盘：不主动写回page cache；事务提交写回page cache；事务提交写回磁盘</p>
+</li>
+<li><p>其次，redo log是循环写，当脏页同步到磁盘，就会删掉redo log对应的内容，采用双指针</p>
+<p>一旦发现追了一圈，那就会阻塞，直至有脏页写到磁盘空出空间，才可以继续写入</p>
+</li>
+</ul>
+<h3 id="Binlog"><a href="#Binlog" class="headerlink" title="Binlog"></a>Binlog</h3><p>上述两个日志undo log和binlog都是InnoDB的日志，也就是说MyISAM是没有事务也没有崩溃恢复能力的，但是binlog是MySQL的东西，也是用来做主从同步的</p>
+<p>binlog里面记录的是所有数据库的修改操作，包括表结构和表数据的修改，但是不包括select语句</p>
+<p>binlog无法做崩溃恢复，只有归档能力，它和redo log还是有很大区别的：</p>
+<ul>
+<li><p>从用途来说：</p>
+<p>binlog用来做归档、主从同步的；</p>
+<p>redo log用来实现事务的持久性，做崩溃恢复的</p>
+</li>
+<li><p>从存储内容来说：</p>
+<p>binlog存储的是<strong>全量的</strong>所有的表结构、表数据的修改操作语句，是修改的逻辑语句；</p>
+<p>redo log存储的是<strong>还没有写回磁盘的脏页的物理修改记录</strong>，是修改的物理地址</p>
+</li>
+</ul>
+<h4 id="为什么binlog无法崩溃恢复"><a href="#为什么binlog无法崩溃恢复" class="headerlink" title="为什么binlog无法崩溃恢复"></a>为什么binlog无法崩溃恢复</h4><p>因为binlog记录的是全量的数据，真要做恢复，就是把mysql的数据全删了，然后用binlog恢复，并且也没有做undo log的保存</p>
+<p>而redo log则是保存的没有刷盘的脏页的数据，只需要回复一下就好了</p>
+<h4 id="binlog的刷盘"><a href="#binlog的刷盘" class="headerlink" title="binlog的刷盘"></a>binlog的刷盘</h4><p>和redo log一样，由于需要同步刷盘，因此也不放到buffer pool中，单独开了一个binlog buffer</p>
+<h3 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h3><p>由于redo log和binlog是两个文件，如果一个刷盘了但是另一个没刷盘，那就会出现问题：</p>
+<ul>
+<li>如果写入binlog没有写入redolog，主库崩溃后无法恢复，但是主库会把binlog中的没恢复的数据同步给从库</li>
+<li>如果写入redo log没有写入binlog，主库崩溃后恢复了，但是binlog中没有，无法同步给从库</li>
+</ul>
+<p>那么如何<strong>保证redo log和binlog的一致性</strong>呢，这就是大名鼎鼎的两阶段提交方案：</p>
+<ul>
+<li>事务提交的时候，会先将redo log刷盘，并将状态置为prepared</li>
+<li>然后将binlog刷盘，刷盘成功后就会将redo log置为committed状态</li>
+</ul>
+<p>这个时候：</p>
+<ul>
+<li><p>若写入binlog失败，恢复时会发现redo log存在prepare项且binlog无对应项，则回滚并删除redo log对应记录</p>
+</li>
+<li><p>若置为committed失败，恢复时会发现redo log存在prepare项但binlog有对应项，则提交并将该记录置为committed</p>
+</li>
+</ul>
+<p>但是两阶段提交也存在一些问题：</p>
+<ul>
+<li>由于一个事务提交就会触发一次两阶段提交，那么就会有两次fsync的刷盘（redo log和binlog）</li>
+<li>并且为了保证事务并发时候顺序性，两阶段提交需要加锁，因此效率会下降</li>
+</ul>
+<p>在MySQL5.7以后，采用了流式操作的组提交的形式，分为了三个阶段：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301135150.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<ul>
+<li>Flush阶段：对redo log刷盘并把binlog写到binlog buffer中不刷盘</li>
+<li>Sync阶段：binlog刷盘，fsync</li>
+<li>Commit阶段：将redo log对应记录置为commit</li>
+</ul>
 
                 
               </div>
