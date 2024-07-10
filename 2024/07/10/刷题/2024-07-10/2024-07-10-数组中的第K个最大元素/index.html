@@ -16,24 +16,23 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="阿里Lazada笔试第一题Problem小红定义一个01串的权值为:相邻两个字符都是’1’的对儿数。例如，”110111”的权值为3。  现在小红希望你求出所有长度为n的01串的权值之和。你能帮帮她吗? Input 一个正整数n $$1\le n \le 10^9\$$  Example Input 13  Output 14  Example-02 Input 14  Output 112  S">
+    <meta name="description" content="数组中的第K个最大元素Problem: 数组中的第K个最大元素 Solution很简单，要实现O(n)的复杂度，那就桶排序了，因为题目给了num的范围在-10000到10000之间 我们只需要加一个基准量，将数字映射到0-20000之间就好了 Code12345678910111213141516171819202122class Solution &#123;    public int fin">
 <meta property="og:type" content="article">
-<meta property="og:title" content="阿里Lazada笔试第一题">
-<meta property="og:url" content="http://example.com/2024/04/29/%E7%AC%94%E8%AF%95%E9%A2%98/2024-04-29-%E9%98%BF%E9%87%8CLazada%E7%AC%94%E8%AF%95%E7%AC%AC%E4%B8%80%E9%A2%98/index.html">
+<meta property="og:title" content="数组中的第K个最大元素">
+<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="阿里Lazada笔试第一题Problem小红定义一个01串的权值为:相邻两个字符都是’1’的对儿数。例如，”110111”的权值为3。  现在小红希望你求出所有长度为n的01串的权值之和。你能帮帮她吗? Input 一个正整数n $$1\le n \le 10^9\$$  Example Input 13  Output 14  Example-02 Input 14  Output 112  S">
+<meta property="og:description" content="数组中的第K个最大元素Problem: 数组中的第K个最大元素 Solution很简单，要实现O(n)的复杂度，那就桶排序了，因为题目给了num的范围在-10000到10000之间 我们只需要加一个基准量，将数字映射到0-20000之间就好了 Code12345678910111213141516171819202122class Solution &#123;    public int fin">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-28T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-10T16:10:14.194Z">
+<meta property="article:published_time" content="2024-07-10T09:55:00.000Z">
+<meta property="article:modified_time" content="2024-07-10T10:02:18.840Z">
 <meta property="article:author" content="Zenith Wang">
+<meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="算法题">
-<meta property="article:tag" content="笔试">
-<meta property="article:tag" content="快速幂">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>阿里Lazada笔试第一题 - Zenith&#39; Blog</title>
+  <title>数组中的第K个最大元素 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="阿里Lazada笔试第一题"></span>
+            <span id="subtitle" data-typed-text="数组中的第K个最大元素"></span>
           
         </div>
 
@@ -239,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-29 00:00" pubdate>
-          2024年4月29日 凌晨
+        <time datetime="2024-07-10 17:55" pubdate>
+          2024年7月10日 下午
         </time>
       </span>
     
@@ -251,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          315 字
+          150 字
         
       </span>
     
@@ -262,7 +261,7 @@
         
         
         
-          3 分钟
+          2 分钟
         
       </span>
     
@@ -307,49 +306,16 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">阿里Lazada笔试第一题</h1>
+            <h1 id="seo-header">数组中的第K个最大元素</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="阿里Lazada笔试第一题"><a href="#阿里Lazada笔试第一题" class="headerlink" title="阿里Lazada笔试第一题"></a>阿里Lazada笔试第一题</h1><h4 id="Problem"><a href="#Problem" class="headerlink" title="Problem"></a>Problem</h4><p>小红定义一个01串的权值为:相邻两个字符都是’1’的对儿数。例如，”110111”的权值为3。 </p>
-<p>现在小红希望你求出所有长度为<code>n</code>的01串的权值之和。你能帮帮她吗?</p>
-<h4 id="Input"><a href="#Input" class="headerlink" title="Input"></a>Input</h4><blockquote>
-<p>一个正整数<code>n</code></p>
-<p>$$<br>1\le n \le 10^9\<br>$$</p>
-</blockquote>
-<h4 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h4><blockquote>
-<p>Input</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">3<br></code></pre></td></tr></table></figure>
+                <h1 id="数组中的第K个最大元素"><a href="#数组中的第K个最大元素" class="headerlink" title="数组中的第K个最大元素"></a>数组中的第K个最大元素</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-largest-element-in-an-array/description/">数组中的第K个最大元素</a></strong></p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>很简单，要实现O(n)的复杂度，那就<strong>桶排序</strong>了，因为题目给了num的范围在-10000到10000之间</p>
+<p>我们只需要加一个基准量，将数字映射到0-20000之间就好了</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">findKthLargest</span><span class="hljs-params">(<span class="hljs-type">int</span>[] nums, <span class="hljs-type">int</span> k)</span> &#123;<br>        <span class="hljs-comment">//基准量</span><br>        <span class="hljs-type">int</span> BASE_NUM=<span class="hljs-number">15000</span>;<br>		<br>        <span class="hljs-comment">//记录每个数量</span><br>        <span class="hljs-type">int</span> [] bucket=<span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[<span class="hljs-number">30000</span>];<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> num:nums)&#123;<br>            <span class="hljs-comment">//防止num为负数的时候，数组下标为负数</span><br>            bucket[num+BASE_NUM]++;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=bucket.length-<span class="hljs-number">1</span>;i&gt;=<span class="hljs-number">0</span>;i--)&#123;<br>            k-=bucket[i];<br>            <span class="hljs-keyword">if</span>(k&lt;=<span class="hljs-number">0</span>)&#123;<br>                <span class="hljs-keyword">return</span> i-BASE_NUM;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>Output</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">4<br></code></pre></td></tr></table></figure>
-</blockquote>
-<h4 id="Example-02"><a href="#Example-02" class="headerlink" title="Example-02"></a>Example-02</h4><blockquote>
-<p>Input</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">4<br></code></pre></td></tr></table></figure>
-
-<p>Output</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">12<br></code></pre></td></tr></table></figure>
-</blockquote>
-<h4 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h4><ul>
-<li>首先，我们可以先求出从<code>dp[i-1]</code>到<code>dp[i]</code>的递推公式，它拥有两个部分：<ol>
-<li>当<code>str[i]</code>为’0’时，那么所有01串的权值和为：<code>dp[i-1]</code></li>
-<li>当<code>str[i]</code>为’1’时，那么所有01串的权值和为：<code>dp[i-1]</code> + 最后两个是‘11’的01串的个数</li>
-</ol>
-</li>
-<li>那么根据上述两个部分，可以算出递推公式：</li>
-</ul>
-<p>$$<br>dp[i]&#x3D;dp[i-1]+dp[i-1]+2^{i-2}&#x3D;dp[i-1] \times 2+2^{i-2}<br>$$</p>
-<ul>
-<li>由于n的最大值为10e9，因此不能循环暴力求解，我们可以由递推公式算出直接公式：</li>
-</ul>
-<p>$$<br>dp[i]&#x3D;(i-1)\times2^{i-2}<br>$$</p>
-<ul>
-<li>再利用费马小定理（因为10e9+7是质数），可以直接得到计算公式：</li>
-</ul>
-<p>$$<br>dp[i]&#x3D;(i-1)\times2^{(i-2) \mod (10^9+6)}<br>$$</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Scanner</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Scanner</span>(System.in);<br>        <span class="hljs-type">int</span> n=in.nextInt();<br><br>        <span class="hljs-type">long</span> mod=(<span class="hljs-type">long</span>)Math.pow(<span class="hljs-number">10</span>,<span class="hljs-number">9</span>)+<span class="hljs-number">6</span>;<br>        <span class="hljs-type">long</span> res=n-<span class="hljs-number">1</span>;<br>        res=(res*(<span class="hljs-type">long</span>)Math.pow(<span class="hljs-number">2</span>,(n-<span class="hljs-number">2</span>)%mod))%mod;<br>        System.out.println(res);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -368,7 +334,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E7%AC%94%E8%AF%95%E9%A2%98%E6%80%BB%E7%BB%93/" class="category-chain-item">笔试题总结</a>
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
   
   
 
@@ -383,11 +349,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
+        <a href="/tags/LeetCode/" class="print-no-link">#LeetCode</a>
+      
         <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" class="print-no-link">#算法题</a>
-      
-        <a href="/tags/%E7%AC%94%E8%AF%95/" class="print-no-link">#笔试</a>
-      
-        <a href="/tags/%E5%BF%AB%E9%80%9F%E5%B9%82/" class="print-no-link">#快速幂</a>
       
     </div>
   
@@ -399,8 +363,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>阿里Lazada笔试第一题</div>
-      <div>http://example.com/2024/04/29/笔试题/2024-04-29-阿里Lazada笔试第一题/</div>
+      <div>数组中的第K个最大元素</div>
+      <div>http://example.com/2024/07/10/刷题/2024-07-10/2024-07-10-数组中的第K个最大元素/</div>
     </div>
     <div class="license-meta">
       
@@ -412,7 +376,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月29日</div>
+          <div>2024年7月10日</div>
         </div>
       
       
@@ -444,9 +408,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/05/06/%E5%85%AB%E8%82%A1/2024-05-05-MySQL%E6%80%BB%E7%BB%93/" title="MySQL总结">
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-K%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8/" title="K个一组翻转链表">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MySQL总结</span>
+                        <span class="hidden-mobile">K个一组翻转链表</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -454,8 +418,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/04/28/%E5%88%B7%E9%A2%98/2024-04-28/2024-04-28-%E6%90%9C%E7%B4%A2%E4%BA%8C%E7%BB%B4%E7%9F%A9%E9%98%B5%E2%85%A1/" title="搜索二维矩阵Ⅱ">
-                        <span class="hidden-mobile">搜索二维矩阵Ⅱ</span>
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-LRU%20%E7%BC%93%E5%AD%98/" title="LRU缓存">
+                        <span class="hidden-mobile">LRU缓存</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

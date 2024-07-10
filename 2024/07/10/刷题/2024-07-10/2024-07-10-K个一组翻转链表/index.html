@@ -16,15 +16,15 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="数组中的第K个最大元素Problem: 数组中的第K个最大元素 Solution很简单，要实现O(n)的复杂度，那就桶排序了，因为题目给了num的范围在-10000到10000之间 我们只需要加一个基准量，将数字映射到0-20000之间就好了 Code12345678910111213141516171819202122class Solution &#123;    public int fin">
+    <meta name="description" content="K个一组翻转链表Problem: K个一组翻转链表 Solution基本思路很简单，就是你把每一组找出来，然后反转每一组的链表就好了 但是每一组反转了，各个组之间的next关系也得改正：  该组反转了后，上一组的最后一个应该指向反转后的第一个  这里我们采用递归的方法，reverseKGroup函数返回的是给定数组反转后的头部，我们只需要反转当前组，然后将反转后的最后一个节点的next指向反转后面">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数组中的第K个最大元素">
-<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/index.html">
+<meta property="og:title" content="K个一组翻转链表">
+<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-K%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="数组中的第K个最大元素Problem: 数组中的第K个最大元素 Solution很简单，要实现O(n)的复杂度，那就桶排序了，因为题目给了num的范围在-10000到10000之间 我们只需要加一个基准量，将数字映射到0-20000之间就好了 Code12345678910111213141516171819202122class Solution &#123;    public int fin">
+<meta property="og:description" content="K个一组翻转链表Problem: K个一组翻转链表 Solution基本思路很简单，就是你把每一组找出来，然后反转每一组的链表就好了 但是每一组反转了，各个组之间的next关系也得改正：  该组反转了后，上一组的最后一个应该指向反转后的第一个  这里我们采用递归的方法，reverseKGroup函数返回的是给定数组反转后的头部，我们只需要反转当前组，然后将反转后的最后一个节点的next指向反转后面">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-07-10T09:55:00.000Z">
-<meta property="article:modified_time" content="2024-07-10T10:02:18.840Z">
+<meta property="article:published_time" content="2024-07-10T12:53:00.000Z">
+<meta property="article:modified_time" content="2024-07-10T13:03:51.500Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="算法题">
@@ -32,7 +32,7 @@
   
   
   
-  <title>数组中的第K个最大元素 - Zenith&#39; Blog</title>
+  <title>K个一组翻转链表 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数组中的第K个最大元素"></span>
+            <span id="subtitle" data-typed-text="K个一组翻转链表"></span>
           
         </div>
 
@@ -238,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 17:55" pubdate>
-          2024年7月10日 下午
+        <time datetime="2024-07-10 20:53" pubdate>
+          2024年7月10日 晚上
         </time>
       </span>
     
@@ -250,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          150 字
+          399 字
         
       </span>
     
@@ -261,7 +261,7 @@
         
         
         
-          2 分钟
+          4 分钟
         
       </span>
     
@@ -306,15 +306,19 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">数组中的第K个最大元素</h1>
+            <h1 id="seo-header">K个一组翻转链表</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="数组中的第K个最大元素"><a href="#数组中的第K个最大元素" class="headerlink" title="数组中的第K个最大元素"></a>数组中的第K个最大元素</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-largest-element-in-an-array/description/">数组中的第K个最大元素</a></strong></p>
-<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>很简单，要实现O(n)的复杂度，那就<strong>桶排序</strong>了，因为题目给了num的范围在-10000到10000之间</p>
-<p>我们只需要加一个基准量，将数字映射到0-20000之间就好了</p>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">findKthLargest</span><span class="hljs-params">(<span class="hljs-type">int</span>[] nums, <span class="hljs-type">int</span> k)</span> &#123;<br>        <span class="hljs-comment">//基准量</span><br>        <span class="hljs-type">int</span> BASE_NUM=<span class="hljs-number">15000</span>;<br>		<br>        <span class="hljs-comment">//记录每个数量</span><br>        <span class="hljs-type">int</span> [] bucket=<span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[<span class="hljs-number">30000</span>];<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> num:nums)&#123;<br>            <span class="hljs-comment">//防止num为负数的时候，数组下标为负数</span><br>            bucket[num+BASE_NUM]++;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=bucket.length-<span class="hljs-number">1</span>;i&gt;=<span class="hljs-number">0</span>;i--)&#123;<br>            k-=bucket[i];<br>            <span class="hljs-keyword">if</span>(k&lt;=<span class="hljs-number">0</span>)&#123;<br>                <span class="hljs-keyword">return</span> i-BASE_NUM;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1 id="K个一组翻转链表"><a href="#K个一组翻转链表" class="headerlink" title="K个一组翻转链表"></a>K个一组翻转链表</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/reverse-nodes-in-k-group/description/">K个一组翻转链表</a></strong></p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>基本思路很简单，就是你把每一组找出来，然后反转每一组的链表就好了</p>
+<p>但是每一组反转了，各个组之间的next关系也得改正：</p>
+<ul>
+<li>该组反转了后，上一组的最后一个应该指向反转后的第一个</li>
+</ul>
+<p>这里我们采用递归的方法，reverseKGroup函数返回的是给定数组反转后的头部，我们只需要反转当前组，然后将反转后的最后一个节点的next指向反转后面链表的头就好了</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> ListNode <span class="hljs-title function_">reverseKGroup</span><span class="hljs-params">(ListNode head, <span class="hljs-type">int</span> k)</span> &#123;<br>        <span class="hljs-keyword">if</span>(head==<span class="hljs-literal">null</span>)&#123;<br>            <span class="hljs-keyword">return</span> head;<br>        &#125;<br><br>        ListNode p=head;<br>        <span class="hljs-type">int</span> count=<span class="hljs-number">1</span>;<br>        <br>        <span class="hljs-comment">//找当前链表的第一组，也就是前K个节点</span><br>        <span class="hljs-keyword">while</span>(p.next!=<span class="hljs-literal">null</span>&amp;&amp;count&lt;k)&#123;<br>            p=p.next;<br>            count++;<br>        &#125;<br>        <br>        <span class="hljs-comment">//如果发现当前链表个数少于K个就不反转，直接返回head</span><br>        <span class="hljs-keyword">if</span>(count&lt;k)&#123;<br>            <span class="hljs-keyword">return</span> head;<br>        &#125;<br><br>        <br>        <span class="hljs-comment">//反转当前的K节点链表，也是使用prev，next、cur指针实现</span><br>        ListNode node=head;<br>        ListNode prev=<span class="hljs-literal">null</span>;<br>        ListNode tailNext=p.next;<br><br>        <span class="hljs-comment">//但是while的break条件是该组结束，也就是遍历到当前组最后一个节点的next的时候就会结束</span><br>        <span class="hljs-comment">//p节点由于是while循环出来的，因此p当前指向的就是当前组的最后一个节点</span><br>        <span class="hljs-keyword">while</span>(node!=tailNext)&#123;<br>            ListNode next=node.next;<br>            node.next=prev;<br>            prev=node;<br>            node=next;<br>        &#125;<br>		<br>        <span class="hljs-comment">//head反转后是最后一个节点，它指向反转后继链表后的头节点</span><br>        head.next=reverseKGroup(tailNext,k);<br>		<br>        <span class="hljs-comment">//返回当前组反转后的头节点，也就是原本的最后一个节点 ———— p节点</span><br>        <span class="hljs-keyword">return</span> p;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
                 
@@ -363,8 +367,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>数组中的第K个最大元素</div>
-      <div>http://example.com/2024/07/10/刷题/2024-07-10-数组中的第K个最大元素/</div>
+      <div>K个一组翻转链表</div>
+      <div>http://example.com/2024/07/10/刷题/2024-07-10/2024-07-10-K个一组翻转链表/</div>
     </div>
     <div class="license-meta">
       
@@ -408,12 +412,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%A4%E7%AB%AF%E5%8F%96%E6%95%B0/" title="数组两端取数">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">数组两端取数</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-LRU%20%E7%BC%93%E5%AD%98/" title="LRU缓存">
-                        <span class="hidden-mobile">LRU缓存</span>
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/" title="数组中的第K个最大元素">
+                        <span class="hidden-mobile">数组中的第K个最大元素</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

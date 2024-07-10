@@ -16,15 +16,15 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="LRU缓存Problem: LRU缓存 Solution用双向链表加hashMap实现 双向链表实现LRU顺序的维护，map实现O(1)时间复杂度的查找  get函数：  如果map中有，那就将该节点移到队头，然后返回 没有就返回-1   put函数  如果map中有，那就将该节点移到队头，然后修改node的value值返回 没有的的话：创建新节点，size++并放到map以及队头中；如果操作完成">
+    <meta name="description" content="无重复字符的最长子串Problem: 无重复字符的最长子串 Solution双指针实现滑动窗口，并且使用hashMap记录滑动窗口中的字符遍历情况，注意滑动窗口变换的时候，hashMap也也要变化 Code12345678910111213141516171819202122232425class Solution &#123;    public int lengthOfLongestSubst">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LRU缓存">
-<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-LRU%20%E7%BC%93%E5%AD%98/index.html">
+<meta property="og:title" content="无重复字符的最长子串">
+<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%97%A0%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%90%E4%B8%B2/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="LRU缓存Problem: LRU缓存 Solution用双向链表加hashMap实现 双向链表实现LRU顺序的维护，map实现O(1)时间复杂度的查找  get函数：  如果map中有，那就将该节点移到队头，然后返回 没有就返回-1   put函数  如果map中有，那就将该节点移到队头，然后修改node的value值返回 没有的的话：创建新节点，size++并放到map以及队头中；如果操作完成">
+<meta property="og:description" content="无重复字符的最长子串Problem: 无重复字符的最长子串 Solution双指针实现滑动窗口，并且使用hashMap记录滑动窗口中的字符遍历情况，注意滑动窗口变换的时候，hashMap也也要变化 Code12345678910111213141516171819202122232425class Solution &#123;    public int lengthOfLongestSubst">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-07-10T09:21:00.000Z">
-<meta property="article:modified_time" content="2024-07-10T10:02:13.503Z">
+<meta property="article:published_time" content="2024-07-10T08:22:00.000Z">
+<meta property="article:modified_time" content="2024-07-10T10:02:22.411Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="算法题">
@@ -32,7 +32,7 @@
   
   
   
-  <title>LRU缓存 - Zenith&#39; Blog</title>
+  <title>无重复字符的最长子串 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="LRU缓存"></span>
+            <span id="subtitle" data-typed-text="无重复字符的最长子串"></span>
           
         </div>
 
@@ -238,7 +238,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 17:21" pubdate>
+        <time datetime="2024-07-10 16:22" pubdate>
           2024年7月10日 下午
         </time>
       </span>
@@ -250,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          505 字
+          194 字
         
       </span>
     
@@ -261,7 +261,7 @@
         
         
         
-          5 分钟
+          2 分钟
         
       </span>
     
@@ -306,38 +306,14 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">LRU缓存</h1>
+            <h1 id="seo-header">无重复字符的最长子串</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="LRU缓存"><a href="#LRU缓存" class="headerlink" title="LRU缓存"></a>LRU缓存</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/lru-cache/">LRU缓存</a></strong></p>
-<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>用双向链表加hashMap实现</p>
-<p>双向链表实现LRU顺序的维护，map实现O(1)时间复杂度的查找</p>
-<ul>
-<li><p>get函数：</p>
-<ul>
-<li>如果map中有，那就将该节点移到队头，然后返回</li>
-<li>没有就返回-1</li>
-</ul>
-</li>
-<li><p>put函数</p>
-<ul>
-<li>如果map中有，那就将该节点移到队头，然后修改node的value值返回</li>
-<li>没有的的话：创建新节点，size++并放到map以及队头中；如果操作完成后发现容量超了，那就移除队尾元素。由于需要两个方向的入队出队操作，因此需要双向链表</li>
-</ul>
-</li>
-<li><p>两个trick：</p>
-<ul>
-<li><p>将节点移到队头可以分为删除节点，添加节点到队头两个操作；移除队尾节点，就是移除节点</p>
-<p>因此，可以写两个函数offer和remove，来封装这两个操作</p>
-</li>
-<li><p>为了保证这两个操作的普适性，我们使用虚拟的头尾节点</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">LRUCache</span> &#123;<br>    <span class="hljs-comment">//双向链表节点内部类</span><br>    <span class="hljs-keyword">class</span> <span class="hljs-title class_">ListNode</span>&#123;<br>        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> key;<br>        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> val;<br>        <span class="hljs-keyword">public</span> ListNode prev;<br>        <span class="hljs-keyword">public</span> ListNode next;<br>    &#125;<br>    ListNode head;<br>    ListNode tail;<br>	<br>    <span class="hljs-comment">//hashMap，key就是get的key，value是链表的节点</span><br>    Map&lt;Integer,ListNode&gt; map=<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>    <span class="hljs-type">int</span> size=<span class="hljs-number">0</span>;<br>    <span class="hljs-type">int</span> capacity;<br><br>   <br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">LRUCache</span><span class="hljs-params">(<span class="hljs-type">int</span> capacity)</span> &#123;<br>        <span class="hljs-built_in">this</span>.capacity=capacity;<br>         <span class="hljs-comment">//初始化，头尾使用虚拟节点</span><br>        head=<span class="hljs-keyword">new</span> <span class="hljs-title class_">ListNode</span>();<br>        tail=<span class="hljs-keyword">new</span> <span class="hljs-title class_">ListNode</span>();<br>        head.next=tail;<br>        tail.prev=head;<br>    &#125;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">get</span><span class="hljs-params">(<span class="hljs-type">int</span> key)</span> &#123;<br>        ListNode node=map.get(key);<br>        <span class="hljs-keyword">if</span>(node==<span class="hljs-literal">null</span>)&#123;<br>            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>        &#125;<span class="hljs-keyword">else</span>&#123;<br>            <span class="hljs-comment">//发现存在，从原位置移除当前节点，在将该节点放到队头</span><br>            remove(node);<br>            offer(node);<br>            <span class="hljs-keyword">return</span> node.val;<br>        &#125;<br>    &#125;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">put</span><span class="hljs-params">(<span class="hljs-type">int</span> key, <span class="hljs-type">int</span> value)</span> &#123;<br>        ListNode node=map.get(key);<br>        <span class="hljs-keyword">if</span>(node!=<span class="hljs-literal">null</span>)&#123;<br>            node.val=value;<br>            <span class="hljs-comment">//发现存在，从原位置移除当前节点，在将该节点放到队头</span><br>            remove(node);<br>            offer(node);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br><br>        node=<span class="hljs-keyword">new</span> <span class="hljs-title class_">ListNode</span>();<br>        node.key=key;<br>        node.val=value;<br>        map.put(key,node);<br>        offer(node);<br>        size++;<br><br>        <span class="hljs-keyword">if</span>(size&gt;capacity)&#123;<br>            <span class="hljs-comment">//移除队尾的节点，由于是虚拟尾节点，因此实际移除的是尾节点的prev</span><br>            map.remove(tail.prev.key);<br>            remove(tail.prev);<br>            size--;<br>        &#125;<br>        <br>    &#125;<br><br>    <span class="hljs-comment">//移除操作</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">remove</span><span class="hljs-params">(ListNode node)</span>&#123;<br>        node.prev.next=node.next;<br>        node.next.prev=node.prev;<br>    &#125;<br><br>    <span class="hljs-comment">//往队头添加节点的操作</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">offer</span><span class="hljs-params">(ListNode node)</span>&#123;<br>        node.next=head.next;<br>        node.prev=head;<br>        head.next.prev=node;<br>        head.next=node;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+                <h1 id="无重复字符的最长子串"><a href="#无重复字符的最长子串" class="headerlink" title="无重复字符的最长子串"></a>无重复字符的最长子串</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-substring-without-repeating-characters/description/">无重复字符的最长子串</a></strong></p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>双指针实现滑动窗口，并且使用hashMap记录滑动窗口中的字符遍历情况，注意滑动窗口变换的时候，hashMap也也要变化</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">lengthOfLongestSubstring</span><span class="hljs-params">(String s)</span> &#123;<br>        Map&lt;Character,Boolean&gt; map=<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        <span class="hljs-type">int</span> left=<span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> right=<span class="hljs-number">0</span>;<br>        <span class="hljs-type">char</span> [] str=s.toCharArray();<br>        <span class="hljs-type">int</span> n=str.length;<br>        <br>        <span class="hljs-comment">//记录当前的最大长度，right每加一次就要更新一下</span><br>        <span class="hljs-type">int</span> res=<span class="hljs-number">0</span>;<br>        <br>        <span class="hljs-keyword">while</span>(right&lt;n)&#123;<br>            <span class="hljs-keyword">while</span>(map.getOrDefault(str[right],<span class="hljs-literal">false</span>))&#123;<br>                <span class="hljs-comment">//当map中发现该char已经遍历过，左边指针移动，直到弹出和右边界冲突的那个char</span><br>                map.put(str[left],<span class="hljs-literal">false</span>);<br>                left++;<br>            &#125;<br>            <span class="hljs-comment">//将右指针的字符入map，并且更新右边界</span><br>            map.put(str[right],<span class="hljs-literal">true</span>);<br>            res=Math.max(res,right-left+<span class="hljs-number">1</span>);<br>            right++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
                 
@@ -386,8 +362,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>LRU缓存</div>
-      <div>http://example.com/2024/07/10/刷题/2024-07-10-LRU 缓存/</div>
+      <div>无重复字符的最长子串</div>
+      <div>http://example.com/2024/07/10/刷题/2024-07-10/2024-07-10-无重复字符的最长子串/</div>
     </div>
     <div class="license-meta">
       
@@ -431,9 +407,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/" title="数组中的第K个最大元素">
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" title="反转链表">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">数组中的第K个最大元素</span>
+                        <span class="hidden-mobile">反转链表</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -441,8 +417,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" title="反转链表">
-                        <span class="hidden-mobile">反转链表</span>
+                      <a href="/2024/07/07/%E5%85%AB%E8%82%A1/2024-07-07-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" title="计算机基础">
+                        <span class="hidden-mobile">计算机基础</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
