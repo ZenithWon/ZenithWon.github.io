@@ -1,0 +1,1140 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zenith Wang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="MySQL总结MySQL中的一条记录是如何存放的在InnoDB存储引擎中，默认的存储格式是Compact格式，其基本结构如下：   变长字段长度列表存放的每个元素表示的是对应的varchar字段的真实长度 NULL值列表存放的是每个没有设置为NULL字段是否为空，只需要一个bit就可以  但是，我们要注意的是：这个两个列表存放的顺序是和表中DDL语句声明的字段相对的顺序是反着的。因为，这每条记录中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL总结">
+<meta property="og:url" content="http://example.com/2024/05/06/%E5%85%AB%E8%82%A1/2024-05-05-MySQL%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Zenith&#39; Blog">
+<meta property="og:description" content="MySQL总结MySQL中的一条记录是如何存放的在InnoDB存储引擎中，默认的存储格式是Compact格式，其基本结构如下：   变长字段长度列表存放的每个元素表示的是对应的varchar字段的真实长度 NULL值列表存放的是每个没有设置为NULL字段是否为空，只需要一个bit就可以  但是，我们要注意的是：这个两个列表存放的顺序是和表中DDL语句声明的字段相对的顺序是反着的。因为，这每条记录中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405051730936.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405051736137.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252338860.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339903.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339941.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339107.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049066.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049260.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049728.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049801.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049816.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134065.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134799.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134345.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301135150.png">
+<meta property="article:published_time" content="2024-05-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-06-30T03:35:34.214Z">
+<meta property="article:author" content="Zenith Wang">
+<meta property="article:tag" content="个人笔记">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405051730936.png">
+  
+  
+  
+  <title>MySQL总结 - Zenith&#39; Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","app_key":"Xq6ytGGvYcBfUTC6ZzSnFuPD","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Zenith&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MySQL总结"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-06 00:00" pubdate>
+          2024年5月6日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          59 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">MySQL总结</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="MySQL总结"><a href="#MySQL总结" class="headerlink" title="MySQL总结"></a>MySQL总结</h1><h2 id="MySQL中的一条记录是如何存放的"><a href="#MySQL中的一条记录是如何存放的" class="headerlink" title="MySQL中的一条记录是如何存放的"></a>MySQL中的一条记录是如何存放的</h2><p>在InnoDB存储引擎中，默认的存储格式是Compact格式，其基本结构如下：</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405051730936.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<ul>
+<li>变长字段长度列表存放的每个元素表示的是对应的varchar字段的真实长度</li>
+<li>NULL值列表存放的是每个没有设置为NULL字段是否为空，只需要一个bit就可以</li>
+</ul>
+<p>但是，我们要注意的是：这个两个列表存放的顺序是和表中DDL语句声明的字段相对的顺序是反着的。因为，这每条记录中指向下一条记录的指针指向的是记录头信息最后的位置，反着存放是为了<strong>指针往右走可以按顺序读取列的真实值，往左走可以按顺序读取列表</strong>。</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405051736137.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<h2 id="一条SQL是如何执行的"><a href="#一条SQL是如何执行的" class="headerlink" title="一条SQL是如何执行的"></a>一条SQL是如何执行的</h2><p>这里，我们默认已经对MySQL的基本组件都是有一点基础的了，一些基础名词不会做额外解释</p>
+<p>我们将其分为两大部分，首先我们来看一看宏观部分，然后在看一看存储引擎的一些细节</p>
+<h3 id="宏观部分"><a href="#宏观部分" class="headerlink" title="宏观部分"></a>宏观部分</h3><p>下图是MySQL的各个功能模块，主要分为三大部分：连接层，Server层，存储引擎层</p>
+<p>其中server层更为复杂，它可以再次细分为：查询缓存、解析器、预处理器、优化器、执行器</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252338860.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<h4 id="连接层"><a href="#连接层" class="headerlink" title="连接层"></a>连接层</h4><p>连接层主要做的事就是连接，MySQL的连接是基于TCP的长连接，并且在连接的两端都是有连接池的，可以保证连接线程的服用，并且不会无限的创建线程。</p>
+<blockquote>
+<p>比如client端有Druid连接池，server端有MySQL自己的连接池</p>
+</blockquote>
+<p>此外，在连接建立后，就会校验用户的身份和密码，一旦校验成功就会缓存用户的权限和身份信息</p>
+<p>因此，只要校验成功连接连上，不管在此期间权限怎么变化，由于已经缓存起来，<strong>本次连接均不会受到影响</strong>，只有下次连接才会受到影响</p>
+<h4 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h4><p>查询缓存其实在MySQL8.0已经被移除了，但是以前的版本还是会有的</p>
+<p>MySQL在每次查询的时候，都会以当前SQL作为key去缓存中看看是否有，如果有的话那就直接返回；没有的话就查询，然后保存结果</p>
+<p>而且一旦相关的表发生修改，关联的所有查询缓存都会被删掉</p>
+<p>因此，由于这种做法十分鸡肋（比如对于经常更新的表，命中率极低；还得保证缓存一致性），因此被移除了</p>
+<h4 id="解析器"><a href="#解析器" class="headerlink" title="解析器"></a>解析器</h4><p>解析器会在查询之前，解析SQL语句，我们可以认为这是一种编译</p>
+<p>它会进行词法分析和语法分析，一旦SQL语句有语法错误，就会在这一层报错</p>
+<p>但是，它<strong>不会校验表名、字段名是否存在</strong></p>
+<h4 id="预处理器"><a href="#预处理器" class="headerlink" title="预处理器"></a>预处理器</h4><p>在解析器中不会去校验表名、字段名。真正校验的地方其实是在预处理器，预处理器会做两个事情：</p>
+<ul>
+<li>校验字段名、表名这些东西是否存在</li>
+<li>将<code>select *</code>中的 * 转换为全字段列表</li>
+</ul>
+<h4 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h4><p>优化器就是要为此条SQL制定一个执行计划，比如到底用哪个索引，怎么用</p>
+<p>它会考虑<strong>CPU成本</strong>（筛选、排序）以及<strong>IO成本</strong>（从磁盘读到buffer pool），最终选择耗费最少的执行计划，交给存储引擎执行</p>
+<p>这里有一个比较重要的概念就是<strong>覆盖索引</strong>，当交给存储引擎执行完计划后，如果发现查出来的字段是B+树节点包含的，那就直接拿出来返回出去，否则就会进行<strong>回表查询</strong></p>
+<h4 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h4><p>存储引擎会根据优化器制定的执行计划，去磁盘中查询，具体怎么查的后面分析存储引擎的时候再说。</p>
+<p>当存储引擎查到后，如果有索引就会使用索引查到满足使用的索引字段的条件的记录</p>
+<p>但是，如果还有其他没有用到索引字段的条件（包括联合索引失效后，右边的索引字段），那就会向上返回给server层去做过滤</p>
+<p>但是还一种特殊情况叫<strong>索引下推</strong>，当发现查出来的B+树节点存在需要过滤的字段并且没有用到索引（索引失效），那就会在<strong>引擎层做过滤</strong>，然后将结果返回给server层</p>
+<blockquote>
+<p>这里一定要区别于覆盖索引：</p>
+<ul>
+<li>索引下推是在引擎层做的，而覆盖索引是在server层做的</li>
+<li>索引下推是在筛选的时候做的，而覆盖索引是在获取select字段时候做的</li>
+<li>但是二者如果不使用，<strong>都有可能会造成回表操作</strong></li>
+</ul>
+</blockquote>
+<h3 id="存储引擎是如何工作的"><a href="#存储引擎是如何工作的" class="headerlink" title="存储引擎是如何工作的"></a>存储引擎是如何工作的</h3><p>和计算机的虚拟内存一样，存储引擎也有一个自己的内存，叫做Buffer Pool（具体后面会介绍）</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339903.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<p>当需要查询的时候，MySQL不会直接在磁盘上查询，而是也是会从磁盘读一个页到buffer pool中来查询，如果发现buffer pool中没有，那就会先读取然后再去buffer pool里面查</p>
+<p>如果是一个修改操作，那就会在读到buffer pool的时候保存一份数据到undo log</p>
+<p>然后更新数据并写入redo log buffer中</p>
+<p>提交事务后，就会将redo log buffer写到page cache，写入binlog 然后在redo log置为commit状态（这就是两阶段提交）</p>
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><h3 id="索引的分类"><a href="#索引的分类" class="headerlink" title="索引的分类"></a>索引的分类</h3><ul>
+<li>按<strong>数据结构</strong>分：B+树索引，Hash索引，全文索引<ul>
+<li>其中MySQL（InnoDB、MyISAM）中默认使用B+索引，并且也支持全文索引</li>
+</ul>
+</li>
+<li>按<strong>物理存储</strong>分：聚簇索引和非聚簇索引<ul>
+<li>InnoDB支持两种形式，其中主键索引就是聚簇索引，其他的索引都是非聚簇索引</li>
+<li>而MyISAM中只有非聚簇索引，数据会存在单独的空间，B+数节点存放索引字段和数据指针</li>
+</ul>
+</li>
+<li>按<strong>字段特性</strong>分：主键索引（primary key）、唯一索引（unique）、普通索引（index）</li>
+<li>按<strong>字段个数</strong>分：联合索引、单列索引</li>
+</ul>
+<h3 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h3><p>MySQL默认使用的是B+树索引，那为什么使用B+数，不用B树、AVL、红黑树？</p>
+<p>首先，我们从数据页的角度来看</p>
+<h4 id="从数据页角度看"><a href="#从数据页角度看" class="headerlink" title="从数据页角度看"></a><strong>从数据页角度看</strong></h4><p>数据库IO的基本单位是页，就是Buffer Pool每次读进来的东西，而InnoDB数据页的默认大小是16KB</p>
+<p>其中一个数据页分为7个部分：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339941.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<p>我们主要关注一下<strong>最大、最小记录</strong>，这个指向的是B+树节点的头尾记录，其实可以认为是头尾指针，不包含数据，真正的每个记录存放在用户记录中。因此，我们可以得出B+树的组织结构：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406252339107.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
+
+<p>看了B+数的组织形式后，我们也可以脑补一下B树的组织形式，其实基本差不多，只不过非叶子节点存放的不仅仅只有指针，还有数据</p>
+<p>那么这么想一想，当InnoDB数据页固定的情况下，对于一个节点来说，B+树分的叉肯定会比B树多</p>
+<p>因此相比于B树来说，<strong>B+树会更矮胖，并且磁盘IO次数也更少</strong></p>
+<blockquote>
+<p>一般来说B+树大概只有2-4层</p>
+</blockquote>
+<h4 id="具体性能差异"><a href="#具体性能差异" class="headerlink" title="具体性能差异"></a><strong>具体性能差异</strong></h4><p>从数据页来看B+树比B层更少，并且IO次数更少。当然，在性能上也会有差异</p>
+<ul>
+<li><p><strong>等值查询</strong>：</p>
+<ul>
+<li>B树的等值查询，最快可以达到O(1)的复杂度，但是最慢还是会查到叶子节点O(m)的复杂度（m为B树高度）</li>
+<li>而B+树更为稳定，永远会查到叶子节点，因此查询速度为O(m)，而且<strong>B+树的m要比B树小</strong></li>
+</ul>
+</li>
+<li><p><strong>范围查询</strong></p>
+<p>B+树叶子节点拥有链表结构，因此范围查询只需要确定起始节点，然后顺序查找就好，性能更优</p>
+</li>
+<li><p><strong>更新操作</strong></p>
+<p>更新的时候，一般来说B+树只需要改变叶子节点的链表结构，但是B树往往会发生较大树形态的改变</p>
+</li>
+</ul>
+<p>综上所述，<strong>B+树完胜B树</strong></p>
+<h4 id="MySQL的单表限制"><a href="#MySQL的单表限制" class="headerlink" title="MySQL的单表限制"></a><strong>MySQL的单表限制</strong></h4><p>由于InnoDB默认的数据页大小为16KB，而且一个数据页的额外字段大约会占据1KB</p>
+<p>因此真正能存储的部分大约只有15KB，假设主键类型为bigint，并且下个节点的页号为4位</p>
+<p>那么非叶子节点的索引部分，一个记录占12byte，也就是说一个数据页可以存放$\frac{15*1024}{12}&#x3D;1280$个记录</p>
+<p>而对于叶子节点，由于使用聚簇索引存放所有数据，因此假设一条记录为1K，那么一个数据页可以存15个</p>
+<p>因此我们可以计算：</p>
+<ul>
+<li>当B+树为两层时，记录有$1280 \times 15&#x3D;19200$</li>
+<li>当B+树为三层时，记录有$1280 \times 1280 \times 15&#x3D;24576000$（2000w左右）</li>
+</ul>
+<p>因此，<strong>当MySQL的一张表超过2000W，一般就会导致B+树变成4层，那么查询效率会陡然上升</strong>！</p>
+<h3 id="使用索引的注意事项"><a href="#使用索引的注意事项" class="headerlink" title="使用索引的注意事项"></a>使用索引的注意事项</h3><h4 id="索引不是越多越好"><a href="#索引不是越多越好" class="headerlink" title="索引不是越多越好"></a><strong>索引不是越多越好</strong></h4><p>索引是用来做查询的，并且是快速定位要查询的记录，因此下面几种情况其实没有必要加索引：</p>
+<ol>
+<li>对于频繁更新的字段，比如库存这种的就没有必要加索引，会带来更新时的额外开销</li>
+<li>对于基本不会用于where、group by、order by的字段也没有必要加</li>
+<li>对于大量重复数据的字段，比如性别，这种对半分的字段其实查询一次也跟全表差不多</li>
+<li>表数据不多的时候，比如只是一些配置信息，那就没有必要加索引</li>
+</ol>
+<h4 id="使用索引"><a href="#使用索引" class="headerlink" title="使用索引"></a><strong>使用索引</strong></h4><ol>
+<li>尽量覆盖索引，避免回表查询</li>
+<li>主键最好自增，这样可以保证每次插入都是链表的追加操作，尽量减少树形态的复杂变化</li>
+<li>索引最好为非NULL</li>
+<li>避免索引失效</li>
+</ol>
+<h4 id="索引失效"><a href="#索引失效" class="headerlink" title="索引失效"></a><strong>索引失效</strong></h4><p>那既然说到索引失效，就来讲讲索引失效的情况吧</p>
+<p>一些十分常见的：最左匹配、like的百分号开头、表达式就不说了</p>
+<p>说两个不常见的：</p>
+<ul>
+<li><p>隐式转换</p>
+<p>MySQL当字符串和数字比较的时候会将<strong>数字转成字符串</strong>。因此实际上隐式转换其实就是在数字前面加了个类似<code>str()</code>的函数。</p>
+<p>那如果某个索引字段是数字，但是where的时候写成了<code>where id=&#39;aaa&#39;</code>，那么就会被解析为<code>where str(id)=&#39;aaa&#39;</code>。其实这也就是一种表达式，最终导致索引失效</p>
+</li>
+<li><p>where 查询的or连接</p>
+<p>如果是or连接的话，如果or相连的表达式有一个没用到索引，那就会直接全表</p>
+<p>因为，or是要两个条件都要搜然后取并集，既然有一个全表了，那就直接全表过滤就好了</p>
+<p>没有必要一个用索引，一个用全表，效率会更低</p>
+</li>
+</ul>
+<h3 id="count函数"><a href="#count函数" class="headerlink" title="count函数"></a>count函数</h3><p>count函数是一种聚合函数，我们分析这个其他的聚合函数可以类推</p>
+<h4 id="count-1"><a href="#count-1" class="headerlink" title="count(1)"></a><strong>count(1)</strong></h4><p>count(1)很简单，就是查询后返回字段全都是1，然后计算1的个数</p>
+<p>如果是计算全表的个数，那就会InnoDB会默认用二级索引（<strong>叶子节点更小，IO次数更少</strong>），没有二级索引的时候才会用主键索引</p>
+<h4 id="count-主键"><a href="#count-主键" class="headerlink" title="count(主键)"></a><strong>count(主键)</strong></h4><p>count(主键)相比于count(1)多了一步，因为count(1)不需要读取数据信息，但是count(主键)需要读取主键信息并判断是否为NULL，因此速度会慢一点</p>
+<p>同时，主键在任何索引都是存在的，因此同样会优先二级索引，其次再主键索引</p>
+<blockquote>
+<p>多个二级索引的时候，会选取索引字段长度和最短的那个</p>
+</blockquote>
+<h4 id="count-字段"><a href="#count-字段" class="headerlink" title="count(字段)"></a><strong>count(字段)</strong></h4><p>这个是最慢的，因为这个一般都是要全表扫描</p>
+<h4 id="InnoDB为什么需要遍历计数"><a href="#InnoDB为什么需要遍历计数" class="headerlink" title="InnoDB为什么需要遍历计数"></a><strong>InnoDB为什么需要遍历计数</strong></h4><p>不同于MyISAM，当直接计算全表个数的时候，InnoDB需要遍历全表，但是MyISAM有一个字段专门维护记录个数。因此，计算全表个数的时候，InnoDB是O(n)而MyISAM是O(1)</p>
+<p>这是因为InnoDB还需要支持事务，使用MVCC来解决并发的话就不能直接通过一个字段来决定，有的记录对于当前事务来说是不可见的，需要<strong>通过遍历来判断</strong></p>
+<p>而当有条件的计数时候，InnoDB和MyISAM都是会遍历的</p>
+<h2 id="MySQL事务"><a href="#MySQL事务" class="headerlink" title="MySQL事务"></a>MySQL事务</h2><h3 id="事务的特性"><a href="#事务的特性" class="headerlink" title="事务的特性"></a>事务的特性</h3><p>这个已经讲烂了：<strong>ACID</strong>，那么在InnoDB中ACID是如何保证的呢？</p>
+<ul>
+<li>Atomic：原子性是指一个事务中的所有操作，要么一起提交，要么一起回滚。这是通过<strong>undo log</strong>实现的，当事务中发生异常，就要通过undo log回滚，实现原子性</li>
+<li>Isolation：隔离性是指多个事务之间，应该是相互隔离的，无法看到事务执行的中间状态。这是通过<strong>MVCC+锁机制</strong>实现的，快照读使用MVCC，当前读使用锁机制</li>
+<li>Durable：持久性是指事务执行完后，结果永远保留。这是通过<strong>redo log</strong>实现的，当事务执行完后redo log就会保存操作记录，并刷盘持久化，如果事务提交后发生崩溃，导致buffer pool还没有写入磁盘，可以通过redo log恢复</li>
+<li>Consistent：一致性是指数据的一致性，这个是通过AID来共同保证的</li>
+</ul>
+<p>也就是说ACID中，<strong>AID是基础，最终保证了C</strong></p>
+<h3 id="并发事务引起的问题"><a href="#并发事务引起的问题" class="headerlink" title="并发事务引起的问题"></a>并发事务引起的问题</h3><p>MySQL提出了事务隔离级别的概念，不同的隔离级别就是为了解决不同的问题</p>
+<p>一共有三种问题：</p>
+<ul>
+<li><p><strong>脏读</strong>：事务A读到了还没有提交的事务B的中间状态</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049066.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom:50%;" />
+</li>
+<li><p><strong>不可重复读</strong>：事务A中执行了两次相同的select，但是事务B在这两次select中提交了修改，导致两次select读出来的数据不一样（这里指的不一样指的是内容，而不是条数增加了）</p>
+<blockquote>
+<p>update、delete都是修改，delete底层是逻辑删除，会有单独线程来清理</p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049260.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom: 50%;" />
+</li>
+<li><p><strong>幻读</strong>：幻读专门指的insert导致的，他是指在两次前后查询到的数据个数不一样</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049728.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom:50%;" />
+
+<p>这个要和不可重复读区别开，幻读是insert引起的，而不是更新操作引起的，因为这有可能会导致两次select的条数不一样</p>
+<p>虽然delete也会，但是delete后是逻辑删除，还是可以通过MVCC来控制，具体为什么我们后面详细说说</p>
+</li>
+</ul>
+<h3 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h3><p>既然事务并发有上面这三个问题，那MySQL肯定也解决了它们，MySQL提供了四种隔离级别：</p>
+<p>Read Uncommitted &lt; Read Committed &lt; Repeatable Read &lt; Serializable</p>
+<p>当然这四种隔离级别肯定也不是所有的都解决了上述问题</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049801.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<p>那这些隔离界别是如何实现的呢？</p>
+<ul>
+<li><p>Read Uncommitted</p>
+<p>没有任何操作，任何并发问题都有可能发生，数据库里是啥，就读啥</p>
+</li>
+<li><p>Read Committed</p>
+<p>通过MVCC实现，但是会在每次读之前生成一个Read View，只解决了脏读问题</p>
+</li>
+<li><p>Repeatable Read，是MySQL的默认隔离级别，但是只解决了部分幻读，可重复读级别使用了两种方式来解决的：</p>
+<ul>
+<li><p>对于快照读，使用的是MVCC</p>
+</li>
+<li><p>对于当前读，使用的是间隙锁。</p>
+<p>间隙锁其实就是范围锁，当使用<code>select for update</code>的时候，由于会直接读取最新的，为防止两次读取之间有修改操作导致结果不一样，会<strong>对这个select范围就会加上间隙锁</strong>直接不允许操作这个范围内的任何数据，如果需要在这个范围里面做update、delete、insert操作都会被阻塞，直至事务提交</p>
+</li>
+</ul>
+</li>
+<li><p>Serializable</p>
+<p>通过读写锁实现，允许并发读，但是不允许同时读写，也不允许并发写</p>
+</li>
+</ul>
+<h3 id="幻读问题"><a href="#幻读问题" class="headerlink" title="幻读问题"></a>幻读问题</h3><p>接下来，我们来重点讨论一下幻读，为什么Repeatable Read隔离级别只解决了部分幻读问题？</p>
+<p><strong>幻读是指</strong>：同一个查询在不同的时间产生不同的结果集时，事务中就会出现所谓的幻象问题。例如，如果 SELECT 执行了两次，但第二次返回了第一次没有返回的行，则该行是“幻像”行</p>
+<h4 id="快照读避免幻读"><a href="#快照读避免幻读" class="headerlink" title="快照读避免幻读"></a>快照读避免幻读</h4><p>在Repeatable Read级别中，由于MVCC创建的读视图是不变的，因此在当前事务中，<strong>一般情况下</strong>，如果有其他事务insert、delete、update的时候都不会出现问题。</p>
+<p>MVCC会从undo log中找到符合读视图的版本，如果是insert的话，那找到最后也没发现直接返回空</p>
+<p>这里有两个问题：</p>
+<ul>
+<li><p><strong>delete的记录，为什么还能从表中找到undo log的头指针？</strong></p>
+<p>这是因为MySQL的delete操作是逻辑删除，因此还是会找到该数据，会判断是否符合读视图还会判断是否已删除</p>
+<p>那如果全都是逻辑删除岂不是会很耗空间？</p>
+<p>MySQL会有一个单独线程（线程数可以设置），来删除逻辑删除的数据条目和undo log，只要确定该记录不会被用到了，比如该记录trx_id以前的事务都已经终止了，那就会删掉</p>
+</li>
+<li><p><strong>为什么说是一般情况？</strong></p>
+<p>因为如果你不做update操作就永远是在读视图里面select就不会出问题，但是如果在当前事务使用delete、update、insert操作，这些操作是基于当前读实现的，那就有可能会出问题了</p>
+<p>如果在当前事务执行修改操作之前，事务B插入了一条数据，恰巧当前事务的修改操作范围匹配上事务B插入的数据，那么本次修改操作就会<strong>在开发者不知道的情况下作用在事务B插入的数据上，并且会将该记录的trx_id修改成自己的</strong>，那么下次查询就会莫名其妙的查出来了</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406282049816.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 67%;" />
+
+<p>其实不仅仅是事务B的insert操作，事务B的delete操作，如果事务Aupdate在delete之后，那就会发现update并没有生效，还是有很多种情况的</p>
+<p>如果要解决只能通过serializable来解决，因为它不允许并发读写和并发写</p>
+</li>
+</ul>
+<h4 id="当前读解决幻读"><a href="#当前读解决幻读" class="headerlink" title="当前读解决幻读"></a>当前读解决幻读</h4><p>那就是简单粗暴的使用间隙锁了，只要在当前事务中使用了select for update语句，那就会有两种情况：</p>
+<ul>
+<li>有其他事务正在写，那么当前事务阻塞，知道写事务提交，才会拿到结果并加上间隙锁</li>
+<li>没有写事务，那就直接加锁并获取结果</li>
+</ul>
+<p>加上间隙锁后，任何对于该范围内的写操作都会被阻塞，因此当前事务所有的当前读都不会被其他写操作干扰，不会出现幻读</p>
+<p>那么就有人问了，如果先select 在select for update呢？</p>
+<p>那确实有可能会不一样，但原则上select和select for update是两个不同的语句，不一样可以接受</p>
+<h2 id="MySQL日志"><a href="#MySQL日志" class="headerlink" title="MySQL日志"></a>MySQL日志</h2><h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><p>在将MySQL日志之前，我觉得有些东西得先讲一讲，那就是缓冲区</p>
+<p>在MySQL的日志、数据这些写入操作的时候，都不是直接写到磁盘，而是先放在一个buffer中，然后由MySQL的配置决定什么时候写到page cache，然后在通过fsync来持久化到磁盘</p>
+<p><strong>从MySQL的角度来说，只要写到page cache其实就算持久化了</strong>，因为这个时候即使MySQL崩了也不会发生丢失，page cache是OS层面的缓存，只有OS崩了或者系统断电等情况发生，才会丢失</p>
+<p>此外，我们还需要提醒一点：undo log的buffer是放在buffer pool中的，而redo log和binlog的buffer都是单独存在的</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134065.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
+
+<p>后面看日志和BufferPool的时候，我们一定要明确一点：</p>
+<p>MySQL是基于磁盘的，<strong>如何减少磁盘IO的同时并保证数据完整性</strong>，是MySQL日志和Buffer Pool优化的地方，这里任何技术的提出都是为了达到此作用</p>
+<h3 id="Undo-log"><a href="#Undo-log" class="headerlink" title="Undo log"></a>Undo log</h3><p>如果在事务还没有提交的时候，MySQL出现了错误或者崩溃需要回滚，那就需要靠undo log记录下执行前的数据，这样如果发生回滚就可以直接根据undo log回滚了，<strong>保证了事务的原子性</strong></p>
+<p>此外，undo log在MVCC中也起到了十分重要的作用，通过undo log形成的链表，找到符合当前读视图的那个记录版本</p>
+<p>要注意的是，每个undo log记录格式并不相同，它取决于执行的操作是insert、delete、update</p>
+<p>undo log的buffer不同于redo log和binlog，它是放在buffer pool中的，被当作是数据页看待。因此undo log的修改同样也会被redo log记录下来</p>
+<p>而redo log会每秒刷盘+事务提交刷盘，因此redo log<strong>可以保证持久性</strong></p>
+<blockquote>
+<p>其实在这里，我想到了一个问题：</p>
+<p>当事务执行一半的时候，mysql崩了，此时修改的数据页脏页刷盘了，但是undolog页并没有刷盘，但是<strong>由于事务执行一半redo log也没有刷盘</strong>。这个时候数据页已经写进去了（如果没写进去，那还好，mysql恢复过来什么也没有刷盘，执行一半的事务相当于没有发生），此时事务相当于没完成需要回滚，但是undo log没了，redo log也没记录undo log的变更</p>
+<p>那么此时，该怎么办？</p>
+<p>其实这个时候，确实是回滚不来了的，这个问题的<strong>重点其实是我加粗的那块</strong></p>
+<p>事务提交reo log刷盘是msyql的默认策略，本来就不能保证强一执行。我们可以修改参数，使其没执行一条指令刷一次盘，这样就可以解决上述问题了。</p>
+</blockquote>
+<h3 id="Buffer-Pool"><a href="#Buffer-Pool" class="headerlink" title="Buffer Pool"></a>Buffer Pool</h3><p>Buffer Pool其实就是MySQL做的一层分页，MySQL定义的页大小是16KB，是OS的四倍（4KB）</p>
+<p>那么既然讲到分页，那应该就能理解了，MySQL使用undo log、数据页的时候，不会只取一条改完再写回，而是一次取一页，然后LRU换出的时候被动写回</p>
+<p>这样的话可以进一步提高速度，因为这个BufferPool是MySQL自己的缓存，不像OS的page cache是OS层面的，要和其他进程竞争页面<strong>更容易缺页</strong>。</p>
+<h3 id="Redo-log"><a href="#Redo-log" class="headerlink" title="Redo log"></a>Redo log</h3><p>对于BufferPool来说，毕竟是基于内存的，一旦MySQL崩了或者系统断电，那么如果脏页没有写回去，那就会出现数据丢失</p>
+<p>为了防止这种情况发生，MySQL使用redo log来保证持久性</p>
+<p>简单来说，就是当有数据更新的时候，会先更新BufferPool中的数据页和undo log，然后将此次修改记录到redo log中，BufferPool中的数据可以异步刷盘，但是redo log数据必须刷盘</p>
+<p>这样，即使MySQL出问题了，也可以通过redo log恢复过来。</p>
+<p>这就是<strong>WAL技术</strong>（Write Ahead Logging），写操作不急着刷盘，而是记录日志将日志刷盘，脏页异步刷盘</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134799.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<h4 id="undo-log和redo-log的区别"><a href="#undo-log和redo-log的区别" class="headerlink" title="undo log和redo log的区别"></a>undo log和redo log的区别</h4><ul>
+<li><p>undo log是用于回滚和MVCC的，记录的是数据修改之前的状态，保证事务的原子性</p>
+</li>
+<li><p>redo log是用于数据持久化的，记录的是数据修改了什么地方，保证事务的持久性</p>
+</li>
+</ul>
+<h4 id="那为什么不直接将buffer-pool刷盘，而是非要通过redo-log来搞？"><a href="#那为什么不直接将buffer-pool刷盘，而是非要通过redo-log来搞？" class="headerlink" title="那为什么不直接将buffer pool刷盘，而是非要通过redo log来搞？"></a>那为什么不直接将buffer pool刷盘，而是非要通过redo log来搞？</h4><p>这是因为redo log是<strong>顺序写入</strong>的</p>
+<p>就比如一个事务修改了100张表，那如果是直接写入，这100张表的数据肯定不在一个数据页上吧，那就得写回100次</p>
+<p>但是如果是异步写回数据页，我们只需要将redo log刷盘，而redo log是顺序记录这100次表的修改的，基本就是在一个redo log页上，只需要写回一次</p>
+<p>那当然redo log性能高了</p>
+<p>此外，<strong>根据局部性原理</strong>，一般拿出来的数据页可能有多个线程修改，那等多个线程写完一起写回，肯定比写一次写回一次要效率高吧！</p>
+<p>因此，总结下来有两个原因：</p>
+<ul>
+<li>redo log是顺序写入</li>
+<li>buffer pool可能多个线程修改同一个页，异步写回，效率更高</li>
+</ul>
+<h4 id="redo-log是怎么刷盘的"><a href="#redo-log是怎么刷盘的" class="headerlink" title="redo log是怎么刷盘的"></a>redo log是怎么刷盘的</h4><p>Redo log也是有自己的buffer的，但是为了保证数据持久性，肯定不能也放在buffer pool中异步写回，因此redo log buffer独立出来，单独处理</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301134345.webp" srcset="/img/loading.gif" lazyload alt="img" style="zoom:40%;" />
+
+<p>redo log的刷盘是有策略的，除了默认的<strong>一秒一次的刷盘</strong>，还有如下细节：</p>
+<ul>
+<li><p>首先，可以通过配置决定什么时候刷盘：不主动写回page cache；事务提交写回page cache；事务提交写回磁盘</p>
+</li>
+<li><p>其次，redo log是循环写，当脏页同步到磁盘，就会删掉redo log对应的内容，采用双指针</p>
+<p>一旦发现追了一圈，那就会阻塞，直至有脏页写到磁盘空出空间，才可以继续写入</p>
+</li>
+</ul>
+<h3 id="Binlog"><a href="#Binlog" class="headerlink" title="Binlog"></a>Binlog</h3><p>上述两个日志undo log和binlog都是InnoDB的日志，也就是说MyISAM是没有事务也没有崩溃恢复能力的，但是binlog是MySQL的东西，也是用来做主从同步的</p>
+<p>binlog里面记录的是所有数据库的修改操作，包括表结构和表数据的修改，但是不包括select语句</p>
+<p>binlog无法做崩溃恢复，只有归档能力，它和redo log还是有很大区别的：</p>
+<ul>
+<li><p>从用途来说：</p>
+<p>binlog用来做归档、主从同步的；</p>
+<p>redo log用来实现事务的持久性，做崩溃恢复的</p>
+</li>
+<li><p>从存储内容来说：</p>
+<p>binlog存储的是<strong>全量的</strong>所有的表结构、表数据的修改操作语句，是修改的逻辑语句；</p>
+<p>redo log存储的是<strong>还没有写回磁盘的脏页的物理修改记录</strong>，是修改的物理地址</p>
+</li>
+</ul>
+<h4 id="为什么binlog无法崩溃恢复"><a href="#为什么binlog无法崩溃恢复" class="headerlink" title="为什么binlog无法崩溃恢复"></a>为什么binlog无法崩溃恢复</h4><p>因为binlog记录的是全量的数据，真要做恢复，就是把mysql的数据全删了，然后用binlog恢复，并且也没有做undo log的保存</p>
+<p>而redo log则是保存的没有刷盘的脏页的数据，只需要回复一下就好了</p>
+<h4 id="binlog的刷盘"><a href="#binlog的刷盘" class="headerlink" title="binlog的刷盘"></a>binlog的刷盘</h4><p>和redo log一样，由于需要同步刷盘，因此也不放到buffer pool中，单独开了一个binlog buffer</p>
+<h3 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h3><p>由于redo log和binlog是两个文件，如果一个刷盘了但是另一个没刷盘，那就会出现问题：</p>
+<ul>
+<li>如果写入binlog没有写入redolog，主库崩溃后无法恢复，但是主库会把binlog中的没恢复的数据同步给从库</li>
+<li>如果写入redo log没有写入binlog，主库崩溃后恢复了，但是binlog中没有，无法同步给从库</li>
+</ul>
+<p>那么如何<strong>保证redo log和binlog的一致性</strong>呢，这就是大名鼎鼎的两阶段提交方案：</p>
+<ul>
+<li>事务提交的时候，会先将redo log刷盘，并将状态置为prepared</li>
+<li>然后将binlog刷盘，刷盘成功后就会将redo log置为committed状态</li>
+</ul>
+<p>这个时候：</p>
+<ul>
+<li><p>若写入binlog失败，恢复时会发现redo log存在prepare项且binlog无对应项，则回滚并删除redo log对应记录</p>
+</li>
+<li><p>若置为committed失败，恢复时会发现redo log存在prepare项但binlog有对应项，则提交并将该记录置为committed</p>
+</li>
+</ul>
+<p>但是两阶段提交也存在一些问题：</p>
+<ul>
+<li>由于一个事务提交就会触发一次两阶段提交，那么就会有两次fsync的刷盘（redo log和binlog）</li>
+<li>并且为了保证事务并发时候顺序性，两阶段提交需要加锁，因此效率会下降</li>
+</ul>
+<p>在MySQL5.7以后，采用了流式操作的组提交的形式，分为了三个阶段：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301135150.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
+
+<ul>
+<li>Flush阶段：对redo log刷盘并把binlog写到binlog buffer中不刷盘</li>
+<li>Sync阶段：binlog刷盘，fsync</li>
+<li>Commit阶段：将redo log对应记录置为commit</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
+      
+        <a href="/tags/MySQL/" class="print-no-link">#MySQL</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MySQL总结</div>
+      <div>http://example.com/2024/05/06/八股/2024-05-05-MySQL总结/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zenith Wang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/08/%E5%85%AB%E8%82%A1/2024-05-08-Redis%E6%80%BB%E7%BB%93/" title="Redis总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis总结</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/29/%E7%AC%94%E8%AF%95%E9%A2%98/2024-04-29-%E9%98%BF%E9%87%8CLazada%E7%AC%94%E8%AF%95%E7%AC%AC%E4%B8%80%E9%A2%98/" title="阿里Lazada笔试第一题">
+                        <span class="hidden-mobile">阿里Lazada笔试第一题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","appKey":"Xq6ytGGvYcBfUTC6ZzSnFuPD","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

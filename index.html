@@ -255,13 +255,265 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/07/07/2024-07-07-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" target="_self">
+        <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/" target="_self">
+          数组中的第K个最大元素
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACK%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/" target="_self">
+        <div>
+          数组中的第K个最大元素Solution-01很简单，要实现O(n)的复杂度，那就桶排序了，因为题目给了num的范围在-10000到10000之间 我们只需要加一个基准量，将数字映射到0-20000之间就好了 Code12345678910111213141516171819202122class Solution &#123;    public int findKthLargest(int[]
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-10 17:55" pubdate>
+              2024-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/LeetCode/">#LeetCode</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/">#算法题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-LRU%20%E7%BC%93%E5%AD%98/" target="_self">
+          LRU缓存
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-LRU%20%E7%BC%93%E5%AD%98/" target="_self">
+        <div>
+          LRU缓存Problem: LRU缓存 Solution用双向链表加hashMap实现 双向链表实现LRU顺序的维护，map实现O(1)时间复杂度的查找  get函数：  如果map中有，那就将该节点移到队头，然后返回 没有就返回-1   put函数  如果map中有，那就将该节点移到队头，然后修改node的value值返回 没有的的话：创建新节点，size++并放到map以及队头中；如果操作完成
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-10 17:21" pubdate>
+              2024-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/LeetCode/">#LeetCode</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/">#算法题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" target="_self">
+          反转链表
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" target="_self">
+        <div>
+          反转链表Problem: 反转链表 Solution我们只需要简单粗暴的将当前元素的next指针指向prev节点就好了 但是这里为了保证数组能继续遍历，并且可以获取prev节点，我们需要两个指针来分别保存prev和next Code123456789101112131415161718192021222324class Solution &#123;    public ListNode reve
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-10 16:32" pubdate>
+              2024-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/LeetCode/">#LeetCode</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/">#算法题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%97%A0%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%90%E4%B8%B2/" target="_self">
+          无重复字符的最长子串
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10-%E6%97%A0%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%90%E4%B8%B2/" target="_self">
+        <div>
+          无重复字符的最长子串Problem: 无重复字符的最长子串 解法：双指针实现滑动窗口，并且使用hashMap记录滑动窗口中的字符遍历情况，注意滑动窗口变换的时候，hashMap也也要变化 12345678910111213141516171819202122232425class Solution &#123;    public int lengthOfLongestSubstring(Stri
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-10 16:22" pubdate>
+              2024-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/LeetCode/">#LeetCode</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/">#算法题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/07/%E5%85%AB%E8%82%A1/2024-07-07-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" target="_self">
           计算机基础
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/07/2024-07-07-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/07/%E5%85%AB%E8%82%A1/2024-07-07-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" target="_self">
         <div>
           计算机基础进程和线程的通信方式进程的通信方式 管道 管道是通过pipe函数生成的，其实本质就是内核中的一个缓冲区，支持无格式的流式写入 分为匿名管道和命名管道 当调用pipe函数后，就会得到一个数组fd，其中fd[0]代表管道的读端、fd[1]代表管道的写端 但是这个数组只存在于pipe的进程中，其他进程怎么拿过来进行通信呢？ 通过fork函数就可以了  在linux中，ps aux|grep j
         </div>
@@ -318,13 +570,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/07/06/2024-07-06-Mybatis%E8%AF%A6%E8%A7%A3/" target="_self">
+        <a href="/2024/07/06/%E5%85%AB%E8%82%A1/2024-07-06-Mybatis%E8%AF%A6%E8%A7%A3/" target="_self">
           Mybatis详解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/06/2024-07-06-Mybatis%E8%AF%A6%E8%A7%A3/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/06/%E5%85%AB%E8%82%A1/2024-07-06-Mybatis%E8%AF%A6%E8%A7%A3/" target="_self">
         <div>
           Mybatis详解Mybatis架构Mybatis的架构图如下所示，分为配置层、接口层、数据处理层和框架支撑层   配置层配置层分为两个部分，分别是mybatis本身的mybatis-config.xml以及每个mapper接口对应的xxxMapper.xml 其中mybatis-config.xml声明了数据库的信息、连接池、以及各个mapper的对应的xml文件位置等等 然后解析完mabati
         </div>
@@ -381,13 +633,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/06/14/2024-06-14-JVM%E8%AF%A6%E8%A7%A3/" target="_self">
+        <a href="/2024/06/14/%E5%85%AB%E8%82%A1/2024-06-14-JVM%E8%AF%A6%E8%A7%A3/" target="_self">
           JVM详解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/14/2024-06-14-JVM%E8%AF%A6%E8%A7%A3/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/14/%E5%85%AB%E8%82%A1/2024-06-14-JVM%E8%AF%A6%E8%A7%A3/" target="_self">
         <div>
           JVM初步认知JVM是一个程序集虚拟机，它可以运行一系列虚拟的计算机指令，这个指令就是我们常说的字节码 当然，JVM不仅仅就是运JAVA程序，它其实是一个虚拟机，你只要提供的字节码是满足JVM定义的规范那就可以运行 也就是说对于任意一个语言，我们只需要设计一个编译器将该语言编译成JVM定义的字节码规范，就可以直接在JVM中运行，比如Scala、Kotlin等 JVM的架构模型JVM的指令集是基于栈
         </div>
@@ -444,13 +696,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/06/04/2024-06-04-JUC%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8%E8%AF%A6%E8%A7%A3/" target="_self">
+        <a href="/2024/06/04/%E5%85%AB%E8%82%A1/2024-06-04-JUC%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8%E8%AF%A6%E8%A7%A3/" target="_self">
           JUC并发容器详解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/04/2024-06-04-JUC%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8%E8%AF%A6%E8%A7%A3/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/04/%E5%85%AB%E8%82%A1/2024-06-04-JUC%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8%E8%AF%A6%E8%A7%A3/" target="_self">
         <div>
           JUC并发容器详解ConcurrentHashMapJava并发的MapJava可以提供并发的map的常用的有三种，分别是HashTable、SynchronizedMap（Collections.synchronizedMap方法提供）以及ConcurrentHashMap，那么这三者有什么区别呢？ 首先，HashTable和SynchronizedMap都是直接通过synchronized关键
         </div>
@@ -514,13 +766,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/06/03/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/" target="_self">
+        <a href="/2024/06/03/%E5%85%AB%E8%82%A1/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/" target="_self">
           JUC并发工具详解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/03/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/03/%E5%85%AB%E8%82%A1/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/" target="_self">
         <div>
           JUC并发工具详解线程基础进程、线程、管程太经典了，这个问题 进程是系统资源分配的单位，而线程是执行的最小单位 管程可以理解为monitor，只有一个线程持有管程的时候，才可以进入同步代码块 用户线程和守护线程用户线程是用户创建的，最典型的就是main方法的主线程 守护线程是为用户线程提供服务的，在后台运行，最典型的就是垃圾回收线程 假设当前JVM只有守护线程时，那么JVM就会退出  即使main
         </div>
@@ -584,13 +836,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/05/30/2024-05-30-JMM%E6%A8%A1%E5%9E%8B%E7%90%86%E8%A7%A3/" target="_self">
+        <a href="/2024/05/30/%E5%85%AB%E8%82%A1/2024-05-30-JMM%E6%A8%A1%E5%9E%8B%E7%90%86%E8%A7%A3/" target="_self">
           JMM内存模型理解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/30/2024-05-30-JMM%E6%A8%A1%E5%9E%8B%E7%90%86%E8%A7%A3/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/30/%E5%85%AB%E8%82%A1/2024-05-30-JMM%E6%A8%A1%E5%9E%8B%E7%90%86%E8%A7%A3/" target="_self">
         <div>
           JMM内存模型理解基本知识什么是JMM在计算机底层系统中，都知道是有主存-&gt;cache-&gt;寄存器这样一个等级的，但是在多核高并发的情况下，就会出现内存的读写不一致的问题，那么该如何解决呢？   首先，要知道的是OS对于读写一致性是由解决方法的，比如总线嗅探机制的MESI协议 但是，对于不同的硬件平台和OS搞出一套不同的解决方案那是不可行的，并且这些协议是由OS将数据写回主存，为了屏蔽硬
         </div>
@@ -622,274 +874,6 @@
     <span>></span>
     
   <a href="/categories/Java%E5%85%AB%E8%82%A1/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" class="category-chain-item">Java并发编程</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/">#个人笔记</a>
-            
-              <a href="/tags/Java%E5%85%AB%E8%82%A1/">#Java八股</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/05/18/2024-05-18-ElasticSearch%E6%80%BB%E7%BB%93/" target="_self">
-          ElasticSearch总结
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/18/2024-05-18-ElasticSearch%E6%80%BB%E7%BB%93/" target="_self">
-        <div>
-          ElasticSearch总结ES和MySQL倒排索引基本形式相比于MySQL的文档id找text的方式，es是将text分词过后，通过每个term去找对应文档 ES中分词后的word叫做term，所以我们这里也&#x3D;都就这么叫了   底层数据结构term是经过排序的一个字典列表，我们称为term dictionary，当然如果把这个放在内存中，一旦数据海量了，必然内存会爆，那么该如何实现搜
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-18 00:00" pubdate>
-              2024-05-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/">#个人笔记</a>
-            
-              <a href="/tags/Java%E5%85%AB%E8%82%A1/">#Java八股</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/05/17/2024-05-17-RocketMQ%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" target="_self">
-          RocketMQ
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/17/2024-05-17-RocketMQ%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" target="_self">
-        <div>
-          RocketMQ系统架构  Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。 Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。广播模式下，一个队列的消息会发给每一个消费者，集群模式下，每个队列只会和一个消费者绑定，只会被消费一次。 NameServe
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-17 00:00" pubdate>
-              2024-05-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="category-chain-item">消息队列</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/">#个人笔记</a>
-            
-              <a href="/tags/Java%E5%85%AB%E8%82%A1/">#Java八股</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/05/11/2024-05-11-%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95%E9%A2%98/" target="_self">
-          美团面试笔试题
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/11/2024-05-11-%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95%E9%A2%98/" target="_self">
-        <div>
-          美团面试笔试题多线程求和输入一个int数组，和线程个数K，多线程求和输出最终sum 这题其实就是多线程，要注意的是如何给每个线程分配要求和的部分。其实可以有很多种方法，比如取模，或者直接暴力顺序拆分，而我在面试中使用的就是取模方法 123456789101112131415161718192021222324252627282930313233343536373839404142434445464
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-11 00:09" pubdate>
-              2024-05-11
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/" class="category-chain-item">面试总结</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/">#算法题</a>
-            
-              <a href="/tags/%E7%AC%94%E8%AF%95/">#笔试</a>
-            
-              <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">#动态规划</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/05/10/2024-05-10-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%9F%BA%E7%A1%80/" target="_self">
-          消息队列基础
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/10/2024-05-10-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%9F%BA%E7%A1%80/" target="_self">
-        <div>
-          消息队列基础基础知识MQ能干什么MQ做的是事儿就是三大点：异步、解耦、削峰  异步 对于不同服务之间的相互调用，如果使用RPC的话那么就是同步的，一旦调用链很长就会十分耗时。 使用消息队列，就可以立即返回处理好的结果，剩下的后续的补充操作（比如秒杀后的创建订单、发送验证码）可以通过消息队列由Consumer尽自己最大能力的执行  解耦 为了保证服务的可扩展性，主服务可以只管发布消息，至于后续有多少
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-10 00:00" pubdate>
-              2024-05-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="category-chain-item">消息队列</a>
   
   
 

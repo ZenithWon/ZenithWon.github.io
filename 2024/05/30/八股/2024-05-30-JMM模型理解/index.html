@@ -1,0 +1,957 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zenith Wang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JMM内存模型理解基本知识什么是JMM在计算机底层系统中，都知道是有主存-&gt;cache-&gt;寄存器这样一个等级的，但是在多核高并发的情况下，就会出现内存的读写不一致的问题，那么该如何解决呢？   首先，要知道的是OS对于读写一致性是由解决方法的，比如总线嗅探机制的MESI协议 但是，对于不同的硬件平台和OS搞出一套不同的解决方案那是不可行的，并且这些协议是由OS将数据写回主存，为了屏蔽硬">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JMM内存模型理解">
+<meta property="og:url" content="http://example.com/2024/05/30/%E5%85%AB%E8%82%A1/2024-05-30-JMM%E6%A8%A1%E5%9E%8B%E7%90%86%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Zenith&#39; Blog">
+<meta property="og:description" content="JMM内存模型理解基本知识什么是JMM在计算机底层系统中，都知道是有主存-&gt;cache-&gt;寄存器这样一个等级的，但是在多核高并发的情况下，就会出现内存的读写不一致的问题，那么该如何解决呢？   首先，要知道的是OS对于读写一致性是由解决方法的，比如总线嗅探机制的MESI协议 但是，对于不同的硬件平台和OS搞出一套不同的解决方案那是不可行的，并且这些协议是由OS将数据写回主存，为了屏蔽硬">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010153682.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010129724.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406022252939.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405302238988.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406032351484.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406040003561.png">
+<meta property="article:published_time" content="2024-05-30T14:36:22.000Z">
+<meta property="article:modified_time" content="2024-06-03T17:52:26.271Z">
+<meta property="article:author" content="Zenith Wang">
+<meta property="article:tag" content="个人笔记">
+<meta property="article:tag" content="Java八股">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010153682.png">
+  
+  
+  
+  <title>JMM内存模型理解 - Zenith&#39; Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","app_key":"Xq6ytGGvYcBfUTC6ZzSnFuPD","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Zenith&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JMM内存模型理解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-30 22:36" pubdate>
+          2024年5月30日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JMM内存模型理解</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="JMM内存模型理解"><a href="#JMM内存模型理解" class="headerlink" title="JMM内存模型理解"></a>JMM内存模型理解</h1><h2 id="基本知识"><a href="#基本知识" class="headerlink" title="基本知识"></a>基本知识</h2><h3 id="什么是JMM"><a href="#什么是JMM" class="headerlink" title="什么是JMM"></a>什么是JMM</h3><p>在计算机底层系统中，都知道是有主存-&gt;cache-&gt;寄存器这样一个等级的，但是在多核高并发的情况下，就会出现内存的读写不一致的问题，那么该如何解决呢？</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010153682.png" srcset="/img/loading.gif" lazyload alt="image-20240601015358523" style="zoom: 33%;" />
+
+<p>首先，要知道的是OS对于读写一致性是由解决方法的，比如总线嗅探机制的MESI协议</p>
+<p>但是，对于不同的硬件平台和OS搞出一套不同的解决方案那是不可行的，并且这些协议是由OS将数据写回主存，<strong>为了屏蔽硬件和操作系统的差异并且可以自己决定写回内存的时机</strong>，JMM定义了一堆东西比如volatile、synchronized，定义了一个变量的读写方式、可见性、原子性、有序性等等问题，由用户通过JMM提供的这些方式进行同步</p>
+<p><strong>因此，JMM是一种抽象的概念和规范</strong>，有了JMM你只需要考虑线程工作内存、主内存这两个东西，你不需要考虑寄存器、这个CPU有几级cache那些玩意儿一层层的同步。</p>
+<p>JMM告诉你，要想实现可见性，你就可以用volatile、synchronized</p>
+<blockquote>
+<p>其实，JVM底层这些关键字的实现还是对于不同平台有不同的实现，只不过对用户屏蔽了</p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406010129724.png" srcset="/img/loading.gif" lazyload style="zoom: 33%;" />
+
+<h3 id="JMM三大特性：原子性、有序性、可见性"><a href="#JMM三大特性：原子性、有序性、可见性" class="headerlink" title="JMM三大特性：原子性、有序性、可见性"></a>JMM三大特性：原子性、有序性、可见性</h3><ol>
+<li><p><strong>原子性</strong>：要和数据库事务区别，在并发中指的是多个指令的执行不允许被中断</p>
+<p>在java中如果有一个<code>i++</code>操作，其实分为了三步 load 、add、store，如果运行完load执行后其他线程抢占了时间片，先一次性执行了这三个操作修改了i的值，那么等到原线程回来恢复寄存器后，执行add操作那么add的src操作数还是先开始修改前的值在store回去，那就出问题了，相当于只修改了一次。</p>
+<blockquote>
+<p>那么该如何保证操作的原子性呢？</p>
+<p>通过<strong>锁</strong>实现：<strong>synchronized、lock、AomicInteger（CAS锁）</strong></p>
+</blockquote>
+</li>
+<li><p><strong>有序性</strong>：指令在CPU调度执行时，CPU为了提升效率（比如缓存局部性原理重排后提高cache命中），在不影响结果的前提下，对CPU指令重排序</p>
+<p><strong>重排的原则必须遵循happens-before</strong>，不满足会导致运行结果不同，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">int</span> x=<span class="hljs-number">11</span>;<span class="hljs-comment">//1</span><br>    <span class="hljs-type">int</span> y=<span class="hljs-number">11</span>;<span class="hljs-comment">//2</span><br>    x=x+<span class="hljs-number">5</span>;   <span class="hljs-comment">//3</span><br>    y=x*x;   <span class="hljs-comment">//4</span><br>    <span class="hljs-comment">//为了增加cache命中，搞不好顺序就会被重排为1324，但是绝对不会重排为4123（影响结果了）</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是指令重排对于单线程是没有问题的，一旦开启多线程就会出现问题,最典型的问题就是单例模式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br> <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;<br><br> <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span>&#123;<br> &#125;<br> <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>     <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>         <span class="hljs-comment">//分为三步：1.申请内存空间 2.构造函数 3.返回指针赋值给引用instance</span><br>         <span class="hljs-comment">//原则上，123和132结果都一样</span><br>         instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>     &#125;<br>     <span class="hljs-keyword">return</span> instance;<br> &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是多线程情况下，如果new对象的时候三步发生指令重排，<strong>导致2排在3后面</strong>，那么就会出现引用已经拿到对象地址，但是对象还没有执行构造函数，如果其他线程获取到了这个未初始化的引用，那么执行get方法获取属性就有可能会出问题</p>
+<p>如果不希望CPU重排序，JMM给你规范了，可以对属性追加volatile修饰，禁止对该属性的操作指令重排序</p>
+</li>
+<li><p><strong>可见性</strong>：CPU处理时，需要从内存读取数据，走总线传到寄存器中，然后进行计算，算完后将结果写回内存。</p>
+<p>但是，从寄存器写回内存，并不是立即写回而是会遵循MESI协议。这就会导致内存不同步的问题。</p>
+<p>解决方法：volatile每次操作就会写回主存、synchronized触发和释放的时候会同步一次</p>
+</li>
+</ol>
+<h3 id="happens-before规则"><a href="#happens-before规则" class="headerlink" title="happens-before规则"></a>happens-before规则</h3><p>happens-before是对有序性和可见性的约束，它是对程序员的承诺，如果你的顺序满足happens-before条件，你就不需要考虑可见性问题，就不要每个变量都要volatile、synchronized</p>
+<p>如果一个操作happens-before另一个操作，那么第一个操作执行结果对第二个操作可见，如果重排序后的结果不会影响满足happens-before规则的执行结果，那么就可以重排序。</p>
+<p>但是JMM对于不会影响happens-before结果的重排序不进行保障，因此还是需要volatile保证有序性，这也被写在happens-before原则中了。</p>
+<blockquote>
+<p>也就说，happens-before其实保证了有序性和可见性，如果发生重排序导致结果不对，那是因为你没有充分利用happens-before，因为你可以利用volatile规则来约束有序性</p>
+<p>happens-before无法保证原子性，即使执行顺序对，但多线程中指令的穿插执行仍然会导致不符合预期的结果</p>
+</blockquote>
+<p>happens-before规则一共有8条</p>
+<ol>
+<li><p><strong>次序规则</strong>：一个线程内，按照代码的顺序，前面的操作先行发生于后面的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">int</span> x=<span class="hljs-number">11</span>;<span class="hljs-comment">//1</span><br>    <span class="hljs-type">int</span> y=x;<span class="hljs-comment">//2</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>上述代码中：x&#x3D;11对y&#x3D;x可见这个虽然从直观角度没啥问题，但这个其实是JMM规定的，如果不限制很可能2重排到1前面了</p>
+</li>
+<li><p><strong>锁定规则</strong>：unlock操作发生于<strong>后面</strong>对同一个锁的lock操作</p>
+<blockquote>
+<p>这里后面是指：<strong>多线程下，只要当前unlock时间发生在其他线程lock前面</strong>，那么其他线程看到的一定是解锁的状态</p>
+<p>在后续规则中，凡是涉及<strong>后面</strong>，不做说明都是指多线程中发生时间上的先后，不是代码指令顺序的先后</p>
+</blockquote>
+</li>
+<li><p><strong>volatile变量规则</strong>：对一个volatile的写操作先行发生于<strong>后面</strong>对这个变量的读操作</p>
+</li>
+<li><p><strong>传递规则</strong>：A happens-before B &amp;&amp; B happens-before C -&gt; A happens-before C</p>
+</li>
+<li><p><strong>线程启动规则</strong>：线程的start方法，先行于线程中run方法中的所有指令</p>
+</li>
+<li><p><strong>线程终端规则</strong>：线程的interrupt方法，先行于线程检测到中断事件</p>
+</li>
+<li><p><strong>线程终止规则</strong>：线程中的所有操作都先行发生于对此线程的终止检测</p>
+</li>
+<li><p><strong>对象终结规则</strong>：一个对象的构造函数先行发生于它的finalize方法</p>
+</li>
+</ol>
+<h2 id="Volatile"><a href="#Volatile" class="headerlink" title="Volatile"></a>Volatile</h2><h3 id="Volatile用处"><a href="#Volatile用处" class="headerlink" title="Volatile用处"></a>Volatile用处</h3><p>被volatile修饰的变量可以保证变量的可见性和有序性，因为加了volatile就相当于对于这个变量操作加了一条happens-before规则的约束，这个规则可以保证可见和有序</p>
+<p>从<strong>内存访问角度</strong>看：volatile变量的写是直接写到主内存中，读是先让本地内存的旧值无效，再从主内存中读</p>
+<p>那底层是怎么实现的呢？那就是<strong>内存屏障</strong></p>
+<h3 id="从JVM看：内存屏障"><a href="#从JVM看：内存屏障" class="headerlink" title="从JVM看：内存屏障"></a>从JVM看：内存屏障</h3><p>JMM给了8条happens-before规则，那么底层到底是怎么实现的的呢？从JVM层面来看，就是使用内存屏障</p>
+<p>JVM规定了任何虚拟机的实现都需要实现四种内存屏障：LoadLoad、LoadStore、StoreLoad、StoreStore</p>
+<p>就是说这两个操作不能交换顺序，即不允许重排序</p>
+<p>那么对于volatile修饰的变量，就是在读写操作时，加这两个内存屏障就可以保证可见性和有序性</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406022252939.png" srcset="/img/loading.gif" lazyload alt="image-20240602225236798"></p>
+<h3 id="从Hotpot和CPU看"><a href="#从Hotpot和CPU看" class="headerlink" title="从Hotpot和CPU看"></a>从Hotpot和CPU看</h3><p>volatile有不同的实现方式，比如对于不同的CPU写汇编，插入mfence（全屏障）、lfence（读屏障）、sfence（写屏障），或者就是直接简单粗暴的lock总线，保证同一时间只有一个线程在访问内存</p>
+<p>那么hotpot为了开发更加简单，选择了后者，因为lock指令是不同CPU都提供的指令，更具有普适性</p>
+<h3 id="Volatile的应用"><a href="#Volatile的应用" class="headerlink" title="Volatile的应用"></a>Volatile的应用</h3><p>最典型的就是DCL单例实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton singleton;<br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;单例初始化&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span>&#123;<br>        <span class="hljs-keyword">if</span>(singleton==<span class="hljs-literal">null</span>)&#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class)&#123;<br>                <span class="hljs-keyword">if</span>(singleton==<span class="hljs-literal">null</span>)&#123;<br>                    singleton=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> singleton;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>禁止创建对象的重排序，防止出现先赋值引用再执行初始化的情况</p>
+<h2 id="CAS操作"><a href="#CAS操作" class="headerlink" title="CAS操作"></a>CAS操作</h2><h3 id="从JMM角度来看"><a href="#从JMM角度来看" class="headerlink" title="从JMM角度来看"></a>从JMM角度来看</h3><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405302238988.png" srcset="/img/loading.gif" lazyload alt="image-20240530223817853" style="zoom: 33%;" />
+
+<p>对于AQS的lock以及synchronized锁，都有可能阻塞线程发生用户态到内核态的转换，因此<strong>CAS更轻量</strong></p>
+<p>CAS全称叫CompareAndSwap，由于一个进程管理资源，当多个线程访问一个资源并且想要修改的时候:</p>
+<ul>
+<li>首先会先把旧值读到工作内存中并保存，然后根据这个值计算，并将结果放入同样保存一份到工作内存</li>
+<li>根据offset和对象本身地址计算目标数据在主内存中的位置，将主存的值和上一步读入工作内存的值比较，如果一样就将计算结果直接写进内存中，否则自旋</li>
+</ul>
+<h3 id="从CPU角度看"><a href="#从CPU角度看" class="headerlink" title="从CPU角度看"></a>从CPU角度看</h3><p>由于Java不用户提供操作内存方法，因此Java的CAS只是给native方法传四个值：</p>
+<p>读到工作内存的值、对象在主存的地址、目标数据相对于对象的偏移、想写入主存的值</p>
+<p>然后根据这四个值，调用<code>CMPXCHG</code>指令，但是不同的CPU平台实现是不一样的，因此会有很多实现</p>
+<p>但是要注意的是，<code>CMPXCHG</code>本身并不能保证原子性，因为对于多核而言<strong>真的会并行</strong>，所以如果是多核CPU那么就要在前面加上lock指令防止别的线程在执行该条指令的时候修改内存</p>
+<blockquote>
+<p>比如，正在从总线往内存写的时候，别的线程也改了，那么还是会覆盖，因此需要加入lock指令，lock指令只允许一个核对同一处内存操作</p>
+</blockquote>
+<p>因此最终CAS的底层实现最终是指令<code>LOCK CPMXCHG CX DX</code>实现的</p>
+<p>CAS虽然不会阻塞线程性能更高，但是会带来一下几个问题：</p>
+<ol>
+<li>只能对一个变量修改保证原子性，无法实现同步代码块</li>
+<li>ABA问题，版本号解决</li>
+<li>如果并发太夸张，导致CAS一直在自旋，占用CPU资源</li>
+</ol>
+<h2 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h2><p>由于synchronized的实现和对象头中的markword息息相关，因此先来看看一个java对象的内存组成有哪些</p>
+<h3 id="宏观来看"><a href="#宏观来看" class="headerlink" title="宏观来看"></a>宏观来看</h3><blockquote>
+<p>在说这个之前，我们要先讲讲Java的引用大小问题：</p>
+<p>在64位的OS中一个指针的大小是8B的，但是Java默认开启了<strong>对象头指针压缩</strong>和<strong>成员变量对象指针压缩</strong>，压缩后的指针大小会从8B变成4B</p>
+</blockquote>
+<p>下面来聊一聊对象内存布局，我们以64bit的hotpot JVM为例：</p>
+<p>对象内存布局分为两种，一个是普通对象，一个数组对象</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406032351484.png" srcset="/img/loading.gif" lazyload alt="image-20240603235114382" style="zoom: 33%;" />
+
+<ul>
+<li><p>一个对象分为三个部分：</p>
+<ul>
+<li><p><strong>对象头</strong>，包括markword、class pointer等</p>
+<ul>
+<li>markword，存储了hashcode、GC age等等，并且当成为锁对象后会重写markword（后面再说）</li>
+<li>class pointer，指向方法区类元信息的指针（<strong>不是Class类！</strong>），标注它属于哪个类，由于开启指针压缩因此就是4B</li>
+<li>数组对象会多一个数组长度信息</li>
+</ul>
+</li>
+<li><p><strong>实例数据</strong>，存放数据的地方，但是如果这里有对象，那么就是指针的大小，由于默认开启了指针压缩，因此也是4B，<strong>数组的话就是所有数据按顺序堆叠起来</strong></p>
+</li>
+<li><p><strong>对齐</strong>，由于是64位的JVM，因此对齐按8B对齐</p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>注意：成员变量的long和Long占的字节分别是8B和4B</p>
+</blockquote>
+<h3 id="Markword"><a href="#Markword" class="headerlink" title="Markword"></a>Markword</h3><p>Markword具体内容和锁的级别息息相关</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202406040003561.png" srcset="/img/loading.gif" lazyload alt="image-20240604000307369" style="zoom: 45%;" />
+
+<h2 id="Synchronized原理"><a href="#Synchronized原理" class="headerlink" title="Synchronized原理"></a>Synchronized原理</h2><p>早期的Synchronized一上锁就是重量级，但是后面lock出来、CAS出来，Java团队在JDK1.6不得不对synchronized进行了优化，优化总共分为三部分：<strong>锁升级、锁消除、锁粗化</strong></p>
+<p>其中<strong>锁升级</strong>极为重要！！！</p>
+<h3 id="锁升级总体过程"><a href="#锁升级总体过程" class="headerlink" title="锁升级总体过程"></a>锁升级总体过程</h3><p>由于原本的synchronized过于庞大，一使用直接干到内核态，十分消耗时间和资源，因此在JDK1.6中，为了尽可能减少进入内核态的次数，并且<strong>主观上认为synchronized同步的代码块往往并发量不高且运行时间不长</strong></p>
+<p>JDK1.6团队提出了锁升级的概念：<strong>无锁-&gt;偏向锁-&gt;轻量级锁-&gt;重量级锁</strong></p>
+<p>那么我们先一个一个介绍这几个锁吧</p>
+<p>（太难了，我就自己理解理解，写出来很有可能是错的，有时间把JVM源码看明白了再写）</p>
+<h3 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3><p>延时、hashCode</p>
+<p>cas_set_mark(mark,header)：查看对象的header是否和mark一样，一样就swap</p>
+<p>偏向锁也会生成lock record（第一次进入都是一个无锁的markword+ref_object，和轻量级锁一样），并且重入一次就会再生成一个</p>
+<h3 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3><h3 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h3><p>JIT会对方法进行逃逸分析，如果锁对象并没有出现在调用方法外，那么synchronized(object)就会被JIT无视</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span><span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();<br>    <span class="hljs-comment">//该锁对象不会出现在该方法外</span><br>    <span class="hljs-keyword">synchronized</span> (o)&#123;<br>        System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>如果连续很多个代码块，用的同一个锁对象，那么不会synchronized多次，而是只会synchronzied一次</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>    Thread.sleep(<span class="hljs-number">5000</span>);<br>    Object o=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();<br>    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(()-&gt;&#123;<br>        <span class="hljs-comment">//连续三个synchronized</span><br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>        <span class="hljs-keyword">synchronized</span> (o)&#123;<br>            System.out.println(<span class="hljs-string">&quot;OK&quot;</span>);<br>        &#125;<br>    &#125;).start();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" class="category-chain-item">Java并发编程</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
+      
+        <a href="/tags/Java%E5%85%AB%E8%82%A1/" class="print-no-link">#Java八股</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JMM内存模型理解</div>
+      <div>http://example.com/2024/05/30/八股/2024-05-30-JMM模型理解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zenith Wang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/06/03/%E5%85%AB%E8%82%A1/2024-06-03-JUC%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%AF%A6%E8%A7%A3/" title="JUC并发工具详解">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JUC并发工具详解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/18/%E5%85%AB%E8%82%A1/2024-05-18-ElasticSearch%E6%80%BB%E7%BB%93/" title="ElasticSearch总结">
+                        <span class="hidden-mobile">ElasticSearch总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"0iur3vFHYzHVWbfW0ACM22p2-gzGzoHsz","appKey":"Xq6ytGGvYcBfUTC6ZzSnFuPD","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
