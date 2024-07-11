@@ -16,15 +16,15 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="数组两端取数Problem: 预测赢家 Problem: 石子游戏 Solution这个就是用dp来做，dp[i][j]表示从i到j第一个取数的玩家可以得到最大值 为什么说是第一个取数的玩家，而不是玩家一，因为在dp过程中，不一定第一个取数的就是玩家一 对于dp转移方程可以写出：$$dp[i][j]&#x3D;max(sum(i+1,j)-dp[i+1][j]+arr[i],sum(i,j-1)-">
+    <meta name="description" content="最长回文子串Problem:最长回文子串 Solution这题也是DP做，dp[i][j]表示substring(i,j)子串是否为回文子串 那么，只有两种情况，当i和j的字符相等并且substring(i+1,j-1)是回文子串的时候，dp[i][j]为true 否则为false，状态转移方程写为：$$dp[i][j]&#x3D;(s[i]&#x3D;&#x3D;s[j])&amp;&amp;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数组两端取数">
-<meta property="og:url" content="http://example.com/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%95%B0%E7%BB%84%E4%B8%A4%E7%AB%AF%E5%8F%96%E6%95%B0/index.html">
+<meta property="og:title" content="最长回文子串">
+<meta property="og:url" content="http://example.com/2024/07/11/%E5%88%B7%E9%A2%98/2024-07-11/2024-07-11-%E6%9C%80%E9%95%BF%E5%9B%9E%E6%96%87%E5%AD%90%E4%B8%B2/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="数组两端取数Problem: 预测赢家 Problem: 石子游戏 Solution这个就是用dp来做，dp[i][j]表示从i到j第一个取数的玩家可以得到最大值 为什么说是第一个取数的玩家，而不是玩家一，因为在dp过程中，不一定第一个取数的就是玩家一 对于dp转移方程可以写出：$$dp[i][j]&#x3D;max(sum(i+1,j)-dp[i+1][j]+arr[i],sum(i,j-1)-">
+<meta property="og:description" content="最长回文子串Problem:最长回文子串 Solution这题也是DP做，dp[i][j]表示substring(i,j)子串是否为回文子串 那么，只有两种情况，当i和j的字符相等并且substring(i+1,j-1)是回文子串的时候，dp[i][j]为true 否则为false，状态转移方程写为：$$dp[i][j]&#x3D;(s[i]&#x3D;&#x3D;s[j])&amp;&amp;">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-07-10T13:03:00.000Z">
-<meta property="article:modified_time" content="2024-07-10T13:41:07.820Z">
+<meta property="article:published_time" content="2024-07-11T08:34:00.000Z">
+<meta property="article:modified_time" content="2024-07-11T11:45:50.216Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="算法题">
@@ -32,7 +32,7 @@
   
   
   
-  <title>数组两端取数 - Zenith&#39; Blog</title>
+  <title>最长回文子串 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数组两端取数"></span>
+            <span id="subtitle" data-typed-text="最长回文子串"></span>
           
         </div>
 
@@ -238,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 21:03" pubdate>
-          2024年7月10日 晚上
+        <time datetime="2024-07-11 16:34" pubdate>
+          2024年7月11日 下午
         </time>
       </span>
     
@@ -250,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          495 字
+          297 字
         
       </span>
     
@@ -261,7 +261,7 @@
         
         
         
-          5 分钟
+          3 分钟
         
       </span>
     
@@ -306,20 +306,18 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">数组两端取数</h1>
+            <h1 id="seo-header">最长回文子串</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="数组两端取数"><a href="#数组两端取数" class="headerlink" title="数组两端取数"></a>数组两端取数</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/predict-the-winner/">预测赢家</a></strong></p>
-<p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/stone-game/">石子游戏</a></strong></p>
-<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这个就是用dp来做，<code>dp[i][j]</code>表示从i到j第一个取数的玩家可以得到最大值</p>
-<p>为什么说是第一个取数的玩家，而不是玩家一，因为在dp过程中，不一定第一个取数的就是玩家一</p>
-<p>对于dp转移方程可以写出：<br>$$<br>dp[i][j]&#x3D;max(sum(i+1,j)-dp[i+1][j]+arr[i],sum(i,j-1)-dp[i][j-1]+arr[j])<br>$$<br>意思就是，对于当前数组，我取左边和取右边两种方式的最大值</p>
-<p>当我拿了某一边后，由于我拿了，那么我就不是先手了，那我后面能拿的就是剩下的数组和减掉可以取的最大值</p>
-<p>因为作为后手玩家，采取的策略肯定也是剩下数组的最大值，那我后面能拿到的不就是剩下的石子吗？</p>
-<p>由于涉及的数组求和，因此需要用前缀和实现求和</p>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span>[] arr)</span> &#123;<br>        <span class="hljs-type">int</span> n=arr.length;<br>        <span class="hljs-type">int</span>[]sum=<span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[n];<br>        <span class="hljs-type">int</span> [][]dp=<span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[n][n];<br>		<br>        <span class="hljs-comment">//初始化前缀和以及dp数组，当只有一个的时候，那我肯定直接拿，因此dp[i][i]就是arr[i]</span><br>        sum[<span class="hljs-number">0</span>]=arr[<span class="hljs-number">0</span>];<br>        dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=arr[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;n;i++)&#123;<br>            sum[i]=arr[i]+sum[i-<span class="hljs-number">1</span>];<br>            dp[i][i]=arr[i];<br>        &#125;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n-<span class="hljs-number">1</span>;i&gt;=<span class="hljs-number">0</span>;i--)&#123;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=i+<span class="hljs-number">1</span>;j&lt;n;j++)&#123;<br>                <span class="hljs-comment">//两个方式，从左边拿和从右边拿</span><br>                <span class="hljs-type">int</span> sum1=arr[i]+sum[j]-sum[i]-dp[i+<span class="hljs-number">1</span>][j];<br>                	<br>                <span class="hljs-comment">//从右边拿需要加一个特殊判断</span><br>                <span class="hljs-comment">//如果当前i是最左边就不需要sum[j-1]-sum[i-1]，直接就是sum[j-1]</span><br>                <span class="hljs-type">int</span> sum2=arr[j]+sum[j-<span class="hljs-number">1</span>]-dp[i][j-<span class="hljs-number">1</span>];<br>                <span class="hljs-keyword">if</span>(i&gt;<span class="hljs-number">0</span>)&#123;<br>                    sum2-=sum[i-<span class="hljs-number">1</span>];<br>                &#125;<br>                <br>                dp[i][j]=Math.max(sum1,sum2);<br>            &#125;<br>        &#125;<br>        <br>		<span class="hljs-comment">//返回结果</span><br>        <span class="hljs-keyword">return</span> dp[<span class="hljs-number">0</span>][n-<span class="hljs-number">1</span>];<br>        <br>        <span class="hljs-comment">//若是判断玩家一是否可以获胜，不要把sum/2，而是结果*2的比较</span><br>        <span class="hljs-comment">//return dp[0][n-1]*2 &gt; sum[n-1]</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1 id="最长回文子串"><a href="#最长回文子串" class="headerlink" title="最长回文子串"></a>最长回文子串</h1><p><strong>Problem:<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-palindromic-substring/">最长回文子串</a></strong></p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题也是DP做，<code>dp[i][j]</code>表示substring(i,j)子串是否为回文子串</p>
+<p>那么，只有两种情况，当i和j的字符相等并且substring(i+1,j-1)是回文子串的时候，<code>dp[i][j]</code>为true</p>
+<p>否则为false，状态转移方程写为：<br>$$<br>dp[i][j]&#x3D;(s[i]&#x3D;&#x3D;s[j])&amp;&amp; (dp[i+1][j-1]||(i+1\ge j-1))<br>$$<br>为什么有后面这一个东西呢：这个东西避免了当前字符长度为1和2的情况</p>
+<p>最后，由于<code>dp[i][j]</code>和i+1、j-1有关，我们不能从左到右dp</p>
+<p>应该第一层从右到左，第二层从左到右</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">longestPalindrome</span><span class="hljs-params">(String s)</span> &#123;<br>        <span class="hljs-type">int</span> n=s.length();<br>        <span class="hljs-type">boolean</span> [][]dp=<span class="hljs-keyword">new</span> <span class="hljs-title class_">boolean</span>[n][n];<br><br>        <span class="hljs-comment">//记录结果</span><br>        <span class="hljs-type">int</span> res=<span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> start=<span class="hljs-number">0</span>;<br><br>        <span class="hljs-comment">//从右向左dp</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n-<span class="hljs-number">2</span>;i&gt;=<span class="hljs-number">0</span>;i--)&#123;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=i+<span class="hljs-number">1</span>;j&lt;n;j++)&#123;<br>                <span class="hljs-comment">//状态转移方程</span><br>                <span class="hljs-keyword">if</span>(s.charAt(i)==s.charAt(j)&amp;&amp;(dp[i+<span class="hljs-number">1</span>][j-<span class="hljs-number">1</span>]|| i+<span class="hljs-number">1</span>&gt;=j-<span class="hljs-number">1</span>))&#123;<br>                    dp[i][j]=<span class="hljs-literal">true</span>;<br>                    <span class="hljs-comment">//如果发现当前子串是，那就更新一下最大的子串长度和起始位置</span><br>                    <span class="hljs-keyword">if</span>(res&lt;j-i+<span class="hljs-number">1</span>)&#123;<br>                        res=j-i+<span class="hljs-number">1</span>;<br>                        start=i;<br>                    &#125;<br>                    <br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> s.substring(start,start+res);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
                 
@@ -344,7 +342,7 @@
   
     <span>></span>
     
-  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/2024-07-10-%E5%88%B7%E9%A2%98/" class="category-chain-item">2024-07-10 刷题</a>
+  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/2024-07-11-%E5%88%B7%E9%A2%98/" class="category-chain-item">2024-07-11 刷题</a>
   
   
 
@@ -375,8 +373,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>数组两端取数</div>
-      <div>http://example.com/2024/07/10/刷题/2024-07-10/2024-07-10-数组两端取数/</div>
+      <div>最长回文子串</div>
+      <div>http://example.com/2024/07/11/刷题/2024-07-11/2024-07-11-最长回文子串/</div>
     </div>
     <div class="license-meta">
       
@@ -388,7 +386,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月10日</div>
+          <div>2024年7月11日</div>
         </div>
       
       
@@ -420,9 +418,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/11/%E5%88%B7%E9%A2%98/2024-07-11/2024-07-11-%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C/" title="三数之和">
+                      <a href="/2024/07/11/%E5%88%B7%E9%A2%98/2024-07-11/2024-07-11-%E6%90%9C%E7%B4%A2%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84/" title="搜索旋转排序数组">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">三数之和</span>
+                        <span class="hidden-mobile">搜索旋转排序数组</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -430,8 +428,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-K%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8/" title="K个一组翻转链表">
-                        <span class="hidden-mobile">K个一组翻转链表</span>
+                      <a href="/2024/07/11/%E5%88%B7%E9%A2%98/2024-07-11/2024-07-11-%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/" title="最大子数组和">
+                        <span class="hidden-mobile">最大子数组和</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
