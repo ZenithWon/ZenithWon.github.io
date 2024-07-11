@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282323846.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282359203.png">
 <meta property="article:published_time" content="2024-05-07T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-28T17:00:05.283Z">
+<meta property="article:modified_time" content="2024-07-11T12:30:30.480Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Redis">
@@ -266,7 +266,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7.3k 字
+          7.5k 字
         
       </span>
     
@@ -277,7 +277,7 @@
         
         
         
-          61 分钟
+          63 分钟
         
       </span>
     
@@ -661,7 +661,8 @@
 <li>B+树属于磁盘友好型，对于redis来说并不实用，而且会<strong>多很多插入删除的额外操作</strong></li>
 <li>树结构最起码需要两个指针（左右子树），但是跳表用redis的概率方法，平均下来只有1.33个指针，<strong>更节省空间</strong></li>
 </ul>
-<h2 id="Redis高可用"><a href="#Redis高可用" class="headerlink" title="Redis高可用"></a>Redis高可用</h2><p>Redis高可用有三种方式，分别是：<strong>主从复制、哨兵模式、切片集群</strong>，下面一个一个来说</p>
+<h2 id="Redis高可用"><a href="#Redis高可用" class="headerlink" title="Redis高可用"></a>Redis高可用</h2><p>Redis高可用就是通过集群实现的</p>
+<p>Redis集群有三种方式，分别是：<strong>主从复制、哨兵模式、切片集群</strong>，下面一个一个来说</p>
 <h3 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h3><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282307680.png" srcset="/img/loading.gif" lazyload alt="图片" style="zoom: 50%;" />
 
 <p>在Redis主从集群之间，是读写分离的，数据修改只会在主服务器上进行，但是二者如何实现数据一致性的呢？</p>
@@ -751,6 +752,16 @@
 <li>给其他从节点发送slaveOf命令，通知新的主节点</li>
 <li>给客户端发送指令，通知新的master的IP和端口</li>
 <li>监视旧主节点，一旦旧的主节点上线，发送slaveOf指令</li>
+</ul>
+<h3 id="集群模式"><a href="#集群模式" class="headerlink" title="集群模式"></a>集群模式</h3><p>分片+主从</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Redis提供了三种集群模式</p>
+<ul>
+<li><p><strong>主从复制</strong>：适用于数据备份和读写分离场景，配置简单，但在主节点故障时需要手动切换。</p>
+</li>
+<li><p><strong>哨兵模式</strong>：在主从复制的基础上实现自动故障转移，提高高可用性，适用于高可用性要求较高的场景。</p>
+</li>
+<li><p><strong>Cluster模式</strong>：通过数据分片和负载均衡实现大规模数据存储和高性能，适用于大规模数据存储和高性能要求场景，一般Cluster模式都是配备主从的（基本配置：三个分片+两个从节点）。</p>
+</li>
 </ul>
 <h2 id="Redis过期删除和淘汰"><a href="#Redis过期删除和淘汰" class="headerlink" title="Redis过期删除和淘汰"></a>Redis过期删除和淘汰</h2><h3 id="Redis-主从模式中，对过期键如何处理"><a href="#Redis-主从模式中，对过期键如何处理" class="headerlink" title="Redis 主从模式中，对过期键如何处理"></a>Redis 主从模式中，对过期键如何处理</h3><p>要注意的是，<strong>slave永远不会修改自己的数据，哪怕是过期了</strong></p>
 <p>只有当master发现key过期了，就会删除该key，并在AOF中添加一条对应的DEL指令，然后同步给slave</p>
