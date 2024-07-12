@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>最长递增子序列</title>
+    <link href="/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/"/>
+    <url>/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/</url>
+    
+    <content type="html"><![CDATA[<h1 id="最长递增子序列"><a href="#最长递增子序列" class="headerlink" title="最长递增子序列"></a>最长递增子序列</h1><p><strong>Problem: <a href="https://leetcode.cn/problems/longest-increasing-subsequence/">最长递增子序列</a></strong></p><h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题一看就是dp，我们用<code>dp[i]</code>表示：以第i个数字结尾的最长递增子序列，然后最后，我们遍历dp取最大值就好了</p><p>那么状态转移方程为：<br>$$<br>dp[i]&#x3D;max(dp[j]+1), \quad num[i]&gt;num[j] \quad &amp;&amp;\quad 0&lt;j&lt;i\<br>res&#x3D;max(dp[i]),\quad0\le i&lt;n<br>$$<br>就是遍历前面的所有子序列，看看第i个数和哪个数挨着组成的递增子序列最长，然后遍历dp数组</p><h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">lengthOfLIS</span><span class="hljs-params">(<span class="hljs-type">int</span>[] nums)</span> &#123;<br>        <span class="hljs-type">int</span> n=nums.length;<br>        <span class="hljs-type">int</span> []dp=<span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[n];<br>        <br>        dp[<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> res=<span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;n;i++)&#123;<br>            dp[i]=<span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;i;j++)&#123;<br>                <span class="hljs-keyword">if</span>(nums[j]&lt;nums[i])&#123;<br>                    dp[i]=Math.max(dp[i],dp[j]+<span class="hljs-number">1</span>);<br>                &#125;<br>            &#125;<br>            res=Math.max(dp[i],res);<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>算法题</category>
+      
+      <category>2024-07-12 刷题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>LeetCode</tag>
+      
+      <tag>算法题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>二叉树的最近公共祖先</title>
     <link href="/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88/"/>
     <url>/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88/</url>
