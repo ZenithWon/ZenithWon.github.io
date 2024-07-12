@@ -38,8 +38,11 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282307680.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282323846.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405282359203.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122024812.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122045696.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122110057.png">
 <meta property="article:published_time" content="2024-05-07T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-07-11T12:30:30.480Z">
+<meta property="article:modified_time" content="2024-07-12T13:11:37.461Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Redis">
@@ -266,7 +269,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7.5k 字
+          8.5k 字
         
       </span>
     
@@ -277,7 +280,7 @@
         
         
         
-          63 分钟
+          71 分钟
         
       </span>
     
@@ -753,14 +756,57 @@
 <li>给客户端发送指令，通知新的master的IP和端口</li>
 <li>监视旧主节点，一旦旧的主节点上线，发送slaveOf指令</li>
 </ul>
-<h3 id="集群模式"><a href="#集群模式" class="headerlink" title="集群模式"></a>集群模式</h3><p>分片+主从</p>
+<h3 id="切片集群"><a href="#切片集群" class="headerlink" title="切片集群"></a>切片集群</h3><p>随着系统的不断壮大以及并发量的提升，Redis会面以下几个问题：</p>
+<ul>
+<li>缓存的数据量太大</li>
+<li>并发量太大</li>
+</ul>
+<p>这里要注意的是，虽然读并发可以通过哨兵以及主从来实现，但是写并发怎么解决呢？</p>
+<p>切片集群模式油然而生，解决了写并发以及缓存不足的问题</p>
+<p>其主要思想就是将数据平均的分到多个redis节点，这些节点各自都会有自己的slave，保证了高可用还提供了写并发以及大缓存</p>
+<p>并且每个master节点都是一个哨兵，互相监控着对方的可用性，如果发现有master客观下线，就要从它的slave中选择一个数据最完整的作为新的master，如果这个master没有slave，那集群无法对外提供服务了</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122024812.png" srcset="/img/loading.gif" lazyload alt="image-20240712202423692" style="zoom: 40%;" />
+
+<p>一般来说一个切片集群需要有三个master（哨兵个数为奇数），每个master需要至少一个slave</p>
+<p>当有新节点加入集群的时候，就会重新分配hash槽，那么就会涉及两个问题：</p>
+<ul>
+<li><p><strong>hash槽为什么是16384个</strong>。计算给定key的方法是，先生成16为的CRCC校验码，然后对hash槽个数16384取模</p>
+<p>那为什么hash槽个数不是$2^{16}&#x3D;65536$，而是$2^{14}&#x3D;16384$个呢？因为redis集群的master个数不会太大，因此16384足矣，并且盲目的增加槽的个数，只会增加节点之间通信的代价</p>
+</li>
+<li><p><strong>在调整hash槽分配的时候，如果有请求过来怎么办</strong>？</p>
+<p>如果发现当前槽还在原始节点，还没迁移过去，那就直接访问</p>
+<p>如果该槽正在迁移中，则返回一个ASK重定向指令，让其重定向到转移的目标节点；但是在向目标节点发送请求之前，会先向其发送一个ASKING指令，然后再发送请求，如果目标节点有该key则返回，否则返回null</p>
+<p>如果该槽已经迁移完成，那就可以认为是访问到了其他节点，正常的返回MOVE指令，然后去目标节点找</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122045696.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:40%;" /></li>
+</ul>
+<p>最后一个问题，<strong>Redis Cluster在发现故障的时候如何实现故障转移的</strong>：</p>
+<ul>
+<li><p>首先要知道的是，切片集群中不管什么节点只要是个节点就会互相ping&#x2F;pong，每次ping的节点是随机从自己的clusterState.nodes中选5个节点，然后选择<strong>最长时间没有ping过自己的节点去ping</strong></p>
+<blockquote>
+<p>clusterState是一个node数组，包含自己已知的所有集群主从节点，还有自己（myself）</p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407122110057.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述" style="zoom:50%;" />
+</li>
+<li><p>如果发现ping不同，那就标记为主观下线，然后广播一条该节点主观下线的消息</p>
+<p>当其他节点收到后，就会在clusterState.nodes中主观下线的node中的<strong>fail_reports</strong>链表中加上疑似认为的那个节点</p>
+<p>比如A收到B认为C主观下线的消息，就会在自己的clusterState.nodes中C的<strong>fail_reports</strong>链表加上B，一旦发现链表长度超过总数的一半，那就广播客观下线的消息</p>
+</li>
+<li><p>当该客观下线的master底下的slave收到客观下线的消息，那就会立马向其他所有主节点广播投票给自己的消息，一旦其他主节点收到这个消息，并且还没有投票，那就投给它</p>
+<p>当然<strong>不是所有的从节点都可以广播投票请求</strong>，每个slave在广播之前，会先看看自己和master的上次数据同步时间有没有超过阈值，超过则无法参加竞选</p>
+<blockquote>
+<p>那master如何确定自己有没有投过票呢？</p>
+<p>在切片集群中，有一个配置纪元的东西，每发起一次故障转移就会+1，那么从节点发送投票请求的时候，会带上这个东西，master收到后如果发现这个配置纪元我已经投过了，那就不投了</p>
+</blockquote>
+</li>
+</ul>
+<p>​	最终，那个<strong>超过半数票+1的节点就成为了新的主节点</strong>，如果没有，那就重新投票，并且配置纪元+1</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Redis提供了三种集群模式</p>
 <ul>
 <li><p><strong>主从复制</strong>：适用于数据备份和读写分离场景，配置简单，但在主节点故障时需要手动切换。</p>
 </li>
 <li><p><strong>哨兵模式</strong>：在主从复制的基础上实现自动故障转移，提高高可用性，适用于高可用性要求较高的场景。</p>
 </li>
-<li><p><strong>Cluster模式</strong>：通过数据分片和负载均衡实现大规模数据存储和高性能，适用于大规模数据存储和高性能要求场景，一般Cluster模式都是配备主从的（基本配置：三个分片+两个从节点）。</p>
+<li><p><strong>切片集群</strong>：通过数据分片和负载均衡实现大规模数据存储和高性能，适用于大规模数据存储和高性能要求场景，一般Cluster模式都是配备主从的（基本配置：三个分片+两个从节点）。</p>
 </li>
 </ul>
 <h2 id="Redis过期删除和淘汰"><a href="#Redis过期删除和淘汰" class="headerlink" title="Redis过期删除和淘汰"></a>Redis过期删除和淘汰</h2><h3 id="Redis-主从模式中，对过期键如何处理"><a href="#Redis-主从模式中，对过期键如何处理" class="headerlink" title="Redis 主从模式中，对过期键如何处理"></a>Redis 主从模式中，对过期键如何处理</h3><p>要注意的是，<strong>slave永远不会修改自己的数据，哪怕是过期了</strong></p>
