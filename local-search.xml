@@ -4,6 +4,64 @@
   
   
   <entry>
+    <title>相交链表</title>
+    <link href="/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A8/"/>
+    <url>/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[<h1 id="相交链表"><a href="#相交链表" class="headerlink" title="相交链表"></a>相交链表</h1><p><strong>Problem: <a href="https://leetcode.cn/problems/intersection-of-two-linked-lists/">相交链表</a></strong></p><h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题简单粗暴的就是hash表查重，但是这里要介绍一个双指针的方法</p><p>这个相交的交点以后就是，我们不管遍历那个链表都是相同节点，换句话说，我们从尾巴往前遍历，最后一个相同的节点就是交点，当然这对于单向链表来说是不现实的</p><p>但我们可以换个思路，我们从相同的长度开始往后找，第一个一样的不就是交点了吗，那也就是说再往后遍历之前，我们需要将较长的那个链表的起点对齐到较短链表的长度那，然后往后找</p><p>具体方法就是双指针，先同时向后，然后较短链表肯定先到尾，这时候，我们将先到尾的指针指向另一个链表的开头，然后继续往后，此时原本的较长链表的指针到尾指针的距离正好就是两个链表长度的差值</p><p>紧接着继续往后找的话，较长链表的指针也会到尾，这时候再将该指针指向另一个链表，此时这两个指针就对齐了</p><h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> ListNode <span class="hljs-title function_">getIntersectionNode</span><span class="hljs-params">(ListNode headA, ListNode headB)</span> &#123;<br>        ListNode pA=headA;<br>        ListNode pB=headB;<br><span class="hljs-comment">//只要没发现相同的节点，就一直倒换指针</span><br>        <span class="hljs-comment">//倒换两次就会结束，也就是说，每个链表只会遍历两次</span><br>        <span class="hljs-comment">//第一次对齐，第二次查找</span><br>        <span class="hljs-keyword">while</span>(pA!=pB)&#123;<br>            <span class="hljs-keyword">if</span>(pA==<span class="hljs-literal">null</span>)&#123;<br>                pA=headB;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                pA=pA.next;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span>(pB==<span class="hljs-literal">null</span>)&#123;<br>                pB=headA;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                pB=pB.next;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> pA;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>算法题</category>
+      
+      <category>2024-07-14 刷题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>LeetCode</tag>
+      
+      <tag>算法题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>合并 K 个升序链表</title>
+    <link href="/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E5%90%88%E5%B9%B6%20K%20%E4%B8%AA%E5%8D%87%E5%BA%8F%E9%93%BE%E8%A1%A8/"/>
+    <url>/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E5%90%88%E5%B9%B6%20K%20%E4%B8%AA%E5%8D%87%E5%BA%8F%E9%93%BE%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[<h1 id="合并-K-个升序链表"><a href="#合并-K-个升序链表" class="headerlink" title="合并 K 个升序链表"></a>合并 K 个升序链表</h1><p><strong>Problem: <a href="https://leetcode.cn/problems/merge-k-sorted-lists/">合并 K 个升序链表</a></strong></p><h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题基本思路和合并两个有序链表类似，但是具体就是，每次向新链表插入，应该选k个链表中最小的那个</p><p>这个没法像两个有序链表那样，直接比较，因为如果这样直接比较，那时间复杂度是O(k)，再加上会插入kn次，最终时间复杂度是$O(nk^2)$，这是不能接受的</p><p>那么我们可以通过top k的思想，使用优先队列，先将k个队列的头放进去，然后从里面poll出最小的，然后如果poll的节点的next不是null，再把其next重新offer到优先队列里面去</p><p>这样重复做，直至优先队列空了</p><h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> ListNode <span class="hljs-title function_">mergeKLists</span><span class="hljs-params">(ListNode[] lists)</span> &#123;<br>        <span class="hljs-comment">//返回结果链表的虚拟头节点</span><br>        <span class="hljs-type">ListNode</span> <span class="hljs-variable">root</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ListNode</span>(-<span class="hljs-number">1</span>);<br>        ListNode p=root;<br>        <br>        <span class="hljs-comment">//由于优先队列的元素是ListNode，因此需要自定义比较器</span><br>        Comparator&lt;ListNode&gt; cmp = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Comparator</span>&lt;ListNode&gt;() &#123;<br>            <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compare</span><span class="hljs-params">(ListNode e1, ListNode e2)</span> &#123;<br>                <span class="hljs-keyword">return</span> e1.val-e2.val;<br>            &#125;<br>        &#125;;<br>        Queue&lt;ListNode&gt; q = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;(cmp);<br><br>        <span class="hljs-comment">//将每个链表的头指针放进去</span><br>        <span class="hljs-keyword">for</span>(ListNode head:lists)&#123;<br>            <span class="hljs-keyword">if</span>(head==<span class="hljs-literal">null</span>)&#123;<br>                <span class="hljs-keyword">continue</span>;<br>            &#125;<br>            q.offer(head);<br>        &#125;<br>       <span class="hljs-comment">//循环至优先队列空</span><br>        <span class="hljs-keyword">while</span>(!q.isEmpty())&#123;<br>            ListNode node=q.poll();<br>            p.next=node;<br>            p=p.next;<br>            <span class="hljs-comment">//如果没有到链表尾，就将其next放进去</span><br>            <span class="hljs-keyword">if</span>(node.next!=<span class="hljs-literal">null</span>)&#123;<br>                q.offer(node.next);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> root.next;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>算法题</category>
+      
+      <category>2024-07-14 刷题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>LeetCode</tag>
+      
+      <tag>算法题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>最长递增子序列</title>
     <link href="/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/"/>
     <url>/2024/07/12/%E5%88%B7%E9%A2%98/2024-07-12/2024-07-12-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97/</url>
