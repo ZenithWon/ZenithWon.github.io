@@ -16,23 +16,25 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="相交链表Problem: 相交链表 Solution这题简单粗暴的就是hash表查重，但是这里要介绍一个双指针的方法 这个相交的交点以后就是，我们不管遍历那个链表都是相同节点，换句话说，我们从尾巴往前遍历，最后一个相同的节点就是交点，当然这对于单向链表来说是不现实的 但我们可以换个思路，我们从相同的长度开始往后找，第一个一样的不就是交点了吗，那也就是说再往后遍历之前，我们需要将较长的那个链表的起点">
+    <meta name="description" content="计算机基础进程和线程的通信方式进程的通信方式 管道 管道是通过pipe函数生成的，其实本质就是内核中的一个缓冲区，支持无格式的流式写入 分为匿名管道和命名管道 当调用pipe函数后，就会得到一个数组fd，其中fd[0]代表管道的读端、fd[1]代表管道的写端 但是这个数组只存在于pipe的进程中，其他进程怎么拿过来进行通信呢？ 通过fork函数就可以了  在linux中，ps aux|grep j">
 <meta property="og:type" content="article">
-<meta property="og:title" content="相交链表">
-<meta property="og:url" content="http://example.com/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A8/index.html">
+<meta property="og:title" content="操作系统">
+<meta property="og:url" content="http://example.com/2024/07/07/%E5%85%AB%E8%82%A1/2024-07-07-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="相交链表Problem: 相交链表 Solution这题简单粗暴的就是hash表查重，但是这里要介绍一个双指针的方法 这个相交的交点以后就是，我们不管遍历那个链表都是相同节点，换句话说，我们从尾巴往前遍历，最后一个相同的节点就是交点，当然这对于单向链表来说是不现实的 但我们可以换个思路，我们从相同的长度开始往后找，第一个一样的不就是交点了吗，那也就是说再往后遍历之前，我们需要将较长的那个链表的起点">
+<meta property="og:description" content="计算机基础进程和线程的通信方式进程的通信方式 管道 管道是通过pipe函数生成的，其实本质就是内核中的一个缓冲区，支持无格式的流式写入 分为匿名管道和命名管道 当调用pipe函数后，就会得到一个数组fd，其中fd[0]代表管道的读端、fd[1]代表管道的写端 但是这个数组只存在于pipe的进程中，其他进程怎么拿过来进行通信呢？ 通过fork函数就可以了  在linux中，ps aux|grep j">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-07-14T15:36:00.000Z">
-<meta property="article:modified_time" content="2024-07-14T15:44:22.778Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407072120984.png">
+<meta property="article:published_time" content="2024-07-07T13:36:22.000Z">
+<meta property="article:modified_time" content="2024-07-20T06:19:07.854Z">
 <meta property="article:author" content="Zenith Wang">
-<meta property="article:tag" content="LeetCode">
-<meta property="article:tag" content="算法题">
+<meta property="article:tag" content="个人笔记">
+<meta property="article:tag" content="Java八股">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407072120984.png">
   
   
   
-  <title>相交链表 - Zenith&#39; Blog</title>
+  <title>操作系统 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="相交链表"></span>
+            <span id="subtitle" data-typed-text="操作系统"></span>
           
         </div>
 
@@ -238,8 +240,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-14 23:36" pubdate>
-          2024年7月14日 晚上
+        <time datetime="2024-07-07 21:36" pubdate>
+          2024年7月7日 晚上
         </time>
       </span>
     
@@ -250,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          409 字
+          677 字
         
       </span>
     
@@ -261,7 +263,7 @@
         
         
         
-          4 分钟
+          6 分钟
         
       </span>
     
@@ -306,19 +308,64 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">相交链表</h1>
+            <h1 id="seo-header">操作系统</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="相交链表"><a href="#相交链表" class="headerlink" title="相交链表"></a>相交链表</h1><p><strong>Problem: <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/intersection-of-two-linked-lists/">相交链表</a></strong></p>
-<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题简单粗暴的就是hash表查重，但是这里要介绍一个双指针的方法</p>
-<p>这个相交的交点以后就是，我们不管遍历那个链表都是相同节点，换句话说，我们从尾巴往前遍历，最后一个相同的节点就是交点，当然这对于单向链表来说是不现实的</p>
-<p>但我们可以换个思路，我们从相同的长度开始往后找，第一个一样的不就是交点了吗，那也就是说再往后遍历之前，我们需要将较长的那个链表的起点对齐到较短链表的长度那，然后往后找</p>
-<p>具体方法就是双指针，先同时向后，然后较短链表肯定先到尾，这时候，我们将先到尾的指针指向另一个链表的开头，然后继续往后，此时原本的较长链表的指针到尾指针的距离正好就是两个链表长度的差值</p>
-<p>紧接着继续往后找的话，较长链表的指针也会到尾，这时候再将该指针指向另一个链表，此时这两个指针就对齐了</p>
-<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> ListNode <span class="hljs-title function_">getIntersectionNode</span><span class="hljs-params">(ListNode headA, ListNode headB)</span> &#123;<br>        ListNode pA=headA;<br>        ListNode pB=headB;<br>		<span class="hljs-comment">//只要没发现相同的节点，就一直倒换指针</span><br>        <span class="hljs-comment">//倒换两次就会结束，也就是说，每个链表只会遍历两次</span><br>        <span class="hljs-comment">//第一次对齐，第二次查找</span><br>        <span class="hljs-keyword">while</span>(pA!=pB)&#123;<br>            <span class="hljs-keyword">if</span>(pA==<span class="hljs-literal">null</span>)&#123;<br>                pA=headB;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                pA=pA.next;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span>(pB==<span class="hljs-literal">null</span>)&#123;<br>                pB=headA;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                pB=pB.next;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> pA;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
+                <h1 id="计算机基础"><a href="#计算机基础" class="headerlink" title="计算机基础"></a>计算机基础</h1><h2 id="进程和线程的通信方式"><a href="#进程和线程的通信方式" class="headerlink" title="进程和线程的通信方式"></a>进程和线程的通信方式</h2><h3 id="进程的通信方式"><a href="#进程的通信方式" class="headerlink" title="进程的通信方式"></a>进程的通信方式</h3><ol>
+<li><p><strong>管道</strong></p>
+<p>管道是通过pipe函数生成的，其实本质就是内核中的一个缓冲区，支持无格式的流式写入</p>
+<p>分为<strong>匿名管道</strong>和<strong>命名管道</strong></p>
+<p>当调用pipe函数后，就会得到一个数组fd，其中fd[0]代表管道的读端、fd[1]代表管道的写端</p>
+<p>但是这个数组只存在于pipe的进程中，其他进程怎么拿过来进行通信呢？</p>
+<p><strong>通过fork函数就可以了</strong></p>
+<blockquote>
+<p>在linux中，<code>ps aux|grep java</code>就是匿名管道，将ps出来的进程信息拿过来grep一下</p>
+<p>虽然没有显式的fork，由于都是命令行，其实都是shell fork出来的</p>
+</blockquote>
+</li>
+<li><p><strong>消息队列</strong></p>
+<p>管道这种通信方式，需要fork的子进程之间才能通信，并且read、write还会阻塞</p>
+<p>因此OS给了一个消息队列的形式，它是一个为内核中链表结构，<strong>当然如果是跨机器的进程可以使用消息中间件</strong></p>
+<p>这个是任何进程都可以访问的，突破了fork的限制</p>
+</li>
+<li><p><strong>共享内存</strong></p>
+<p>消息队列由于消息体有大小限制，并且有一次内核态到用户态的内存拷贝，因此效率还是不够高</p>
+<p>共享内存就是相当于java中的直接内存，直接约定一块虚拟内存区域，多个进程都可以访问就好了</p>
+</li>
+<li><p><strong>信号量</strong></p>
+<p>当使用共享内存的时候，如果多个进程同时修改同一块数据，那就会乱套</p>
+<p>为了实现进程同步，通过信号量来保证资源的有序使用</p>
+</li>
+<li><p><strong>信号</strong></p>
+<p>就是通过kill -xxx pid的形式来给其他进程发送信号，比如kill -9就是杀死进程</p>
+</li>
+<li><p><strong>socket</strong></p>
+<p>刚刚提到的消息中间件，其实也属于socket</p>
+<p>当两个进程不在同一台机器上，那就无法通过管道、消息队列、共享内存这些方式来实现了</p>
+</li>
+</ol>
+<h3 id="线程的通信方式"><a href="#线程的通信方式" class="headerlink" title="线程的通信方式"></a>线程的通信方式</h3><p>线程的通信方式其实跟进程差不多</p>
+<ol>
+<li><p><strong>锁机制</strong>：比如互斥锁、读写锁等等</p>
+</li>
+<li><p><strong>信号量机制</strong></p>
+</li>
+<li><p><strong>共享内存</strong>：Java的堆其实就是共享内存</p>
+</li>
+</ol>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><h3 id="死锁的四大必要条件"><a href="#死锁的四大必要条件" class="headerlink" title="死锁的四大必要条件"></a>死锁的四大必要条件</h3><ul>
+<li><p>互斥条件：一个资源无法共享使用，拿不到就等</p>
+</li>
+<li><p>持有并等待条件：当拿不到的时候就会等待，并且等待的时候不会释放已经获得的互斥资源</p>
+</li>
+<li><p>不可剥夺条件：持有的互斥资源无法被其他程序剥夺</p>
+</li>
+<li><p>循环等待条件：获取资源的顺序构成了环形链</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407072120984.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+</li>
+</ul>
 
                 
               </div>
@@ -337,15 +384,8 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" class="category-chain-item">算法题</a>
+  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/2024-07-14-%E5%88%B7%E9%A2%98/" class="category-chain-item">2024-07-14 刷题</a>
-  
-  
-
   
 
       </span>
@@ -359,9 +399,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/LeetCode/" class="print-no-link">#LeetCode</a>
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
       
-        <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" class="print-no-link">#算法题</a>
+        <a href="/tags/Java%E5%85%AB%E8%82%A1/" class="print-no-link">#Java八股</a>
       
     </div>
   
@@ -373,8 +413,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>相交链表</div>
-      <div>http://example.com/2024/07/14/刷题/2024-07-14/2024-07-14-相交链表/</div>
+      <div>操作系统</div>
+      <div>http://example.com/2024/07/07/八股/2024-07-07-操作系统/</div>
     </div>
     <div class="license-meta">
       
@@ -386,7 +426,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月14日</div>
+          <div>2024年7月7日</div>
         </div>
       
       
@@ -418,9 +458,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/15/%E5%85%AB%E8%82%A1/2024-07-15-%E5%A0%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E7%8E%B0/" title="堆数据结构实现">
+                      <a href="/2024/07/10/%E5%88%B7%E9%A2%98/2024-07-10/2024-07-10-%E6%97%A0%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%90%E4%B8%B2/" title="无重复字符的最长子串">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">堆数据结构实现</span>
+                        <span class="hidden-mobile">无重复字符的最长子串</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -428,8 +468,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/14/%E5%88%B7%E9%A2%98/2024-07-14/2024-07-14-%E5%90%88%E5%B9%B6%20K%20%E4%B8%AA%E5%8D%87%E5%BA%8F%E9%93%BE%E8%A1%A8/" title="合并 K 个升序链表">
-                        <span class="hidden-mobile">合并 K 个升序链表</span>
+                      <a href="/2024/07/06/%E5%85%AB%E8%82%A1/2024-07-06-Mybatis%E8%AF%A6%E8%A7%A3/" title="Mybatis详解">
+                        <span class="hidden-mobile">Mybatis详解</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

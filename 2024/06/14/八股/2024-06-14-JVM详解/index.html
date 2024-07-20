@@ -50,15 +50,15 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301911274.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908306.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202406301908632.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011839519.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20210803204856524.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011839859.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20210804201210401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011838109.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20210804203117936.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011838211.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424728.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424849.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424779.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424956.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424007.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424567.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424503.png">
 <meta property="article:published_time" content="2024-06-13T17:36:22.000Z">
-<meta property="article:modified_time" content="2024-07-01T10:40:06.176Z">
+<meta property="article:modified_time" content="2024-07-20T06:24:42.075Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
@@ -285,7 +285,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          17k 字
+          18k 字
         
       </span>
     
@@ -296,7 +296,7 @@
         
         
         
-          138 分钟
+          149 分钟
         
       </span>
     
@@ -1104,10 +1104,10 @@
 <h2 id="垃圾回收器"><a href="#垃圾回收器" class="headerlink" title="垃圾回收器"></a>垃圾回收器</h2><h3 id="GC的指标"><a href="#GC的指标" class="headerlink" title="GC的指标"></a>GC的指标</h3><p>在GC中有两个比较重要，但是有相对矛盾的指标：</p>
 <ul>
 <li><p>吞吐量：一定时间内，用户线程活跃时间的占比，当然这个占比肯定越高越好</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011839519.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424728.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
 </li>
 <li><p>延迟时间：每次停顿下来的时间的长度，这个当然越低越好</p>
-<img src="https://img-blog.csdnimg.cn/20210803204856524.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" /></li>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424849.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" /></li>
 </ul>
 <p>但是这两个指标是互相矛盾的，如果延迟时间短，那么GC次数一定会上升，相同的GC工作量会多更多的线程切换，因此吞吐量会下降</p>
 <p>但是吞吐量提高的话，肯定要减少GC次数，因此每次GC工作量会更长，导致延迟下降</p>
@@ -1153,7 +1153,7 @@
 </tr>
 </tbody></table>
 <p>但是他们之间并不是可以随意一一组合，而是有这样一个组合关系：</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011839859.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 67%;" />
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424779.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
 
 <p>其中CMS在JDK14已经被删掉了，具体的组合要从使用场景来分析，不能一棒子打死</p>
 <h3 id="Serial回收器"><a href="#Serial回收器" class="headerlink" title="Serial回收器"></a>Serial回收器</h3><p>Serial回收器是针对于新生代的回收器，是JDK中最早的回收器，是Client模式下的默认选择</p>
@@ -1163,9 +1163,9 @@
 <p>Serial Old垃圾回收器比较特殊，它不仅仅是Client模式下的默认回收老年代回收器</p>
 <p>同时也是使用CMS时候的兜底回收器（CMS是并发的，发生OOM时需要Seral Old来STW式的GC）</p>
 </blockquote>
-<p><img src="https://img-blog.csdnimg.cn/20210804201210401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424956.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <h3 id="ParNew回收器"><a href="#ParNew回收器" class="headerlink" title="ParNew回收器"></a>ParNew回收器</h3><p>ParNew回收器相当于时Serial回收器的并发版本，使用的是<strong>复制算法+并行STW</strong></p>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011838109.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424007.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <p>上图是一个ParNew和Serial Old配合使用的流程图，因为新生代GC次数多并行更高效，老年代GC次数上，串行节省性能</p>
 <h3 id="Parallel-Scavenge回收器"><a href="#Parallel-Scavenge回收器" class="headerlink" title="Parallel Scavenge回收器"></a>Parallel Scavenge回收器</h3><p>并行回收器器中，除了ParNew以外，还有一个Parallel Scavenge回收器，也是使用<strong>复制+并行STW</strong></p>
 <p>那为什么有ParNew了，还要搞一个Parallel Scavenge呢？</p>
@@ -1175,11 +1175,11 @@
 <p>但不是说配置了一定会满足，你要是配置STW时间为1ms+吞吐量99.9%，那也不可能满足啊</p>
 </blockquote>
 <p>同样，为了保证老年代回收的吞吐量，也推出了Parallel的老年代版本：Parallel Old，采用<strong>标记-压缩+并行STW</strong></p>
-<p><img src="https://img-blog.csdnimg.cn/20210804203117936.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424567.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <h3 id="CMS回收器"><a href="#CMS回收器" class="headerlink" title="CMS回收器"></a>CMS回收器</h3><p>CMS又叫Concurrent Mark Sweep，是一种<strong>并发的标记-清理垃圾回收器</strong></p>
 <p>CMS和Parallel回收器不同，它<strong>更注重低延迟</strong>，比如互联网的服务端十分注重响应时间就用CMS</p>
 <p>虽然CMS注重低延迟但是还是会STW，同时使用的是标记-清理算法</p>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407011838211.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201424503.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <p>如上图所示，CMS的工作流程分为四步：</p>
 <ul>
 <li><strong>初始标记</strong>：这个阶段会标记出堆中直接和GCroots相连的对象，由于这个数量较少，是<strong>STW式</strong>的</li>
@@ -1195,10 +1195,49 @@
 <p>这也是为什么CMS用的Mark-Sweep还是可以工作，一旦碎片无法处理的时候肯定会OOM，那么就由Serial Old通过复制算法来重新规整内存空间</p>
 </blockquote>
 </li>
-<li><p>CMS</p>
+<li><p>CMS由于是和用户线程并发的，并且使用的时候是多线程进行回收，因此它会和服务争抢资源导致性能下降</p>
+</li>
+<li><p>CMS无法处理浮动垃圾，比如在并发清理和并发标记的时候，由于用户线程的操作导致又产生新的垃圾了，那只能等到下次再回收了（要注意的是，由于使用的是<strong>三色标记法</strong>，因此不会将正常的对象标记为垃圾，但是会有概率将垃圾标记为正常对象）</p>
 </li>
 </ul>
-
+<h3 id="三色标记法"><a href="#三色标记法" class="headerlink" title="三色标记法"></a>三色标记法</h3><p>在CMS，包括后面的G1、ZGC这些有并发标记的地方，都会使用到这个方法，来保证并发标记的正确性，并且在重新标记的时候保证不会将不是垃圾的对象标记为垃圾</p>
+<p>三色标记会将堆中的对象分成三个颜色，也就是堆中的对象会有三个集合：</p>
+<ul>
+<li><p><strong>黑色</strong>：黑色对象表示当前对象被访问到了（即和GC roots相连，不是垃圾），并且其所有内部引用都已经被扫描过。</p>
+<p>我们<strong>先不考虑并发标记的修改</strong>，因为修改后会有颜色的转变：</p>
+<p>由于黑色对象的所有内部的引用都已经被扫描过，因此<strong>不可能会有白色对象直接和黑色对象相连</strong>，黑色对象一定是会通过灰色对象间接的和白色对象相连</p>
+</li>
+<li><p><strong>灰色</strong>：这是对象的中间状态，表示当前对象是和GC root相连，但是它内部的引用还有没有扫描的</p>
+<p>这个状态在STW式的重新标记后就没有了，即<strong>重新标记后只有白色对象和黑色对象</strong>。由于没有任何引用指向白色，这个对象虽然存在于堆中，但是程序不可能访问的到</p>
+<p>因此重新标记后白色一定为垃圾，不可能在并发清理的时候会有白色转变为灰色或者黑色的情况</p>
+</li>
+<li><p><strong>白色</strong>：这表示GC线程还没有访问到这个对象，GC开始前所有对象都是白色，如果重新标记结束后，仍然还是白色，就说明该对象是垃圾需要被回收</p>
+</li>
+</ul>
+<p>在GC过程中会通过GC roots集合通过dfs或者bfs遍历所有引用，为了防止循环依赖，如果发现dfs或者bfs到非白色对象就不会再次遍历了</p>
+<p>三色标记会有几个问题，比如<strong>如何保证不错标</strong>，<strong>并发标记的时候新建对象怎么办</strong>：</p>
+<ul>
+<li><p><strong>并发标记新建对象</strong></p>
+<p>并发标记、并发清理的时候，如果新建对象那么就直接将其置为黑色，即使GC过程中变成了垃圾也不会在本次GC处理，而是留到下次GC</p>
+</li>
+<li><p><strong>保证不把正常对象标记为垃圾</strong><br>首先要强调的是，<strong>这个错误只会发生在并发标记的阶段</strong>，并发清理的阶段只有黑色和白色集合，白色不会发生引用变更，因为用户线程无法通过黑色对象访问到白色对象</p>
+<p>这个其实有两种方案，一个是增量更新（CMS）、一个是原始快照（G1）</p>
+<ul>
+<li><p><strong>增量更新</strong>：当一个黑色对象要和一个白色对象建立引用关系的时候，会将黑色对象改成灰色对象，如果并发标记没有再访问到这个标记为灰色对象，等到重新标记的时候STW式的扫描这些灰色对象，保证重新标记后不会出现灰色对象</p>
+<p>这样做，可以保证疑似垃圾的对象和正常对象建立引用后，可以被察觉到。但是这个无法检测到引用删除的变化，因此一旦被标记为黑色或者灰色的节点删除引用后变成垃圾了，那就会变成浮动垃圾</p>
+</li>
+<li><p><strong>原始快照</strong>：由于只有删除引用才会导致对象变成垃圾，因此在并发标记过程中，直接将这些删除的引用记录下来，然后重新标记的时候，通过这些删除的引用将一些垃圾变成非垃圾</p>
+<p>这样做，可以保证绝对不会错标，保存的删除引用相当于一个快照，但是这样<strong>会导致很多浮动垃圾，但是效率会比增量更新这种再扫描一次要高</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="记忆集和卡表"><a href="#记忆集和卡表" class="headerlink" title="记忆集和卡表"></a>记忆集和卡表</h3><p>当仅仅只是Minor GC的时候，如果通过GC roots遍历要先从老年代才能访问到年轻代对象，那岂不是还是要把整个堆查一遍，这和Minor GC的初衷不符合</p>
+<p>因此JVM搞了一个记忆集的东西，而<strong>记忆集的一个实现就是卡表</strong></p>
+<p>卡表是一个数组，将整个堆分成了很多卡页（512B），然后卡表中的每一个元素代表一个卡页的状态</p>
+<p>如果一个卡页中有跨代的指针，那对应的卡表元素标记为1，否则为0</p>
+<p>在遍历的时候，只会遍历那些被标记为1的卡页里的对象，这样可以防止全局遍历</p>
+<h3 id="Garbage-First-G1垃圾回收器"><a href="#Garbage-First-G1垃圾回收器" class="headerlink" title="Garbage First(G1垃圾回收器)"></a>Garbage First(G1垃圾回收器)</h3>
                 
               </div>
             
