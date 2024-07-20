@@ -16,31 +16,24 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="RocketMQ系统架构  Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。 Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。广播模式下，一个队列的消息会发给每一个消费者，集群模式下，每个队列只会和一个消费者绑定，只会被消费一次。 NameServe">
+    <meta name="description" content="美团面试笔试题多线程求和输入一个int数组，和线程个数K，多线程求和输出最终sum 这题其实就是多线程，要注意的是如何给每个线程分配要求和的部分。其实可以有很多种方法，比如取模，或者直接暴力顺序拆分，而我在面试中使用的就是取模方法 123456789101112131415161718192021222324252627282930313233343536373839404142434445464">
 <meta property="og:type" content="article">
-<meta property="og:title" content="RocketMQ">
-<meta property="og:url" content="http://example.com/2024/05/17/%E5%85%AB%E8%82%A1/2024-05-17-RocketMQ%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/index.html">
+<meta property="og:title" content="美团面试笔试题">
+<meta property="og:url" content="http://example.com/2024/05/11/%E7%AC%94%E8%AF%95%E9%A2%98/2024-05-11-%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95%E9%A2%98/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="RocketMQ系统架构  Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。 Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。广播模式下，一个队列的消息会发给每一个消费者，集群模式下，每个队列只会和一个消费者绑定，只会被消费一次。 NameServe">
+<meta property="og:description" content="美团面试笔试题多线程求和输入一个int数组，和线程个数K，多线程求和输出最终sum 这题其实就是多线程，要注意的是如何给每个线程分配要求和的部分。其实可以有很多种方法，比如取模，或者直接暴力顺序拆分，而我在面试中使用的就是取模方法 123456789101112131415161718192021222324252627282930313233343536373839404142434445464">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170114120.jpeg">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170134407.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344006.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344431.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344523.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172353960.png">
-<meta property="article:published_time" content="2024-05-16T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-05-17T16:54:26.696Z">
+<meta property="article:published_time" content="2024-05-10T16:09:00.000Z">
+<meta property="article:modified_time" content="2024-07-20T12:41:31.159Z">
 <meta property="article:author" content="Zenith Wang">
-<meta property="article:tag" content="个人笔记">
-<meta property="article:tag" content="Java八股">
+<meta property="article:tag" content="算法题">
+<meta property="article:tag" content="笔试">
+<meta property="article:tag" content="动态规划">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png">
   
   
   
-  <title>RocketMQ - Zenith&#39; Blog</title>
+  <title>美团面试笔试题 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -235,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="RocketMQ"></span>
+            <span id="subtitle" data-typed-text="美团面试笔试题"></span>
           
         </div>
 
@@ -246,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-05-17 00:00" pubdate>
-          2024年5月17日 凌晨
+        <time datetime="2024-05-11 00:09" pubdate>
+          2024年5月11日 凌晨
         </time>
       </span>
     
@@ -258,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.6k 字
+          767 字
         
       </span>
     
@@ -269,7 +262,7 @@
         
         
         
-          14 分钟
+          7 分钟
         
       </span>
     
@@ -314,121 +307,26 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">RocketMQ</h1>
+            <h1 id="seo-header">美团面试笔试题</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h1><h2 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h2><p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170111562.png" srcset="/img/loading.gif" lazyload alt=" "></p>
-<ul>
-<li>Producer Group：同一类生产者的集合，这类Producer发送相同Topic类型的消息。一个生产者组可以同时发送多个主题的消息。</li>
-<li>Consumer Group：同一类消费者的集合，这类Consumer消费的是同一个Topic类型的消息。<strong>广播模式</strong>下，一个队列的消息会发给每一个消费者，<strong>集群模式</strong>下，每个队列只会和一个消费者绑定，只会被消费一次。</li>
-<li>NameServer Cluster：一个Broker与Topic路由的注册中心，Broker需要和NameServer保持长连接，定时发送心跳检测。并且还保存Broker路由信息以及队列信息，方便Consumer和Producer拉取信息消费。</li>
-<li>BrokerCluster：Broker充当着消息中转角色，负责存储消息、转发消息。Broker在RocketMQ系统中负责接收并存储从生产者发送来的消息，同时为消费者的拉取请求作准备。</li>
-</ul>
-<blockquote>
-<p>消费者组中Consumer的数量应该小于等于订阅Topic的Queue数量。如果超出Queue数量，则多出的<br>Consumer将不能消费消息。</p>
-<p>此外：</p>
-<ol>
-<li>消费者组只能消费一个Topic的消息，不能同时消费多个Topic消息</li>
-<li>一个消费者组中的消费者必须订阅完全相同的Topic</li>
-</ol>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170114120.jpeg" srcset="/img/loading.gif" lazyload alt="img"></p>
-<h2 id="消息生产和存储"><a href="#消息生产和存储" class="headerlink" title="消息生产和存储"></a>消息生产和存储</h2><h4 id="消息生产"><a href="#消息生产" class="headerlink" title="消息生产"></a>消息生产</h4><p>Producer可以将消息写入到某Broker中的某Queue中，其经历了如下过程：</p>
-<ol>
-<li>向NameServer发出获取消息Topic的路由信息的请求</li>
-<li>NameServer返回该Topic的路由表及Broker列表</li>
-</ol>
-<blockquote>
-<ul>
-<li>路由表：key为topic，value是<strong>队列列表</strong>，但是这个队列列表的元素是按broker为单位分的，也就是说队列列表是一个二维列表</li>
-<li>Broker列表：key为topic，value是<strong>Broker列表</strong>，Broker列表中的元素是一个Broker的主从集群作</li>
-</ul>
-</blockquote>
-<ol start="3">
-<li>Producer根据代码中指定的Queue选择策略，从Queue列表中选出一个队列，用于后续存储消息</li>
-<li>Producer向选择出的Queue所在的Broker发出<strong>RPC</strong>请求，将消息发送到选择出的Queue</li>
-</ol>
-<h4 id="消息存储"><a href="#消息存储" class="headerlink" title="消息存储"></a>消息存储</h4><ol>
-<li><p>commitLog文件</p>
-<ul>
-<li><p>commitLog存放了所有发到这个Broker上的消息（不区分topic），在RocketMQ的commitlog目录中存放着很多的mappedFile文件，每个文件大小为1G，文件名由20位十进制数构成，表示当前文件的第一条消息的起始位移偏移量。</p>
-</li>
-<li><p>当一条消息进来后，就会<strong>顺序写入</strong>commitLog，当前mppedFile满了，就会创建新的继续写入</p>
-</li>
-<li><p>其中存放的最小单元是消息单元，</p>
-</li>
-<li><p>包含消息总长度MsgLen、消息的物理位置physicalOffset、消息体内容Body、消息体长度BodyLength、消息主题Topic、Topic长度TopicLength、消息生产者BornHost、消息发送时间戳BornTimestamp、消息所在的队列QueueId、消息在Queue中存储的偏移量QueueOffset等近20余项消息相关属性。</p>
-</li>
-</ul>
-</li>
-<li><p>consumequeue</p>
-<ul>
-<li>RokcetMQ同样也会为每个topic创建一个目录，每个topic目录下会为每个队列创建目录，目录名为queueId</li>
-<li>每个队列目录下放了多个consumequeue文件，它里面存放的每个单元是该消息在commitLog中的偏移量，即存放的是索引</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405170134407.png" srcset="/img/loading.gif" lazyload alt="image-20240517013452373"></p>
-</li>
-</ol>
-<h4 id="消息写入"><a href="#消息写入" class="headerlink" title="消息写入"></a>消息写入</h4><p>一条消息进入到Broker后经历了以下几个过程才最终被持久化。</p>
-<ul>
-<li>Broker根据queueId，获取到该消息对应索引条目要在consumequeue目录中的写入偏移量，即<br>QueueOffset</li>
-<li>将queueId、queueOffset等数据，与消息一起封装为消息单元，写入到commitlog，形成消息索引条目</li>
-<li>将消息索引条目分发到相应的consumequeue，如果消息包含key，则写入indexFile</li>
-</ul>
-<h2 id="IndexFile"><a href="#IndexFile" class="headerlink" title="IndexFile"></a>IndexFile</h2><h4 id="IndexFile结构"><a href="#IndexFile结构" class="headerlink" title="IndexFile结构"></a>IndexFile结构</h4><p>每个Broker都有一组IndexFile文件，名称是该文件创建时候的时间，一个IndexFile文件分为三个部分，分别是：indexHeader，slots槽位，indexData索引数据</p>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344006.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<ul>
-<li><p>indexHeader存放的是该索引文件的信息，比如索引条目个数、填充的slot条目个数等等</p>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344431.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-</li>
-<li><p>slots就是一个hsh表，存放的是该索引条目在indexData中的位置，其底层处理冲突的方式是拉链法</p>
-</li>
-<li><p>indexData存放的是索引数据，存放对应msg在commitLog中位置等信息</p>
-</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172344523.png" srcset="/img/loading.gif" lazyload alt="img"></p>
-<blockquote>
-<p>timeDiff是插入这条index时候距离索引创建时间（索引文件名获取）的偏移，方便按时间查找</p>
-</blockquote>
-<h4 id="IndexFile写入"><a href="#IndexFile写入" class="headerlink" title="IndexFile写入"></a>IndexFile写入</h4><p>当一个消息需要存到indexFile中的时候，会经过一下几个步骤：</p>
-<ol>
-<li><p>计算key的hash值，然后试图存放到indexFile中，会有两种情况需要新建一个indexFile：</p>
-<ul>
-<li>当前为第一个消息，还没有indexFile</li>
-<li>indexFile的索引个数达到2000W，那么也需要新建</li>
-</ul>
-</li>
-<li><p>存放的时候，会将hash(key)%500w，结果为存放的slots位置</p>
-<ul>
-<li><p>如果没有发生冲突，那么直接存放到indexData中，前驱indexDataNo置为空，并将该slots对应的indexNo置为存放的位置</p>
-</li>
-<li><p>如果发生冲突，就需要使用拉链法处理，构建indexData后，需要将原本slot底下的indexData的前驱indexDataNo置为新的indexDat的位置，然后slot也存放新的indexDataNo</p>
-<blockquote>
-<p>slot只存放最新的indexData在index部分的位置，类似undo log，index存放的才是实际拉链的链表顺序结构</p>
-</blockquote>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="消息的消费"><a href="#消息的消费" class="headerlink" title="消息的消费"></a>消息的消费</h2><h4 id="维护顺序"><a href="#维护顺序" class="headerlink" title="维护顺序"></a>维护顺序</h4><p>对于<strong>集群模式</strong>而言：在RocketMQ的服务端有一个<code>ConsumserOffset.json</code>文件，他保存了每个消费者组对于每个消费队列的消费进度，每次发送pull request都会先找broker要offset</p>
-<p>对于<strong>广播模式</strong>而言：由于每个消费者都要去消费topic的每个消息，因此这个offset保存在本地，不用去远程拉</p>
-<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202405172353960.png" srcset="/img/loading.gif" lazyload alt="image-20240517235309926"></p>
-<h4 id="PushConsumer"><a href="#PushConsumer" class="headerlink" title="PushConsumer"></a>PushConsumer</h4><p>当一个消费者start后，就会调用pullMessageService.start()，这个就就会开启一个线程，做的事情就是从一个阻塞队列里面去读，读到一个pullRequest就拉去消息，然后回调pushCallBack函数处理消息，处理完就会更新pullRequest然后再放回去，这就实现了推送型接收</p>
-<p>那么还有两个问题：</p>
-<ol>
-<li><p>pullRequest怎么放进去的？</p>
-<p>负载均衡的时候，会重新分配一个队列，分配完就会将这个队列对应的pullRequest放进去</p>
-<p>也就是说，一个队列对应一个pullRequest</p>
-</li>
-<li><p>如果pull的时候没有消息怎么办？</p>
-<p>Broker的<strong>长轮询机制</strong>，Broker收到pullRequest后先根据tag过滤，然后看看对应的offset有没有新消息，有就立刻返回，没有就保留pullRequest，每五秒查询一次，查到再返回</p>
-</li>
-</ol>
-<blockquote>
-<p>pullConsumer就是单纯的从某个地方拉取多少条消息，没啥好说的</p>
-</blockquote>
+                <h1 id="美团面试笔试题"><a href="#美团面试笔试题" class="headerlink" title="美团面试笔试题"></a>美团面试笔试题</h1><h2 id="多线程求和"><a href="#多线程求和" class="headerlink" title="多线程求和"></a>多线程求和</h2><p>输入一个int数组，和线程个数K，多线程求和输出最终sum</p>
+<p>这题其实就是多线程，要注意的是如何给每个线程分配要求和的部分。其实可以有很多种方法，比如取模，或者直接暴力顺序拆分，而我在面试中使用的就是取模方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.zenith.example.solution;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span>[]array=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>&#125;;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> k=<span class="hljs-number">2</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        SumCalculator [] threads=<span class="hljs-keyword">new</span> <span class="hljs-title class_">SumCalculator</span>[k];<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;k;i++)&#123;<br>            threads[i]=<span class="hljs-keyword">new</span> <span class="hljs-title class_">SumCalculator</span>(i);<br>            threads[i].start();<br>        &#125;<br>        <span class="hljs-keyword">for</span>(SumCalculator thread:threads)&#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                thread.join();<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-type">int</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (SumCalculator thread : threads) &#123;<br>            sum += thread.getSum();<br>        &#125;<br><br>        System.out.println(sum);<br><br>    &#125;<br><br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SumCalculator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Thread</span>&#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> index;<br>        <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> sum;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-title function_">SumCalculator</span><span class="hljs-params">(<span class="hljs-type">int</span> index)</span>&#123;<br>            <span class="hljs-built_in">this</span>.index=index;<br>            <span class="hljs-built_in">this</span>.sum=<span class="hljs-number">0</span>;<br>        &#125;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i*k+index&lt;array.length;i++)&#123;<br>                sum+=array[i*k+index];<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getSum</span><span class="hljs-params">()</span>&#123;<br>            <span class="hljs-keyword">return</span> sum;<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="前K个频率最高数字"><a href="#前K个频率最高数字" class="headerlink" title="前K个频率最高数字"></a>前K个频率最高数字</h2><p>给你一个数组，和一个K。返回前K个出现频率最高的数字，最终输出一个数组</p>
+<p>不管怎样，首先肯定先要用一个map来统计每个数字出现的个数。</p>
+<h4 id="O-nlogn-方法"><a href="#O-nlogn-方法" class="headerlink" title="O(nlogn)方法"></a>O(nlogn)方法</h4><p>暴力排序，我们可以直接用不限容量的优先队列，一个一个往里放，最后输出前n个就行</p>
+<p>但是这个方法可以优化</p>
+<h4 id="O-nlogk-方法"><a href="#O-nlogk-方法" class="headerlink" title="O(nlogk)方法"></a>O(nlogk)方法</h4><p>由于我们只需要前k个，因此我们通过使用容量为K的优先队列</p>
+<p>如果key的次数大于优先队列队尾的次数，那么就替换掉，由于优先队列是小顶堆且容量为K，因此时间复杂度为klogk，然后我们要从头遍历一次，最终为nlogk</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.zenith.example.solution;<br><br><span class="hljs-keyword">import</span> java.util.*;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span>[]array=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>&#125;;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> k=<span class="hljs-number">3</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Map&lt;Integer,Integer&gt; map;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        map=<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> num:array)&#123;<br>            <span class="hljs-type">Integer</span> <span class="hljs-variable">cur</span> <span class="hljs-operator">=</span> map.getOrDefault(num , <span class="hljs-number">0</span>);<br>            map.put(num ,cur+<span class="hljs-number">1</span>);<br>        &#125;<br>        <br>        PriorityQueue&lt;Integer&gt; pq = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Comparator</span>&lt;Integer&gt;() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compare</span><span class="hljs-params">(Integer a, Integer b)</span> &#123;<br>                <span class="hljs-keyword">return</span> map.get(a) - map.get(b);<br>            &#125;<br>        &#125;);<br>        <br>        <span class="hljs-keyword">for</span>(Integer key:map.keySet())&#123;<br>            <span class="hljs-keyword">if</span>(pq.size()&lt;k)&#123;<br>                pq.add(key);<br>            &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(map.get(key)&gt;map.get(pq.peek()))&#123;<br>                pq.poll();<br>                pq.offer(key);<br>            &#125;<br>        &#125;<br>        List&lt;Integer&gt; res = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br>        <span class="hljs-keyword">while</span> (!pq.isEmpty()) &#123;<br>            res.add(pq.poll());<br>        &#125;<br>        System.out.println(res);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h4 id="O-n-的方法"><a href="#O-n-的方法" class="headerlink" title="O(n)的方法"></a>O(n)的方法</h4><p>我们还有一个极致的空间换时间的方法，由于次数对应的数字是唯一的，那么我们可以直接反过来保存从次数到数字的映射，然后次数最大不会超过n，那么我们就从n反过来遍历，有数字就输出，直到输出了k个数字</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.zenith.example.solution;<br><br><span class="hljs-keyword">import</span> java.util.*;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span>[]array=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>&#125;;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> k=<span class="hljs-number">3</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Map&lt;Integer,Integer&gt; map;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        map=<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> num:array)&#123;<br>            <span class="hljs-type">Integer</span> <span class="hljs-variable">cur</span> <span class="hljs-operator">=</span> map.getOrDefault(num , <span class="hljs-number">0</span>);<br>            map.put(num ,cur+<span class="hljs-number">1</span>);<br>        &#125;<br><br>        Map&lt;Integer,Integer&gt; countMap=<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        <span class="hljs-keyword">for</span>(Integer key:map.keySet())&#123;<br>            countMap.put(map.get(key),key);<br>        &#125;<br><br>        List&lt;Integer&gt; res=<span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=array.length;i&gt;=<span class="hljs-number">0</span>;i--)&#123;<br>            <span class="hljs-keyword">if</span>(k==<span class="hljs-number">0</span>)&#123;<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br>            <span class="hljs-keyword">if</span>(!countMap.getOrDefault(i,-<span class="hljs-number">1</span>).equals(-<span class="hljs-number">1</span>))&#123;<br>                res.add(countMap.get(i));<br>                k--;<br>            &#125;<br>        &#125;<br>        System.out.println(res);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
@@ -447,15 +345,8 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/" class="category-chain-item">Java八股</a>
+  <a href="/categories/%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/" class="category-chain-item">面试总结</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/Java%E5%85%AB%E8%82%A1/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="category-chain-item">消息队列</a>
-  
-  
-
   
 
       </span>
@@ -469,9 +360,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" class="print-no-link">#个人笔记</a>
+        <a href="/tags/%E7%AE%97%E6%B3%95%E9%A2%98/" class="print-no-link">#算法题</a>
       
-        <a href="/tags/Java%E5%85%AB%E8%82%A1/" class="print-no-link">#Java八股</a>
+        <a href="/tags/%E7%AC%94%E8%AF%95/" class="print-no-link">#笔试</a>
+      
+        <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" class="print-no-link">#动态规划</a>
       
     </div>
   
@@ -483,8 +376,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>RocketMQ</div>
-      <div>http://example.com/2024/05/17/八股/2024-05-17-RocketMQ消息队列/</div>
+      <div>美团面试笔试题</div>
+      <div>http://example.com/2024/05/11/笔试题/2024-05-11-美团面试笔试题/</div>
     </div>
     <div class="license-meta">
       
@@ -496,7 +389,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年5月17日</div>
+          <div>2024年5月11日</div>
         </div>
       
       
@@ -528,9 +421,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/05/18/%E5%85%AB%E8%82%A1/2024-05-18-ElasticSearch%E6%80%BB%E7%BB%93/" title="ElasticSearch总结">
+                      <a href="/2024/05/17/%E5%85%AB%E8%82%A1/2024-05-17-RocketMQ%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" title="RocketMQ">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ElasticSearch总结</span>
+                        <span class="hidden-mobile">RocketMQ</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -538,8 +431,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/05/11/%E7%AC%94%E8%AF%95%E9%A2%98/2024-05-11-%E7%BE%8E%E5%9B%A2%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95%E9%A2%98/" title="美团面试笔试题">
-                        <span class="hidden-mobile">美团面试笔试题</span>
+                      <a href="/2024/05/10/%E5%85%AB%E8%82%A1/2024-05-10-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%9F%BA%E7%A1%80/" title="消息队列基础">
+                        <span class="hidden-mobile">消息队列基础</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
