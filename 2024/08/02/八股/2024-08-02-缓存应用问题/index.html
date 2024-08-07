@@ -16,31 +16,25 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="数据存储问题今天，我们来聊一聊在业务中，我们的数据是如何存储的，包括海量数据、高并发读写等问题是如何解决的 我们将会从MySQL开始讲起，谈一谈分库分表，然后我们聊一聊除了MySQL以外的数据库，包括NoSQL和新一代的分布式关系数据库NewSQL 最后，来讲一讲在类似ES、HBase这些数据存储方式面前，MySQL到底是个什么样的存在 基于MySQL的存储优化：分库分表分库分表的初衷首先，我们来">
+    <meta name="description" content="缓存应用问题这里我们将Redis的缓存应用问题，单独提出一篇文章来讲 说到缓存，咱们想到的肯定就是Redis，但是还是有很多其他的东西，比如本地缓存、Memcached等等 因此，把Redis和缓存混为一谈，那是都是放屁，再说Redis也不是就用来做缓存的啊 下面，我们就缓存这一知识点来单独谈一谈 缓存的分类缓存的分类大致可以分为两种，一种是分布式缓存，一种是本地缓存 分布式缓存分布式缓存一般需要">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据存储问题">
-<meta property="og:url" content="http://example.com/2024/07/20/%E5%85%AB%E8%82%A1/2024-07-20-%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:title" content="缓存应用问题">
+<meta property="og:url" content="http://example.com/2024/08/02/%E5%85%AB%E8%82%A1/2024-08-02-%E7%BC%93%E5%AD%98%E5%BA%94%E7%94%A8%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="数据存储问题今天，我们来聊一聊在业务中，我们的数据是如何存储的，包括海量数据、高并发读写等问题是如何解决的 我们将会从MySQL开始讲起，谈一谈分库分表，然后我们聊一聊除了MySQL以外的数据库，包括NoSQL和新一代的分布式关系数据库NewSQL 最后，来讲一讲在类似ES、HBase这些数据存储方式面前，MySQL到底是个什么样的存在 基于MySQL的存储优化：分库分表分库分表的初衷首先，我们来">
+<meta property="og:description" content="缓存应用问题这里我们将Redis的缓存应用问题，单独提出一篇文章来讲 说到缓存，咱们想到的肯定就是Redis，但是还是有很多其他的东西，比如本地缓存、Memcached等等 因此，把Redis和缓存混为一谈，那是都是放屁，再说Redis也不是就用来做缓存的啊 下面，我们就缓存这一知识点来单独谈一谈 缓存的分类缓存的分类大致可以分为两种，一种是分布式缓存，一种是本地缓存 分布式缓存分布式缓存一般需要">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407231625132.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407231630788.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232241213.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232256924.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232257468.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201630029.webp">
-<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232329838.webp">
-<meta property="article:published_time" content="2024-07-20T08:08:22.000Z">
-<meta property="article:modified_time" content="2024-07-23T15:33:25.302Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202408080013606.png">
+<meta property="article:published_time" content="2024-08-02T13:44:00.000Z">
+<meta property="article:modified_time" content="2024-08-07T16:13:19.433Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="Java八股">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202407231625132.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202408080013606.png">
   
   
   
-  <title>数据存储问题 - Zenith&#39; Blog</title>
+  <title>缓存应用问题 - Zenith&#39; Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -235,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数据存储问题"></span>
+            <span id="subtitle" data-typed-text="缓存应用问题"></span>
           
         </div>
 
@@ -246,8 +240,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-20 16:08" pubdate>
-          2024年7月20日 下午
+        <time datetime="2024-08-02 21:44" pubdate>
+          2024年8月2日 晚上
         </time>
       </span>
     
@@ -258,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.7k 字
+          3.5k 字
         
       </span>
     
@@ -269,7 +263,7 @@
         
         
         
-          31 分钟
+          30 分钟
         
       </span>
     
@@ -314,150 +308,186 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">数据存储问题</h1>
+            <h1 id="seo-header">缓存应用问题</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="数据存储问题"><a href="#数据存储问题" class="headerlink" title="数据存储问题"></a>数据存储问题</h1><p>今天，我们来聊一聊在业务中，我们的数据是如何存储的，包括海量数据、高并发读写等问题是如何解决的</p>
-<p>我们将会从MySQL开始讲起，谈一谈分库分表，然后我们聊一聊除了MySQL以外的数据库，包括NoSQL和新一代的分布式关系数据库NewSQL</p>
-<p>最后，来讲一讲在类似ES、HBase这些数据存储方式面前，MySQL到底是个什么样的存在</p>
-<h2 id="基于MySQL的存储优化：分库分表"><a href="#基于MySQL的存储优化：分库分表" class="headerlink" title="基于MySQL的存储优化：分库分表"></a>基于MySQL的存储优化：分库分表</h2><h3 id="分库分表的初衷"><a href="#分库分表的初衷" class="headerlink" title="分库分表的初衷"></a>分库分表的初衷</h3><p>首先，我们来讨论一下分库分表的初衷，为什么我们要进行分库分表呢？</p>
-<p>要知道的是，分库分表在一个项目里肯定会大大增加开发工作量和系统复杂度的，我们做分库分表肯定是有读写瓶颈，而导致我们迫不得已要做分库分表</p>
-<p>对于MySQL而言，我们在业务场景中往往会碰到这几种问题：<strong>读请求过多</strong>、<strong>写请求过多</strong>、<strong>数据量过大</strong></p>
-<p>那么针对上面三种问题，我们可以通过MySQL分库分表来解决这些问题</p>
+                <h1 id="缓存应用问题"><a href="#缓存应用问题" class="headerlink" title="缓存应用问题"></a>缓存应用问题</h1><p>这里我们将Redis的缓存应用问题，单独提出一篇文章来讲</p>
+<p>说到缓存，咱们想到的肯定就是Redis，但是还是有很多其他的东西，比如本地缓存、Memcached等等</p>
+<p>因此，把Redis和缓存混为一谈，那是都是放屁，再说Redis也不是就用来做缓存的啊</p>
+<p>下面，我们就缓存这一知识点来单独谈一谈</p>
+<h2 id="缓存的分类"><a href="#缓存的分类" class="headerlink" title="缓存的分类"></a>缓存的分类</h2><p>缓存的分类大致可以分为两种，一种是分布式缓存，一种是本地缓存</p>
+<h3 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h3><p>分布式缓存一般需要单独部署一个缓存服务，用于多个实例共享一个内存来协作，比如分布式锁，缓解MySQL等压力，其<strong>瓶颈往往在于网络IO</strong>，</p>
+<p>比如Redis的多路复用+多线程就是为了尽可能提高网络IO，一般延迟在毫秒级</p>
+<p>常见的缓存有分布式缓存Redis与Memcached</p>
+<h3 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h3><p>本地缓存则是，直接放在本机内存，没有网络延迟，基本只受本机内存的影响，但是无法想分布式缓存一下实现集群部署，扩展节点等功能，延迟极地，一般在纳米级</p>
+<p>常见的本地缓存有mybatis的两级缓存，Guava Cache，Caffeine</p>
+<p>更底层一点的有操作系统的CPU cache，分页中的page cache，还有文件的读写缓冲区，这些也都是</p>
+<h3 id="本地还是分布式"><a href="#本地还是分布式" class="headerlink" title="本地还是分布式"></a>本地还是分布式</h3><p>首先，要明确的是本地缓存一般没法扩展，你一个机器申请下来，内存就这么大，因此需要省着用</p>
+<p>分布式缓存则可以扩展，但是延迟稍微高一点</p>
+<p>一般来说，在QPS不是很高的情况下，并且查询的数据不是很多，本地缓存就够了</p>
+<p>这种场景，实例个数一般也不到100个，就算同时请求mysql能有多大压力，因此考虑ROI问题，本地缓存就足矣</p>
+<p>但是如果对于QPS较高，数据量大，实例节点成百上千的时候，或者需要分布式锁、bitmap这种基于缓存的协调问题，一般就要分布式缓存了</p>
+<p>因为首先数据量大，本地内存肯定不够用，又没法扩充，并且QPS大的时候往往瓶颈不在缓存和MySQL了，Tomcat、JVM扛不住了</p>
+<p>这个时候可以用MQ削峰、限流，或者<strong>Nginx中写Lua脚本，直接走Redis</strong>，这个时候分布式缓存就有用了吧</p>
+<p>但是，一般来说，还是两级缓存比较常见吧，那既然用了两级缓存，缓存一致性问题就得解决了吧？</p>
+<h2 id="缓存一致性问题"><a href="#缓存一致性问题" class="headerlink" title="缓存一致性问题"></a>缓存一致性问题</h2><h3 id="没有本地缓存的时候"><a href="#没有本地缓存的时候" class="headerlink" title="没有本地缓存的时候"></a>没有本地缓存的时候</h3><p>一般来说就是旁路读写，先改MySQL在删Redis，这个没啥解释的吧，就是因为写MySQL比Redis慢，先改MySQL再删Redis尽可能保证并发问题概率足够小</p>
+<p>但是还是存在两个问题：</p>
 <ul>
-<li><p><strong>读请求过多</strong></p>
-<p>这个还是比较简单的，多搞几个从库，然后做读写分离就可以了</p>
+<li><p>上述方法仍然存在并发问题，咋办？</p>
+<p>延迟双删，就是删完Redis后，sleep一下，再删，这样尽可能保证并发时候读出来了脏数据</p>
+<p>其实这样还是有一定概率，但是这种概率已经非常非常小了，并且修改同一个字段的高并发几乎很少见，比如删减库存这种，基本都是加锁并只走Redis，隔一段时间才会同步一次MySQL</p>
 </li>
-<li><p><strong>写请求过多</strong></p>
-<p>这个就不能加从库了，我们得将数据分到多个主库上，这也就对应着分库分表中的<strong>分库</strong></p>
-<p>像拆成微服务，每个服务抽出自己的数据放到自己的库里，这就是<strong>垂直分库</strong></p>
-<p>也有的就是单纯的将数据切分成部分，然后放到不同的库里，那这就是<strong>水平分库</strong></p>
-</li>
-<li><p><strong>数据量过大</strong></p>
-<p>我们知道MySQL单表不能超过2000w，其实一般我们不会让单表的数据超过1000w的</p>
-<p>那么超过这个，我们就得将数据拆到多个表中，这也就对应着分库分表中的<strong>分表</strong></p>
-<p>但是我很少见到有垂直分表的（按列拆），基本都是拆分成多个部分放到不同的表中，即<strong>水平分表</strong></p>
-</li>
-</ul>
-<p>综上所述，我们可以将分库分表的初衷归纳为：</p>
-<p><strong>分库就是缓解数据库计算的压力</strong>，因为数据库连接池（<strong>MySQL自己的</strong>）大小有限，当并发量过高，不但CPU、内存压力过大，等待连接的阻塞时间也会变长，我们只能通过分库来缓解压力</p>
-<p>而<strong>分表就是缓解数据库的存储压力</strong>，因为一旦一张表的数据量上去，B+树的层数很有可能超过三层，那么就会导致查询很慢，我们分表就是为了保证B+树的层数在三层以内</p>
-<p>这就是分库分表的初衷了，其实从分库的目的来看，主从、冷热我觉得都可以看作是分库吧</p>
-<h3 id="分库分表的方式"><a href="#分库分表的方式" class="headerlink" title="分库分表的方式"></a>分库分表的方式</h3><p>我们先来看看数据是如何路由到某个库的某张表上</p>
-<h4 id="路由方式"><a href="#路由方式" class="headerlink" title="路由方式"></a>路由方式</h4><p>一般来说，较为简单的就是，直接取模，我们可以将数据库以及表的数量设置为<strong>2的幂</strong>，这样我们只需要根据id做mask就可以直接路由了，相比于取模更加节省时间</p>
-<p>但是这样的方式，不适合系统的拓展，比如你要将数据库的个数增大一倍，那你就会导致所有的数据都会更换到不同的数据库的表中去，工程量巨大！</p>
-<p>一般来说，都是使用<strong>一致性哈希</strong>的方法来实现路由的，简单来说就是将整个id空间划分为一个范围，然后在上面放上几个节点，进来一个id就会沿着这个环顺时针的找，碰到的第一个节点就是存储的节点</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407231625132.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
-
-
-
-<p>这个方法，看起来貌似扩展性很强，但是考虑图中的节点D加入的位置，就会导致只有少量的id分配给了节点B</p>
-<p>这就会导致另一个问题：数据倾斜，这也是为什么订单id不根据卖家id分库分表，而是通过买家id，因为对于nike、adidas这中大卖家，订单量可能比很多个小卖家加起来还多</p>
-<p>那么为了解决这种问题，一般我们都是在换上均匀的放置虚拟节点，然后给真正的节点分配虚拟节点，这样就可以实现数据平衡了</p>
+<li><p>如果第二步删除Redis失败了咋办？</p>
+<p>为了解决这个问题，那就只能靠消息队列了，要么删除后发一个消息出去，要么监听binlog最终还是发一个消息出去</p>
+<p>然后收到消息再删除缓存，这样即使删除失败，无法ACK，消息会重新发送的</p>
 <blockquote>
-<p>其实redis的slot分片，也是采用的这种思想，只不过虚拟节点的间隔为1，更加灵活</p>
-</blockquote>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407231630788.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
-
-<h4 id="分库分表工具"><a href="#分库分表工具" class="headerlink" title="分库分表工具"></a>分库分表工具</h4><p>下面我们再来看一看，常用的分库分表的工具，一般来说分为两种：<strong>中间件形式</strong>以及<strong>代码侵入的jar包形式</strong></p>
-<p>中间件有MyCat，KingShard这种的，这种代码耦合度较低，但是由于需要单独部署，那么可靠性就是一个问题了，一旦出现问题，不好定位</p>
-<p>而像Sharding-Jdbc这种的，只需要引入jar包，在代码中做配置，会增加一定工作量，但是稳定性较高</p>
-<h3 id="分库分表的案例"><a href="#分库分表的案例" class="headerlink" title="分库分表的案例"></a>分库分表的案例</h3><p>这里会讲一讲订单的分库分表，我也是从美团的技术博客：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/18/dianping-order-db-sharding.html">大众点评订单系统分库分表实践</a>学习的</p>
-<p>在这个例子中，是对订单表进行了分库分表，采用的是32*32的方式，也就是32个库32个表，全部做的水平拆分</p>
-<p>是通过userid的后四位mod32，分到不同的库，然后（userid&#x2F;32）mod 32分到各个表中</p>
-<p>这个是分表的方式，但是分完后有三个问题：</p>
-<ul>
-<li><p>分布式ID怎么生成</p>
-<p>分布式ID有很多方法，比如UUID、雪花算法等等，但是这里直接是时间戳+用户ID后四位+随机数</p>
-<p>这样既不会重复，而且订单ID包含用户信息，可以直接通过订单ID实现分库分表，这样看似是通过userID分库分表，同时也是通过订单号分库分表的，<strong>不管是根据userID查还是orderID查都是可以直接路由到指定表</strong></p>
-</li>
-<li><p>数据迁移怎么做？</p>
-<p>要知道，原本数据库中的数据，如何通过设置的分库分表算法迁移到新的库中，而且还不会影响原本业务的调用，其实是很难的</p>
-<p>就比如，当你在迁移的时候，由用户下单了，那你怎么办呢？或者用户取消订单了等等，哪又如何保证数据一致性呢？</p>
-<p>这个我们后面介绍，其中美团采用的就是第三个：双写方案</p>
-</li>
-<li><p>要是查询订单的其他信息，比如时间、金额等数据，或者统计报表某个指定条件的订单这种功能怎么办呢？</p>
-<p>我总不能把每个表全筛选一边，然后做聚合吧？这个后面的查询问题，我们会介绍</p>
-</li>
-</ul>
-<h2 id="数据迁移问题"><a href="#数据迁移问题" class="headerlink" title="数据迁移问题"></a>数据迁移问题</h2><p>数据迁移一般来说有三个解决方案，简单地说：</p>
-<ul>
-<li><strong>停机迁移</strong>，这没啥好说的，关闭服务然后数据迁移，像银行这种的，下班后关闭服务，然后开始迁移，这样只需要保证迁移正确，不会出现数据一致性问题</li>
-<li><strong>日志追加法</strong>，这个就是在对老库做写操作的时候，记录一个日志，同时将老库的数据全量迁移到旧库，然后全量完毕，就通过日志进行追平，一边增量一边校验，直至数据完整</li>
-<li><strong>双写法</strong>，就是在对老库操作的时候，同时对新库进行同样的操作，同时进行全量迁移</li>
-</ul>
-<p>而美团采用的就是双写法，我们来重点介绍一下双写法，一般迁移都是用这个</p>
-<h3 id="双写法基本思想"><a href="#双写法基本思想" class="headerlink" title="双写法基本思想"></a>双写法基本思想</h3><p>双写法简单来说就是：在对老库进行写操作的时候，同时也对新库执行一样的操作，并且在此过程中进行全量数据迁移</p>
-<p>其实写操作也就三个嘛，增删改，那么我们一个个来分析</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232241213.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;" />
-
-
-
-<p>我们采用主键从小到大的方式进行迁移，假设我们迁移的主键为now</p>
-<ul>
-<li><p><strong>Insert</strong></p>
-<p>如果在插入的是now之前的，那同时插入，没有问题</p>
-<p>如果是插入在now之后，那插入后，等同步到这里，就会多出一条出来（因为老库的ID和新库的分布式ID不一样）</p>
-<p>这里出现问题，只是说会出现问题，会有解决方案的</p>
-</li>
-<li><p><strong>Delete</strong></p>
-<p>如果在now之前，那同时删除，没有问题</p>
-<p>如果在now之后，同时删除，新库中没有，删了等于没删，旧库有，删了就不会同步了</p>
-<p>不会出问题，但是极端情况下，刚从旧库拿了一条，然后执行双删操作，然后再插入新的一条，那就出问题了</p>
-</li>
-<li><p><strong>Update</strong></p>
-<p>这个比较重要，我们在数据迁移的时候，会把update看成delete+insert操作，保证数据一致，当然也会出现Delete中的并发问题</p>
-</li>
-</ul>
-<p>那么怎么解决呢？对于这种极端的并发问题，我们一般是通过数据校验的方式解决，就是对比数据，发现问题，就补全差异，一般以老库为准</p>
-<p>那insert的这种问题呢？我们来看看美团是怎么解决的</p>
-<h3 id="美团的数据迁移"><a href="#美团的数据迁移" class="headerlink" title="美团的数据迁移"></a>美团的数据迁移</h3><p>美团的数据迁移分为了三个部分，同时为了保证插入、查询问题，使用了一个order_mapping表，来关联新库和老库的orderID关系</p>
-<ol>
-<li><p><strong>第一阶段</strong>：数据库双写，并且全量更新数据，每天数据校验补齐差异，期间任何查询都是走老库</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232256924.png" srcset="/img/loading.gif" lazyload alt="数据迁移" style="zoom:50%;" />
-</li>
-<li><p><strong>第二阶段</strong>：全量更新结束并且数据校验无误，继续数据库双写，但是查询逐渐切到新库，每天校验数据完整性</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232257468.png" srcset="/img/loading.gif" lazyload alt="数据迁移" style="zoom:50%;" />
-</li>
-<li><p><strong>第三阶段</strong>：同步结束，老库基本不是用，等到全部改造完成，就可以废除了</p>
-</li>
-</ol>
-<h2 id="其他查询问题"><a href="#其他查询问题" class="headerlink" title="其他查询问题"></a>其他查询问题</h2><p>在美团的分库分表的解决方案中，根具orderID查，是通过内嵌userID来实现的，那么其他的查询请求我们该怎么解决呢?</p>
-<p>那就是要借助其他的数据存储工具了，ES、HBase实现最近订单的查询</p>
-<p>可以ES建立要查询的索引，这里ES其实就是扮演了一种分布式索引的一个功能，然后拿到对应的ID再去MySQL里面找，或者在MySQL上面再加一层HBase实现，我认为如果不做冷热分离，可以加一层，做了的话，可以那就热数据直接走MySQL，冷数据走HBase，比如阿里就是做了冷热分离</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407201630029.webp" srcset="/img/loading.gif" lazyload alt="img" style="zoom:50%;" />
-
-<p>那么我们完全可以将统计类的一些指标提前统计好，比如日交易金额、订单量等等</p>
-<p>那么一些真的是查几年前的订单，这种历史的查询其实很少，冷库使用一些数仓的解决方案比如HBase这种的其实也还好，慢一点就慢一点</p>
-<h2 id="数据存储方案"><a href="#数据存储方案" class="headerlink" title="数据存储方案"></a>数据存储方案</h2><h3 id="数据存储工具对比"><a href="#数据存储工具对比" class="headerlink" title="数据存储工具对比"></a>数据存储工具对比</h3><p>上述讲到了很多数据的存储方式，比如ES、HBase等等。更进一步的，我们还有Redis、MongoDB这种NoSQL数据库，甚至还有像TiDB这种的分布式关系数据库，那么这些数据库到底有什么优劣呢？</p>
-<p>其实看这些数据库，我们可以知道这些特性，就很好理解了</p>
-<ul>
-<li>MySQL：关系型数据库，用于数据结构化存储，并且支持事务保证数据完整性，但是没有天然的水平切分能力</li>
-<li>Redis：内存级的NoSQL数据库，并发能力极强，一般用于分布式锁、分布式缓存，还支持持久化、集群部署</li>
-<li>ES：索引数据库，一般是用于查询，一般可以存全量数据，也可以存id+索引字段数据，查出来再去MySQL、HBase这种存放全量数据的地方根据ID查找，支持天然的水平切分能力</li>
-<li>MongoDB：文档型数据库，虽然有类似MySQL中表的定义，但是表中的每个document的schema都是允许修改的，一般用来存放数据量大、写入多，而且不是那么重要的数据，比如日志、消息的落库等等</li>
-<li>TiDB：这是一种分布式关系型数据库，NewSQL，支持分布式事务，支持MVCC，天然的水平分片，因此后续的分库分表可以使用TiDB来实现简单的水平扩展，美团已经迁过去了：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2018/11/22/mysql-pingcap-practice.html">新一代数据库TiDB在美团的实践</a></li>
-<li>HBase：一般用于大数据的处理场景，同样水平可切分，支持海量数据查询，并且根据主键rowKey查询极快</li>
-</ul>
-<p>综上所述，我们一般存储都是基于MySQL存储，然后通过canal这种监听binlog的中间件去异步同步类似ES、HBase这种中间件</p>
-<p>因为MySQL具备事务的能力，保证数据的完整性，而且其他的组件没有支撑事务的能力，除了TiDB，因此仙子啊有钱的公司都是上了TiDB，或者类似这种的<strong>分布式关系数据库</strong></p>
-<h3 id="海量数据的存储查询问题"><a href="#海量数据的存储查询问题" class="headerlink" title="海量数据的存储查询问题"></a>海量数据的存储查询问题</h3><p>一般来说，为了解决海量数据存储问题，都是MySQL+ES+HBase的方案</p>
-<ul>
-<li><p>通过MySQL保证数据的完整性，因为MySQL支持事务，这也是为什么都用HBase存储全量数据了，还要MySQL落库的原因，也是任何数据存储都是采用MySQL落库+binlog监听同步的原因（kc也是）</p>
-</li>
-<li><p>通过ES实现索引字段的查询，现在我终于理解了为什么ES中把table叫做index，其实ES不应该存放全量数据，而是充当分库分表后MySQL的<strong>分布式索引的功能</strong></p>
-<blockquote>
-<p>全量存放可以称为聚簇索引，只存放ID+索引字段可能会造成要去HBase做“回表查询”</p>
-<p>我们完全可以实现覆盖索引的功能</p>
+<p>但是引入MQ后，MQ的一致性又是一个问题，它分为三个部分：生产者发送ACK、消息在MQ中的持久化、消费者消费的ACK</p>
 </blockquote>
 </li>
-<li><p>通过HBase的水平扩展能力，以及根据ID查询的高性能，作为数据全量存储的引擎，提供海量数据的存储和查询能力</p>
+</ul>
+<h3 id="有本地缓存的时候"><a href="#有本地缓存的时候" class="headerlink" title="有本地缓存的时候"></a>有本地缓存的时候</h3><p>今晚看！！！</p>
+<h2 id="一个Http请求经过全链路缓存有哪些？"><a href="#一个Http请求经过全链路缓存有哪些？" class="headerlink" title="一个Http请求经过全链路缓存有哪些？"></a>一个Http请求经过全链路缓存有哪些？</h2><p>发送一个HTTP请求，会经过很多缓存从操作系统缓存、到应用程序本地缓存、分布式缓存、数据库缓存、到本地缓存（浏览器、App）、CDN缓存、反向代理缓存等等</p>
+<p>下面来分析分析：</p>
+<ul>
+<li><p>HTTP在发出去之前，肯定要走一遍<strong>客户端缓存</strong>吧，即HTTP缓存</p>
+<p>这个缓存分为两种：<strong>强缓存和协商缓存</strong></p>
+<p>强缓存就是命中且没过期，就返回</p>
+<p>协商缓存命中后，还是会发出去，服务端收到后会看看相关资源有没有过期，没过期返回304直接用，过期则返回200并带上数据</p>
+<p>也就是说，协商缓存的话，其实HTTP请求还是发出去了并没有真正意义上走本地缓存</p>
+</li>
+<li><p>本地缓存过后，就会走DNS解析，那么本地的<strong>HOST文件</strong>也是一种缓存，如果请求的域名在HOST已经写死了映射，那就不用找DNS服务器了，直接走HOST文件提供的IP地址</p>
+</li>
+<li><p>如果HTTP请求的是静态资源的话，还会走一次<strong>CDN缓存</strong></p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202408080013606.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:67%;" />
+
+<p>DNS服务器回去请求CDN的GSLB服务器，根据负载均衡以及地域等相关信息，返回一个CDN节点，然后直接走CDN返回静态资源</p>
+</li>
+<li><p>到此，如果HTTP还是没返回，那就真的会把HTTP请求发给服务器了，但是真的到没到服务器还是另一回事儿，一般来说服务器前面还有两个东西，一个是<strong>Nginx反向代理</strong>，一个是<strong>Gateway网关</strong></p>
+<ul>
+<li>Nginx反向代理，也可以有缓存，当QPS特别高的时候，Nginx甚至可以直接通过Lua脚本直连Redis，最终还是没到服务器</li>
+<li>网关缓存，这个还是比较简单的，就比如存放一些用户的身份信息啊等等</li>
+</ul>
+</li>
+<li><p>到现在为止，HTTP还没返回，那就真的到服务器了，到服务器还是有一堆缓存等着呢</p>
+<ul>
+<li><strong>Tomcat缓存</strong>，服务器一般就是Tomcat容器了吧，这个也是有缓存的</li>
+<li><strong>分布式缓存</strong>，到这才是到了Redis这种分布式缓存，可见Redis的优先级是多么的低哈哈</li>
+<li><strong>本地缓存</strong>，这里的本地缓存，我特指Guava、Caffeine这种缓存组件</li>
+</ul>
+</li>
+<li><p>如果到现在都还没有，那就是到数据库去搜了，搜的时候还有几个缓存要注意</p>
+<ul>
+<li><strong>mybatis缓存</strong>：这个虽然也是本地缓存的范畴，但是还是不太一样，因为这个时候已经走到数据库了，还是要区别一下</li>
+<li><strong>MySQL缓存</strong>，这个缓存在MySQL8.0以后就取消掉了，不过用的如果是5.0的版本还是会有的</li>
+<li><strong>MySQL的Page Cache</strong>，这个是最终缓存，已经到<strong>OS级别</strong>了，到这里其实延迟已经很慢了，如果还是没有，就只能加载磁盘，去搜了</li>
+</ul>
 </li>
 </ul>
-<p>下面这个图是几种方案的总结，我们称分库分表为SC，单个SC就是没有分库分表</p>
-<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202407232329838.webp" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;" />
+<h2 id="内存淘汰策略"><a href="#内存淘汰策略" class="headerlink" title="内存淘汰策略"></a>内存淘汰策略</h2><h3 id="内存淘汰策略分类"><a href="#内存淘汰策略分类" class="headerlink" title="内存淘汰策略分类"></a>内存淘汰策略分类</h3><p>内存淘汰策略两大类，三个算法：</p>
+<p><strong>两大类</strong>是指，针对的key类型是所有key还是有过期时间的key，分为all-keys和volatile</p>
+<p><strong>三个算法</strong>有：lru、lfu、fifo</p>
+<p>我们来看看LRU和LFU在Redis咋实现的</p>
+<ul>
+<li><p><strong>LRU</strong></p>
+<p>Redis的LRU不是基于双向链表的，而是基于计时器的，但是计时器的话就会涉及时间排序问题</p>
+<p>Redis直接每次选n个key，然后lru出最近最久未使用的，也就是说<strong>Redis是一种近似LRU</strong></p>
+</li>
+<li><p><strong>LFU</strong></p>
+<p>Redis的LFU也不是简简单单计个数，而是访问次数和时间的比值，这个比值计算比较麻烦</p>
+<p>但是最终反应的是，<strong>访问频率这一指标</strong></p>
+</li>
+</ul>
+<h3 id="内存淘汰策略选择"><a href="#内存淘汰策略选择" class="headerlink" title="内存淘汰策略选择"></a>内存淘汰策略选择</h3><p>我们来讨论讨论这个策略的选择</p>
+<ul>
+<li><p>首先，要明确的是内存淘汰原则上在项目里不应该发生</p>
+<p>因为一般公司都应该有一个监控系统，如果redis内存达到80%就会告警，这个时候就应该扩容了</p>
+</li>
+<li><p>但是仍然会有发生内存满的情况，此时内存淘汰策略应该是一种兜底方案，发生内存满的特殊情况我认为可以分为两种</p>
+<ul>
+<li><p>一种是大key直接把redis塞满，这样就没有到80%的过程，而是直接从70%到爆满</p>
+<p>那这种只能是编码问题了，比如大V的粉丝不能用set直接放进去等等</p>
+<p>对于这种情况，一般不设置缓存策略，塞满了应该直接报错而不是把大key塞进去，从而影响其他key的使用，比如存在的key被清掉或者其他key放不进来</p>
+<p>通过报错，来解决大key的问题</p>
+</li>
+<li><p>另一种，就是并发过大，发现告警到扩容来不及了，三秒塞满</p>
+<p>这种情况，都是因为Redis作为缓存来用的，我们来想一想缓存的特性</p>
+<p>首先一定是设置过期时间的，其次缓存是为最近需要使用的数据而准备的，因此我们肯定是选择volatile</p>
+<p>但是是lru还是lfu这个倒是都可以，因为Redis的LFU是基于频率的，而不是次数的，因此LFU也可以</p>
+</li>
+</ul>
+<p><strong>总的来说，对于不是大并发的情况，可以不设置淘汰策略，避免大key导致的其他key异常</strong></p>
+<p><strong>对于，Redis作为缓存的情况，可以使用volatile+LRU或者volatile+LFU</strong></p>
+</li>
+</ul>
+<h2 id="缓存击穿、缓存雪崩、缓存穿透"><a href="#缓存击穿、缓存雪崩、缓存穿透" class="headerlink" title="缓存击穿、缓存雪崩、缓存穿透"></a>缓存击穿、缓存雪崩、缓存穿透</h2><p>这个是烂大街的八股了，但是我在这里会做最简洁的总结以及实现一些方案，不能光理论</p>
+<p>这里有一点需要提一下，在Redis中有一个<strong>双key策略</strong>，在缓存雪崩的解决方案中，就可以使用这个</p>
+<p>双key策略更可以看成是一种降级的方式，为了防止redis同一时间大量key同时过期，可以对一些热点key设置一个永不过期的key，这个key在发现设置过期时间的key过期后，直接拿来使用，而不是走数据库</p>
+<blockquote>
+<p>在高并发期间，任何的高并发打到数据库都是无法想象的</p>
+</blockquote>
+<p>包括在高并发的搜索，也是走的Redis，一般使用list来实现，而不是String</p>
+<p>因为String的解析是十分耗时的，而为了防止list失效，我们可以用一个String的数据来作为备用key，这也是一种双key策略</p>
+<h2 id="热点key的解决方案"><a href="#热点key的解决方案" class="headerlink" title="热点key的解决方案"></a>热点key的解决方案</h2><p>热key问题，也是频繁的问的一个问题，但是很多人，都会忽略嗅探，只背一个些鸡肋的解决方案，殊不知，嗅探热点key才是王道!</p>
+<h3 id="什么是热点key"><a href="#什么是热点key" class="headerlink" title="什么是热点key"></a>什么是热点key</h3><p>虽然采用了集群部署，但是对于某一个key的高并发访问，最终压力还是打到了单一Redis节点上</p>
+<p>仅仅靠读写分离肯定是够呛的，因此解决热点key问题也是十分必要的</p>
+<p>解决热点key有两个步骤：嗅探热点key、解决热点key</p>
+<h3 id="嗅探热点key"><a href="#嗅探热点key" class="headerlink" title="嗅探热点key"></a>嗅探热点key</h3><ul>
+<li><p><strong>流量监控</strong></p>
+<p>因为热点key本质是流量&#x2F;数据倾斜，比如阿里云中，就可以监控某台机器是否资源快速上升，而他资源没有，可能就是热点key问题</p>
+<p>但是具体是哪个热点key还是不知道</p>
+</li>
+<li><p><strong>客户端统计</strong></p>
+<p>当使用比如Java的Jedis客户端连接的时候，可以在发送请求前打个日志，然后通过实时计算聚合统计，精准找到热点key</p>
+<p>至于实时计算，一般可以使用Flink等这种大数据流式计算的方式</p>
+</li>
+</ul>
+<h3 id="解决热点key"><a href="#解决热点key" class="headerlink" title="解决热点key"></a>解决热点key</h3><p>当嗅探到热点key，一般当key的qps到1000的时候就需要关注热点key问题了，怎么解决呢？</p>
+<ul>
+<li><p><strong>引入本地缓存</strong></p>
+<p>本地缓存的延迟为纳秒级，只要JVM能扛住，就不是问题</p>
+<p>但是引入本地缓存后，一致性问题的解决还是比较麻烦的</p>
+</li>
+<li><p><strong>离散热点key</strong></p>
+<p>将同一个key分成多份，然后存到不同的redis节点上</p>
+<p>比如，通过给key拼装ip或者mac地址，使得热点key离散</p>
+<p>但是这样做，一旦缓存更新，就会更新多个key，万一没有完全覆盖，就出问题了</p>
+</li>
+</ul>
+<h2 id="BigKey的解决方案"><a href="#BigKey的解决方案" class="headerlink" title="BigKey的解决方案"></a>BigKey的解决方案</h2><h3 id="什么是big-key"><a href="#什么是big-key" class="headerlink" title="什么是big key"></a>什么是big key</h3><p>一般来说，对于string类型来说，一个key大概超过10KB，就可以当作大key</p>
+<p>对于list hash set zset二级数据结构来说，超过1000个，就是大key</p>
+<p>一旦Redis中存在big key：</p>
+<ul>
+<li><p>就会导致节点的内存占用太大，导致节点还没存啥，就开始内存淘汰策略了</p>
+</li>
+<li><p>当key过大时，网络IO问题就是很难受了，即使Redis采用了多线程，但是要是输出缓冲区不够，那可就寄了</p>
+</li>
+<li><p>删除阻塞，如果使用del同步删除，那会很慢从而阻塞其他命令，一般都会用unlink的后台删除</p>
+</li>
+</ul>
+<p>一般来说big key的产生主要都是开发问题，比如大V的粉丝列表、很大的缓存数据直接转json丢进去</p>
+<h3 id="解决big-key"><a href="#解决big-key" class="headerlink" title="解决big key"></a>解决big key</h3><p>同样big key的解决也是分两步：嗅探+解决</p>
+<ul>
+<li><p><strong>嗅探big key</strong></p>
+<ul>
+<li>Redis自己就提供嗅探big key的策略，使用–bigkeys来查看，但是这个命令会扫描全节点，最好还是<strong>用从节点</strong>，不要走主节点影响写阻塞</li>
+<li>或者，和嗅探热点key一样，走jedis客户端，打日志然后分析</li>
+</ul>
+</li>
+<li><p><strong>解决bigkey</strong></p>
+<ul>
+<li><p>对于删除操作，直接使用unlink异步删除，而不是del同步删除</p>
+</li>
+<li><p>选择合适的数据结构，对于多字段的大对象，可以采用hash而不是string</p>
+<p>set这种考虑使用bitmap来解决</p>
+</li>
+<li><p>优化存储架构</p>
+<p>比如对于大V的粉丝可以用bitmap方式，特殊处理，而不是直接作为Set塞进去</p>
+</li>
+</ul>
+</li>
+</ul>
 
                 
               </div>
@@ -505,8 +535,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>数据存储问题</div>
-      <div>http://example.com/2024/07/20/八股/2024-07-20-数据存储问题/</div>
+      <div>缓存应用问题</div>
+      <div>http://example.com/2024/08/02/八股/2024-08-02-缓存应用问题/</div>
     </div>
     <div class="license-meta">
       
@@ -518,7 +548,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月20日</div>
+          <div>2024年8月2日</div>
         </div>
       
       
@@ -550,9 +580,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/29/%E5%85%AB%E8%82%A1/2024-07-29-%E5%AD%97%E8%8A%82%E7%A0%81%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" title="字节码和类加载器">
+                      <a href="/2024/08/04/%E5%85%AB%E8%82%A1/2024-08-04-Java%20SE%E8%AF%A6%E8%A7%A3/" title="Java SE详解">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">字节码和类加载器</span>
+                        <span class="hidden-mobile">Java SE详解</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -560,8 +590,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/18/%E5%85%AB%E8%82%A1/2024-07-20-%E6%95%B0%E6%8D%AE%E5%8E%BB%E9%87%8D%E9%97%AE%E9%A2%98/" title="数据去重问题">
-                        <span class="hidden-mobile">数据去重问题</span>
+                      <a href="/2024/07/29/%E5%85%AB%E8%82%A1/2024-07-29-%E5%AD%97%E8%8A%82%E7%A0%81%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" title="字节码和类加载器">
+                        <span class="hidden-mobile">字节码和类加载器</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
