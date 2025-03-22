@@ -16,19 +16,25 @@
   <meta name="author" content="Zenith Wang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="RAG技术">
+    <meta name="description" content="RAG技术基本架构一个基本的RAG（Retrieval-Augmented Generation）架构如下：     RAG技术包括两个重要模块：generator（生成器） 和 retriever（检索器）：  retriever：通过用户的query，根据检索算法找到top k相关的信息  sparse retriever：通过统计文本中的关键词（token），来找到相关文案 dense re">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RAG技术">
 <meta property="og:url" content="http://example.com/2025/03/22/LLM/2025-03-22-RAG%E6%8A%80%E6%9C%AF/index.html">
 <meta property="og:site_name" content="Zenith&#39; Blog">
-<meta property="og:description" content="RAG技术">
+<meta property="og:description" content="RAG技术基本架构一个基本的RAG（Retrieval-Augmented Generation）架构如下：     RAG技术包括两个重要模块：generator（生成器） 和 retriever（检索器）：  retriever：通过用户的query，根据检索算法找到top k相关的信息  sparse retriever：通过统计文本中的关键词（token），来找到相关文案 dense re">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221516137.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221523976.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221621840.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221613173.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221615647.png">
 <meta property="article:published_time" content="2025-03-22T07:36:22.000Z">
-<meta property="article:modified_time" content="2025-03-22T07:01:46.904Z">
+<meta property="article:modified_time" content="2025-03-22T08:45:56.734Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="LLM">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221516137.png">
   
   
   
@@ -250,7 +256,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3 字
+          609 字
         
       </span>
     
@@ -261,7 +267,7 @@
         
         
         
-          1 分钟
+          6 分钟
         
       </span>
     
@@ -311,7 +317,67 @@
             
               <div class="markdown-body">
                 
-                <h1 id="RAG技术"><a href="#RAG技术" class="headerlink" title="RAG技术"></a>RAG技术</h1>
+                <h1 id="RAG技术"><a href="#RAG技术" class="headerlink" title="RAG技术"></a>RAG技术</h1><h2 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h2><p>一个基本的RAG（Retrieval-Augmented Generation）架构如下：</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221516137.png" srcset="/img/loading.gif" lazyload alt="image-20250322151602991" style="zoom: 33%;" />
+
+
+
+<p>RAG技术包括两个重要模块：generator（生成器） 和 retriever（检索器）：</p>
+<ul>
+<li><p>retriever：通过用户的query，根据检索算法找到top k相关的信息</p>
+<ul>
+<li>sparse retriever：通过统计文本中的关键词（token），来找到相关文案</li>
+<li>dense retirver：通过embedding模型，获取chunk的稠密向量，然后计算向量的相似度</li>
+</ul>
+</li>
+<li><p>generator：就是现在的LLM，基于检索的信息和用户的query，生成答案</p>
+<ul>
+<li>transformer-based：目前主流的text2text的模型架构，比如deepseek、qwen、llama等</li>
+<li>diffusion-based：主要用于text2img的应用，适用于img生成</li>
+</ul>
+</li>
+</ul>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221523976.png" srcset="/img/loading.gif" lazyload alt="image-20250322152307931" style="zoom: 50%;" />
+
+<h2 id="RAG技术的范式"><a href="#RAG技术的范式" class="headerlink" title="RAG技术的范式"></a>RAG技术的范式</h2><p>RAG的基本技术范式主要可以分为四种：query-based、latent representation-based、logit-based、speculative</p>
+<p>这四种范式对于如何使用用户query和检索出来的info，有着不同的基本方法</p>
+<p><img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221621840.png" srcset="/img/loading.gif" lazyload alt="image-20250322162154789"></p>
+<h3 id="query-based"><a href="#query-based" class="headerlink" title="query-based"></a>query-based</h3><p>query-based是最为常见的方法，简单来说就是直接将info和query扔到一个prompt template中，作为generator的输入</p>
+<p>比较牛逼的方法有：</p>
+<ul>
+<li><p>Self-rag: Learning to retrieve, generate, and critique through self-reflection（ICLR’24）</p>
+<p>通过一种自己评判的模块，来决定是否还需要检索，以及检索出来的info是否需要</p>
+<p>其实就是通过几个特殊符号来做</p>
+</li>
+<li><p>RNG-KBQA: generation augmented iterative ranking for knowledge base question answering (ACL’22)</p>
+</li>
+</ul>
+<h3 id="latent-representation-based"><a href="#latent-representation-based" class="headerlink" title="latent representation-based"></a>latent representation-based</h3><p>这个它和query-based不太一样，它不是将info显示的放到generator的input中</p>
+<p>通过使用encoder-decoder架构的transformer model，有两种latent representation-based的解决方案：</p>
+<ul>
+<li><p>Leveraging Passage Retrieval with Generative Modelsfor Open Domain Question Answering （EACL’21）</p>
+<p>对于每个query+info的组合使用单独的encoder，然后concat后，放入decoder解码</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221613173.png" srcset="/img/loading.gif" lazyload alt="image-20250322161306138" style="zoom:67%;" />
+</li>
+<li><p>Improving language models by retrieving from trillions of tokens （ICML’22）</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221615647.png" srcset="/img/loading.gif" lazyload alt="image-20250322161537600" style="zoom:50%;" /></li>
+</ul>
+<p>总结下来就是通过encoder，将info和query整合到decoder的latent变量中，然后利用decoder来做seq2seq</p>
+<h3 id="other"><a href="#other" class="headerlink" title="other"></a>other</h3><p>query是在输入做prompt，latent是在encoder-decoder中间的latent中做，那么logit就是在decoder中做</p>
+<p>另外speculative rag就不说了</p>
+<p>对于目前的LLM来说，可以看到主流model都是decoder-only架构，所以我们还是多做一些对于query-based rag的研究</p>
+<h2 id="RAG的优化"><a href="#RAG的优化" class="headerlink" title="RAG的优化"></a>RAG的优化</h2><p>对于RAG可以做优化的地方，可以分为五大类：input, retriever, generator, result, entire pipeline</p>
+<p>其中retriever和generator的enhancement是很重要的</p>
+<h3 id="Input-Enhancement"><a href="#Input-Enhancement" class="headerlink" title="Input Enhancement"></a>Input Enhancement</h3><p>输入增强可以分为两类，一个是query增强一个是数据增强</p>
+<ul>
+<li><p>query enhancement：通过改写用户的query来获得更好的检索效果</p>
+<p>有的是丰富用户的query，使得query包含更多的信息</p>
+<p>而有的是分解query为多个sub-query，然后整合结果得到更好的output，如：《Rq-rag: Learning to refine queries for retrieval augmented generation》</p>
+</li>
+<li><p>data augmentation：对于document数据的增强，或者说是预处理</p>
+</li>
+</ul>
+<h3 id="Retriver-Enhancement"><a href="#Retriver-Enhancement" class="headerlink" title="Retriver Enhancement"></a>Retriver Enhancement</h3>
                 
               </div>
             
