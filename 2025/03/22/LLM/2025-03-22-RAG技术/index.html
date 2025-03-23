@@ -28,8 +28,12 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221621840.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221613173.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503221615647.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231459084.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231503044.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231453386.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231556533.png">
 <meta property="article:published_time" content="2025-03-22T07:36:22.000Z">
-<meta property="article:modified_time" content="2025-03-22T08:45:56.734Z">
+<meta property="article:modified_time" content="2025-03-23T09:23:58.788Z">
 <meta property="article:author" content="Zenith Wang">
 <meta property="article:tag" content="个人笔记">
 <meta property="article:tag" content="LLM">
@@ -256,7 +260,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          609 字
+          1.8k 字
         
       </span>
     
@@ -267,7 +271,7 @@
         
         
         
-          6 分钟
+          15 分钟
         
       </span>
     
@@ -366,18 +370,129 @@
 <h3 id="other"><a href="#other" class="headerlink" title="other"></a>other</h3><p>query是在输入做prompt，latent是在encoder-decoder中间的latent中做，那么logit就是在decoder中做</p>
 <p>另外speculative rag就不说了</p>
 <p>对于目前的LLM来说，可以看到主流model都是decoder-only架构，所以我们还是多做一些对于query-based rag的研究</p>
+<h2 id="CoT"><a href="#CoT" class="headerlink" title="CoT"></a>CoT</h2><p>CoT: Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (NIPS’22)</p>
+<p>当时这篇论文发出来，其实就是为了解决大模型在复杂推理方面欠缺的能力，他发现如果在模型推理的时候能够在prompt中加入一些推理能力就可以使其达到很好的推理效果</p>
+<p>比如对于zero-shot场景，单纯的加一句”Let’s think step by step”，就可以让LLM不会瞎做数学题。衍射到现在的LLM产品来看，比如deepseek、chatGpt的深度思考其实就是CoT的一种体现</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231459084.png" srcset="/img/loading.gif" lazyload alt="image-20250323145946967" style="zoom:50%;" />
+
+<p>当面对few-shot的场景的时候，CoT的输入可以进一步看作example+instruction+reason的一套体系</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231503044.png" srcset="/img/loading.gif" lazyload alt="image-20250323150308917" style="zoom:50%;" />
+
+<p>这篇论文发表后，ref已经到1w多了，也延伸出了大量的研究，具体可以分为三类分别是prompt、inference、application</p>
+<blockquote>
+<p>要注意的是，CoT其实并不使用小模型（20B以下），小模型使用CoT很有可能会出现幻觉的情况</p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231453386.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom: 33%;" />
+
+<h3 id="Prompt"><a href="#Prompt" class="headerlink" title="Prompt"></a>Prompt</h3><p>Pormpt在CoT上的研究可以分为两种，一种是手工构建，一种是auto的</p>
+<ul>
+<li><p>手工模式</p>
+<p>手工模式最典型的就是plan-and-solve prompt</p>
+<p>Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models（ACL’23）</p>
+<p>简单来说就是人工将要解决的问题分解为多个sub-steps，然后让模型去一步一步解决</p>
+</li>
+<li><p>auto模式</p>
+<p>当面对复杂问题时候，其实我们往往都不知道应当如何拆分任务，那么自动指令就显得很重要了</p>
+<ol>
+<li>Large Language Models are Human-Level Prompt Engineers（ICLR’23）APE</li>
+<li>Large Language Models as Optimizers（ICLR’24）OPRO</li>
+</ol>
+<p>其实二者的核心思想都是通过大模型来生成最合适的prompt</p>
+</li>
+</ul>
+<h3 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h3><p>这块的研究就是对于CoT中的reason做的研究，即CoT中的chain到底是什么形式</p>
+<ol>
+<li><p>Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks（TMLR’24）</p>
+<p>直接生成解决问题的代码，在解释器中运行，根据运行结果生成output（感觉有点像Manus的解决方法）</p>
+</li>
+<li><p>Tab-CoT: Zero-shot Tabular Chain of Thought（ACL’23）</p>
+</li>
+<li><p>Tree of Thoughts: Deliberate Problem Solving with Large Language Models（NIPS’23）</p>
+</li>
+<li><p>Graph of Thoughts: Solving Elaborate Problems with Large Language Models（AAAI’24）</p>
+</li>
+</ol>
+<p>除了这些各种xxx-of-thought以外，还有的比如会通过迭代提问的方式，让大模型自己迭代的向自己提问，就比如RAG中迭代检索的方案ReACT就是利用了CoT的思想</p>
+<p>应用这块就不谈了，这里主要是讲RAG，CoT的应用就不再赘述</p>
 <h2 id="RAG的优化"><a href="#RAG的优化" class="headerlink" title="RAG的优化"></a>RAG的优化</h2><p>对于RAG可以做优化的地方，可以分为五大类：input, retriever, generator, result, entire pipeline</p>
 <p>其中retriever和generator的enhancement是很重要的</p>
 <h3 id="Input-Enhancement"><a href="#Input-Enhancement" class="headerlink" title="Input Enhancement"></a>Input Enhancement</h3><p>输入增强可以分为两类，一个是query增强一个是数据增强</p>
 <ul>
 <li><p>query enhancement：通过改写用户的query来获得更好的检索效果</p>
-<p>有的是丰富用户的query，使得query包含更多的信息</p>
-<p>而有的是分解query为多个sub-query，然后整合结果得到更好的output，如：《Rq-rag: Learning to refine queries for retrieval augmented generation》</p>
+<ol>
+<li><p>有的是丰富用户的query，使得query包含更多的信息</p>
+</li>
+<li><p>分解query为多个sub-query，然后整合结果得到更好的output</p>
+</li>
+</ol>
+<p>Rq-rag: Learning to refine queries for retrieval augmented generation（COLM’24）</p>
 </li>
 <li><p>data augmentation：对于document数据的增强，或者说是预处理</p>
 </li>
 </ul>
-<h3 id="Retriver-Enhancement"><a href="#Retriver-Enhancement" class="headerlink" title="Retriver Enhancement"></a>Retriver Enhancement</h3>
+<h3 id="Retriver-Enhancement"><a href="#Retriver-Enhancement" class="headerlink" title="Retriver Enhancement"></a>Retriver Enhancement</h3><p>RAG中检索的内容是十分重要的一环，如果检索的info质量不高，那么就会出现大模型乱回答或者出现幻觉的情况</p>
+<p>因此，检索的优化技术是RAG中十分重要的一环</p>
+<ul>
+<li><p>Recursive Retrieval</p>
+<p>通过多次检索或者说多轮的rag pipeline，来提高最终检索info的质量</p>
+<p>典型的就是React: Synergizing reasoning and acting in language models（ICLR’23）</p>
+<p>这篇文章可以说是agent的鼻祖，文章认为CoT尽管很强，但是由于推理过程仍然是一种黑盒状态，人类无法干预，因此很容易出现幻觉等现象，而React将推理和交互融合起来（agent的雏形）</p>
+<p>简单来说，具体思想就是，thought+search+info这样的pipeline多走几轮</p>
+<p>在tool-llm中，search可以认为是调各种api的操作，而在rag中search其实就是retriver做的事情</p>
+<img src="https://raw.githubusercontent.com/ZenithWon/figure/master/202503231556533.png" srcset="/img/loading.gif" lazyload alt="image-20250323155618420" style="zoom:33%;" />
+
+
+</li>
+<li><p>Chunk Optimization</p>
+<p>LLammaIndex提供了很多切割的方法，比如给定chunk size的切割</p>
+<p>对于markdown、html这种自带标签属性的文本，可以直接根据标签切割</p>
+<p>比如markdown可以基于标题切割</p>
+</li>
+<li><p>Retriever Finetuning</p>
+<p>这个其实就是对于embedding模型，在某些特定domain-specific的数据集上做微调</p>
+</li>
+<li><p>Hybrid Retrieval</p>
+<p>通过使用多种检索方法或者多个数据源来做检索</p>
+<ol>
+<li><p>Retrieval-Augmented Score Distillation for Text-to-3D Generation（ICML’24）</p>
+<p>从text和img两个数据源去做检索</p>
+</li>
+<li><p>Reacc: A retrieval-augmented code completion framework（ACL’22）</p>
+<p>利用稀疏检索和稠密检索同时去做，好像code这块很多这样做的</p>
+<p>稀疏检索来找语法层面的，稠密检索来找语义层面的</p>
+</li>
+</ol>
+</li>
+<li><p>Re-ranking</p>
+<p>顾名思义，对检索的info进行重排序。由于检索出来的info不一定语义上和query有相关性，因此对于检索出来的info需要做re-rank</p>
+</li>
+</ul>
+<h3 id="Generator-Enhancement"><a href="#Generator-Enhancement" class="headerlink" title="Generator Enhancement"></a>Generator Enhancement</h3><p>generator的优化决定了输出文本的能力，即使有了很好的info，generator能力不行还是无法达到很好的效果</p>
+<ul>
+<li>prompt engineering</li>
+<li>finetuning</li>
+</ul>
+<h3 id="Result-Enhancement"><a href="#Result-Enhancement" class="headerlink" title="Result Enhancement"></a>Result Enhancement</h3><p>对结果进行优化，其实就是output rewrite</p>
+<h3 id="Pipeline-Enhancement"><a href="#Pipeline-Enhancement" class="headerlink" title="Pipeline Enhancement"></a>Pipeline Enhancement</h3><ul>
+<li><p>Adaptive retrieval</p>
+<p>在rag的时候其实有的时候并不需要做检索，比如，我仅仅只是发一个”hello”，难道也需要去做检索吗？</p>
+<p>为了评判是否需要做retrieve，有两种方式</p>
+<ol>
+<li><p>rule-based，利用一些规则去做adaptive retrieve</p>
+<p>Active Retrieval Augmented Generation（EMNLP’23）</p>
+<p>通过概率算法来做决策</p>
+</li>
+<li><p>model-based，利用模型来做</p>
+<p>SELF-RAG就是这样的，其中的continue标签就是用来决策是否要去retrieve</p>
+</li>
+</ol>
+</li>
+<li><p>Iterative RAG</p>
+<p>通过反复的检索+生成来逐步优化最终答案，其实就是react的解决方法</p>
+<p>cot+rag+iterative</p>
+</li>
+</ul>
+
                 
               </div>
             
